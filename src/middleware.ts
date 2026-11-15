@@ -60,14 +60,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return context.redirect("/maintenance/", 307);
   }
 
-  context.cookies.set("lang", context.locals.lang, {
-    path: "/",
-    maxAge: 60 * 60 * 24 * 365,
-    sameSite: "lax",
-    httpOnly: true,
-    secure: context.url.protocol === "https:",
-  });
-
   const isPublicAssetOrApi =
     routePath.startsWith("/api/") ||
     routePath.startsWith("/_astro/") ||
@@ -93,6 +85,16 @@ export const onRequest = defineMiddleware(async (context, next) => {
     // and auth endpoints can report their own actionable errors.
     return isEnglish ? next(basePath + search) : next();
   }
+
+  // Public API responses must not emit a language Set-Cookie header:
+  // it prevents shared CDN caching for otherwise public, cacheable responses.
+  context.cookies.set("lang", context.locals.lang, {
+    path: "/",
+    maxAge: 60 * 60 * 24 * 365,
+    sameSite: "lax",
+    httpOnly: true,
+    secure: context.url.protocol === "https:",
+  });
 
   let user: User | null = null;
 
