@@ -80,10 +80,10 @@ try {
 
   <main id="main-content">
     <Hero
-      kicker="Renanime's"
-      title="Gallery."
-      copy={isEnglish ? "Anime through my eyes.\nThis is my gift to you." : "Anime a través de mis ojos.\nEste es mi regalo para ti."}
-      ariaLabel={isEnglish ? "Renanime's Gallery" : "Galería de Renanime"}
+      kicker=""
+      title="Renanime World"
+      copy=""
+      ariaLabel="Renanime World"
     />
 
     <section class="home-gallery-section" aria-label={isEnglish ? "Ren's collection" : "Colección de Ren"}>
@@ -161,6 +161,11 @@ try {
   :global(.hero) {
     margin: 0;
     padding: 0;
+  }
+
+  :global(.hero-kicker:empty),
+  :global(.hero-copy:empty) {
+    display: none;
   }
 
   @media (max-width: 1120px) {
