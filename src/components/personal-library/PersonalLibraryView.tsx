@@ -119,7 +119,7 @@ export default function PersonalLibraryView({mode,lang="es"}:Props){
     </div>:<div className="personal-library-empty">
       <strong>{mode==="WATCHED"?t("library.emptyWatchedTitle"):t("library.emptyPendingTitle")}</strong>
       <span>{mode==="WATCHED"?t("library.emptyWatchedCopy"):t("library.emptyPendingCopy")}</span>
-      <a className="personal-library-empty-cta" href={lang === "en" ? "/en/search/" : "/search/"}>{mode==="WATCHED"?t("library.explore"):t("library.findSomething")}</a>
+      <a className="personal-library-empty-cta" href={lang === "en" ? "/en/buscar/" : "/buscar/"}>{mode==="WATCHED"?t("library.explore"):t("library.findSomething")}</a>
     </div>}
 
     {hasMore&&<button type="button" className="personal-library-load-more" onClick={()=>setVisible(value=>Math.min(value+PAGE_SIZE,entries.length))}>{t("library.loadMore").replace("{count}",String(entries.length-visible))}</button>}

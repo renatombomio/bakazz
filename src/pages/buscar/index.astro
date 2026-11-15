@@ -1,0 +1,22 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Navbar from "../../components/layout/Navbar.astro";
+import SearchView from "../../components/search/SearchView";
+import { useT } from "../../i18n";
+const t = useT(Astro.locals.lang);
+---
+
+<Layout title={`${t("search.pageTitle")} — Renanime World`}>
+  <Navbar />
+  <main id="main-content" class="search-page">
+    <div class="search-page-inner">
+      <h1 class="sr-only">{t("search.heading")}</h1>
+      <SearchView lang={Astro.locals.lang} client:load />
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .search-page { min-height: 60vh; padding-block: clamp(6rem, 11vw, 10rem) var(--section-space); }
+  .search-page-inner { width: min(calc(100% - (var(--gutter) * 2)), var(--container-max)); margin-inline: auto; }
+</style>

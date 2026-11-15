@@ -6,8 +6,7 @@ interface Props { variant?: "default" | "ghibli"; lang: Lang; showLogout?: boole
 const links = [
   { key: "nav.home", href: "/" },
   { key: "nav.renCollection", href: "/ren-collection/" },
-  { key: "nav.renGenres", href: "/genres/" },
-  { key: "nav.search", href: "/search/" },
+  { key: "nav.search", href: "/buscar/" },
   { key: "nav.profile", href: "/profile/" },
   { key: "nav.community", href: "/community/" },
   { key: "nav.renSecret", href: "/ghibli/" }

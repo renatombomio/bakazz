@@ -1,31 +1,8 @@
 ---
-import Layout from "../../layouts/Layout.astro";
-import { useT } from "../../i18n";
-import Navbar from "../../components/layout/Navbar.astro";
-import Container from "../../components/ui/Container.astro";
-import GenresView from "../../components/genres/GenresView";
-const t = useT(Astro.locals.lang);
+import { localizedPath } from "../../i18n";
+const lang = Astro.locals.lang;
+const genres = Astro.url.searchParams.getAll("genre").map((value) => value.trim()).filter(Boolean);
+const target = new URL(localizedPath(lang, "/buscar/"), Astro.url);
+if (genres.length) target.searchParams.set("genre", genres.join(","));
+return Astro.redirect(target.pathname + target.search, 301);
 ---
-
-<Layout title={`${t("genres.pageTitle")} — Renanime's Gallery`}>
-  <Navbar />
-  <main id="main-content" class="genres-page">
-    <Container>
-      <h1 class="sr-only">{t("genres.heading")}</h1>
-      <div class="genres-page-content">
-        <GenresView lang={Astro.locals.lang} client:load />
-      </div>
-    </Container>
-  </main>
-</Layout>
-
-<style>
-  .genres-page {
-    min-height: 70vh;
-    padding-block: clamp(6rem, 11vw, 10rem) var(--section-space);
-  }
-
-  .genres-page-content {
-    margin-top: 0;
-  }
-</style>
