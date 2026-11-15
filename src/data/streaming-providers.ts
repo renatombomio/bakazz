@@ -1,6 +1,8 @@
 export type StreamingProvider = { name: string; logo: string; url: string };
 export type StreamingAvailability = { region: "ES"; checkedAt: string; sourceUrl: string; providers: StreamingProvider[] };
-const logo = (slug: string) => `https://cdn.simpleicons.org/${slug}/ffffff`;
+const logo = (slug: string) => slug === "primevideo"
+  ? "https://cdn.jsdelivr.net/npm/simple-icons@16.9.0/icons/primevideo.svg"
+  : `https://cdn.simpleicons.org/${slug}/ffffff`;
 
 // Catálogo editorial estático por ID estable de la colección de Ren.
 export const streamingAvailability: Record<string, StreamingAvailability> = {
