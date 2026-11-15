@@ -76,7 +76,7 @@ export default function BookshelfSelection({ items, lang }: Props) {
         .book-preview-copy a { display: inline-flex; padding: .65rem 1rem; border-radius: 999px; background: #ec4899; color: #fff; font-size: .8rem; font-weight: 650; }
         @media (min-width: 700px) { .bookshelf-grid { grid-template-columns: repeat(14, minmax(0, 1fr)); } }
         @media (min-width: 1100px) { .bookshelf-grid { grid-template-columns: repeat(18, minmax(0, 1fr)); } }
-        @media (prefers-reduced-motion: reduce) { .book-spine { transition: none; } }
+        @media (prefers-reduced-motion: reduce) { .book-spine, .book-spine:hover, .book-spine.is-selected { transition: none; transform: none; } }
       `}</style>
     </div>
   );
