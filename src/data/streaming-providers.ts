@@ -316,6 +316,22 @@ export const streamingAvailability: Record<string, StreamingAvailability> = {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/sousou-no-frieren",
     providers: [provider.netflix, provider.crunchyroll],
   },
+  "personal-021": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/katekyo-hitman-reborn",
+    providers: [provider.crunchyroll],
+  },
+  "personal-024": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/blue-exorcist",
+    providers: [provider.crunchyroll],
+  },
+  "personal-056": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/tensei-shitara-slime-datta-ken",
+    providers: [provider.netflix, provider.crunchyroll],
+  },
+  "personal-116": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/hijos-de-las-ballenas",
+    providers: [provider.netflix],
+  },
   "personal-119": {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/kaiju-no-8",
     providers: [provider.crunchyroll],
