@@ -5,13 +5,12 @@ import { CategoryRail, ResultsList, type DisplayMedia } from "./SearchDisplay";
 interface Media {
   id: number;
   title?: { romaji?: string | null; english?: string | null };
-  coverImage?: { extraLarge?: string | null; large?: string | null };
+  coverImage?: { extraLarge?: string | null; large?: string | null; color?: string | null };
   format?: string | null;
   startDate?: { year?: number | null } | null;
   genres?: string[];
   episodes?: number | null;
   averageScore?: number | null;
-  coverImage?: { extraLarge?: string | null; large?: string | null; color?: string | null };
 }
 type Status = "FINISHED" | "RELEASING";
 interface Filters { genres: string[]; year: string; status: Status | ""; }
