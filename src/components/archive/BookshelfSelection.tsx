@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import type { Lang } from "../../i18n";
+import type { CSSProperties } from "react";
+import { useT, type Lang } from "../../i18n";
 import type { RenCollectionItem } from "../../lib/ren-collection";
 
 interface Props { items: RenCollectionItem[]; lang: Lang; }
@@ -20,9 +21,10 @@ function readableText(hex: string) {
 }
 
 export default function BookshelfSelection({ items, lang }: Props) {
+  const t = useT(lang);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selected = useMemo(() => items.find((item) => item.animeId === selectedId) ?? null, [items, selectedId]);
-  const viewLabel = lang === "en" ? "View anime" : "Ver ficha";
+  const viewLabel = t("renCollection.view");
 
   return (
     <div className="bookshelf">
@@ -37,10 +39,10 @@ export default function BookshelfSelection({ items, lang }: Props) {
               key={item.animeId}
               type="button"
               className={`book-spine${active ? " is-selected" : ""}`}
-              style={{ "--spine-color": color, "--spine-text": textColor, "--spine-height": `${height}px` } as React.CSSProperties}
+              style={{ "--spine-color": color, "--spine-text": textColor, "--spine-height": `${height}px` } as CSSProperties}
               aria-label={item.title}
               aria-pressed={active}
-              onClick={() => setSelectedId(active ? null : item.animeId)}
+              onClick={() => setSelectedId(item.animeId)}
               onMouseEnter={() => setSelectedId(item.animeId)}
               onFocus={() => setSelectedId(item.animeId)}
             >

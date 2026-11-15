@@ -226,5 +226,7 @@
   "renCollection.title": "Colección de Ren",
   "renCollection.recommended": "Los que recomiendo",
   "renCollection.watched": "También los he visto",
-  "renCollection.view": "Ver ficha"
+  "renCollection.view": "Ver ficha",
+  "renCollection.seriesWatched": "series vistas",
+  "renCollection.recommendedCount": "recomendadas"
 }

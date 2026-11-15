@@ -1,13 +1,14 @@
 ---
 import BookshelfSelection from "./BookshelfSelection";
 import type { RenCollectionItem } from "../../lib/ren-collection";
-import type { Lang } from "../../i18n";
+import { useT, type Lang } from "../../i18n";
 
 interface Props {
   items: RenCollectionItem[];
   lang: Lang;
 }
 const { items, lang } = Astro.props;
+const t = useT(lang);
 const recommended = items.filter((item) => item.recommended).sort((a, b) => b.popularity - a.popularity);
 const watched = items.filter((item) => !item.recommended);
 const featured = recommended.map((item, index) => ({
@@ -20,21 +21,19 @@ const totalCount = items.length;
 ---
 <div class="ren-collection">
   <header class="collection-heading">
-    <h1>{lang === "en" ? "Ren’s Collection" : "Colección de Ren"}</h1>
-    <p><strong>{totalCount}</strong> {lang === "en" ? "series watched" : "series vistas"} <span aria-hidden="true">·</span> <strong>{recommendedCount}</strong> {lang === "en" ? "recommended" : "recomendadas"}</p>
+    <h1>{t("renCollection.title")}</h1>
+    <p><strong>{totalCount}</strong> {t("renCollection.seriesWatched")} <span aria-hidden="true">·</span> <strong>{recommendedCount}</strong> {t("renCollection.recommendedCount")}</p>
   </header>
 
-  {#if recommendedCount > 0}
+  {recommendedCount > 0 && (
     <section class="recommendations" aria-labelledby="recommendations-heading">
-      <h2 id="recommendations-heading">{lang === "en" ? "My recommendations" : "Los que recomiendo"}</h2>
+      <h2 id="recommendations-heading">{t("renCollection.recommended")}</h2>
       <div class="poster-wall">
         {featured.map((item, index) => (
           <a
             class:list={["poster-tile", item.featured && "poster-tile--featured", item.featured && `poster-tile--${item.side}`]}
             href={item.href}
             aria-label={item.title}
-            title={item.featured ? undefined : item.title}
-            key={item.animeId}
           >
             {item.cover && <img src={item.cover} alt="" width="230" height="345" loading={index < 8 ? "eager" : "lazy"} decoding="async" />}
             {item.featured && <span class="poster-title">{item.title}</span>}
@@ -42,14 +41,14 @@ const totalCount = items.length;
         ))}
       </div>
     </section>
-  {/if}
+  )}
 
-  {#if watched.length > 0}
+  {watched.length > 0 && (
     <section class="watched" aria-labelledby="watched-heading">
-      <h2 id="watched-heading">{lang === "en" ? "Also watched" : "También los he visto"}</h2>
+      <h2 id="watched-heading">{t("renCollection.watched")}</h2>
       <BookshelfSelection items={watched} lang={lang} client:visible />
     </section>
-  {/if}
+  )}
 </div>
 
 <style>

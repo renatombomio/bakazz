@@ -226,5 +226,7 @@
   "renCollection.title": "Ren's Collection",
   "renCollection.recommended": "My recommendations",
   "renCollection.watched": "Also watched",
-  "renCollection.view": "View anime"
+  "renCollection.view": "View anime",
+  "renCollection.seriesWatched": "series watched",
+  "renCollection.recommendedCount": "recommended"
 }

@@ -2,6 +2,7 @@ import { getWatchedLibrary } from "../data/library";
 import identityCatalogue from "../data/ren-anime-identities.json";
 import coverManifest from "../data/ren-cover-manifest.json";
 import { getPersistentCache } from "./server/persistent-cache";
+import { localizedPath } from "../i18n";
 
 type Identity = {
   animeId: string;
@@ -84,14 +85,19 @@ export async function getRenCollectionItems(lang: "es" | "en"): Promise<RenColle
   const uniqueIds = [...new Set(ids)];
   const mediaById = new Map<number, AniListMedia>();
 
-  for (let offset = 0; offset < uniqueIds.length; offset += BATCH_SIZE) {
-    const batch = uniqueIds.slice(offset, offset + BATCH_SIZE);
+  const batches = Array.from({ length: Math.ceil(uniqueIds.length / BATCH_SIZE) }, (_, index) =>
+    uniqueIds.slice(index * BATCH_SIZE, (index + 1) * BATCH_SIZE),
+  );
+  const results = await Promise.all(batches.map(async (batch) => {
     try {
-      const media = await fetchAniListBatch(batch);
-      for (const item of media) mediaById.set(item.id, item);
+      return await fetchAniListBatch(batch);
     } catch (error) {
       console.warn("[ren-collection] AniList metadata unavailable:", error);
+      return [];
     }
+  }));
+  for (const result of results) {
+    for (const item of result) mediaById.set(item.id, item);
   }
 
   const items = candidates.flatMap((entry): RenCollectionItem[] => {
@@ -110,7 +116,7 @@ export async function getRenCollectionItems(lang: "es" | "en"): Promise<RenColle
     return [{
       animeId: entry.animeId,
       title,
-      href: `${lang === "en" ? "/en" : ""}/anime/${entry.animeId}/`,
+      href: localizedPath(lang, `/anime/${entry.animeId}/`),
       cover,
       color: media?.coverImage?.color || "#3a3a44",
       popularity: media?.popularity ?? 0,
