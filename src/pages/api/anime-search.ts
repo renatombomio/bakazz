@@ -166,20 +166,22 @@ async function filterAnime(genres:string[],year:string,status:string,q:string,pa
   const p=await anilist(query,variables);
   return {items:p.media,total:p.pageInfo?.total??0,hasNextPage:Boolean(p.pageInfo?.hasNextPage),source:"anilist"};
 }
+// Editorial discovery categories are intentionally restricted to 2024–2025.
+const DISCOVERY_AFTER = 20240000;
+const DISCOVERY_BEFORE = 20260000;
 async function discoveryAnime(page:number,perPage:number):Promise<Data> {
-  const firstYear=new Date().getFullYear()-2;
-  const query="query DiscoveryAnime($page:Int!,$perPage:Int!,$after:FuzzyDateInt!){Page(page:$page,perPage:$perPage){pageInfo{total hasNextPage} media(type:ANIME,sort:START_DATE_DESC,isAdult:false,startDate_greater:$after){"+FIELDS+"}}}";
-  const p=await anilist(query,{page,perPage,after:firstYear*10000});
+  const query="query DiscoveryAnime($page:Int!,$perPage:Int!,$after:FuzzyDateInt!,$before:FuzzyDateInt!){Page(page:$page,perPage:$perPage){pageInfo{total hasNextPage} media(type:ANIME,sort:START_DATE_DESC,isAdult:false,startDate_greater:$after,startDate_lesser:$before){"+FIELDS+"}}}";
+  const p=await anilist(query,{page,perPage,after:DISCOVERY_AFTER,before:DISCOVERY_BEFORE});
   return {items:p.media,total:p.pageInfo?.total??0,hasNextPage:Boolean(p.pageInfo?.hasNextPage),source:"anilist"};
 }
 async function gemsAnime(page:number,perPage:number):Promise<Data> {
-  const query="query HiddenGems($page:Int!,$perPage:Int!){Page(page:$page,perPage:$perPage){pageInfo{total hasNextPage} media(type:ANIME,sort:SCORE_DESC,isAdult:false,status:FINISHED,averageScore_greater:79,popularity_lesser:25000){"+FIELDS+"}}}";
-  const p=await anilist(query,{page,perPage});
+  const query="query HiddenGems($page:Int!,$perPage:Int!,$after:FuzzyDateInt!,$before:FuzzyDateInt!){Page(page:$page,perPage:$perPage){pageInfo{total hasNextPage} media(type:ANIME,sort:SCORE_DESC,isAdult:false,status:FINISHED,averageScore_greater:79,popularity_lesser:25000,startDate_greater:$after,startDate_lesser:$before){"+FIELDS+"}}}";
+  const p=await anilist(query,{page,perPage,after:DISCOVERY_AFTER,before:DISCOVERY_BEFORE});
   return {items:p.media,total:p.pageInfo?.total??0,hasNextPage:Boolean(p.pageInfo?.hasNextPage),source:"anilist"};
 }
 async function popularAnime(page:number,perPage:number):Promise<Data> {
-  const query="query PopularAnime($page:Int!,$perPage:Int!){Page(page:$page,perPage:$perPage){pageInfo{total hasNextPage} media(type:ANIME,sort:POPULARITY_DESC,isAdult:false){"+FIELDS+"}}}";
-  const p=await anilist(query,{page,perPage});
+  const query="query PopularAnime($page:Int!,$perPage:Int!,$after:FuzzyDateInt!,$before:FuzzyDateInt!){Page(page:$page,perPage:$perPage){pageInfo{total hasNextPage} media(type:ANIME,sort:POPULARITY_DESC,isAdult:false,startDate_greater:$after,startDate_lesser:$before){"+FIELDS+"}}}";
+  const p=await anilist(query,{page,perPage,after:DISCOVERY_AFTER,before:DISCOVERY_BEFORE});
   return {items:p.media,total:p.pageInfo?.total??0,hasNextPage:Boolean(p.pageInfo?.hasNextPage),source:"anilist"};
 }
 function loadGenres() {
@@ -255,7 +257,7 @@ export const GET:APIRoute=async({request})=>{
   const isSearch=q.length>=2;
   const isFiltered=genres.length>0||Boolean(year||status);
   const filterState={query:normalizedQuery,genres,year,status,page,perPage,popular};
-  const rawKey="v3:"+(discovery?"discovery:":gems?"gems:":popular?"popular:":isFiltered?"filters:":"search:")+JSON.stringify(filterState);
+  const rawKey="v4:"+(discovery?"discovery:":gems?"gems:":popular?"popular:":isFiltered?"filters:":"search:")+JSON.stringify(filterState);
   const key=await digest(rawKey);
   const localKey=key;
 
