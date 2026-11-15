@@ -1,9 +1,9 @@
 @import "tailwindcss";
 @import "./tokens.css";
 @import "./utilities.css";
-@import "./day-mode.css";
 
 html {
+  color-scheme: dark;
   overflow-y: auto;
   background: var(--color-ink-950);
   color: var(--color-paper-50);
@@ -15,6 +15,7 @@ html {
 }
 
 body {
+  color-scheme: dark;
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
