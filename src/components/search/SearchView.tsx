@@ -16,7 +16,7 @@ const PAGE_SIZE = 24;
 
 function readFilters(params: URLSearchParams): Filters {
   const rawGenres = params.get("genre") ?? "";
-  const genres = [...new Set(rawGenres.split(",").map((value) => value.trim()).filter(Boolean))];
+  const genres = [...new Set(rawGenres.split(",").map((value) => value.trim()).filter((value) => Boolean(value) && value !== "Hentai" && value !== "Ecchi"))];
   const year = params.get("year") ?? "";
   const status = params.get("status") ?? "";
   return {
@@ -56,6 +56,8 @@ export default function SearchView({ lang = "es" }: { lang?: Lang }) {
   const [error, setError] = useState(false);
   const [count, setCount] = useState<number | null>(null);
   const [countLoading, setCountLoading] = useState(false);
+  const [countError, setCountError] = useState(false);
+  const [countRetry, setCountRetry] = useState(0);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
 
@@ -142,6 +144,7 @@ export default function SearchView({ lang = "es" }: { lang?: Lang }) {
     if (!filtersOpen) return;
     const controller = new AbortController();
     setCount(null);
+    setCountError(false);
     setCountLoading(true);
     const timeout = window.setTimeout(() => {
       const params = buildParams(debouncedQuery || query, draft, 1, true);
@@ -153,11 +156,11 @@ export default function SearchView({ lang = "es" }: { lang?: Lang }) {
           return payload;
         })
         .then((payload) => setCount(Number(payload.total ?? 0)))
-        .catch((reason) => { if (reason?.name !== "AbortError") setCount(0); })
+        .catch((reason) => { if (reason?.name !== "AbortError") { setCount(null); setCountError(true); } })
         .finally(() => { if (!controller.signal.aborted) setCountLoading(false); });
     }, 250);
     return () => { window.clearTimeout(timeout); controller.abort(); };
-  }, [filtersOpen, draftKey, debouncedQuery, query]);
+  }, [filtersOpen, draftKey, debouncedQuery, query, countRetry]);
 
   const closePanel = useCallback(() => {
     setFiltersOpen(false);
@@ -239,7 +242,9 @@ export default function SearchView({ lang = "es" }: { lang?: Lang }) {
     );
   };
 
-  const buttonLabel = count === 0
+  const buttonLabel = countError
+    ? t("search.error")
+    : count === 0
     ? t("search.noResults")
     : countLoading || count === null
       ? t("search.seeLoading")
@@ -326,8 +331,9 @@ export default function SearchView({ lang = "es" }: { lang?: Lang }) {
                 <button type="button" className="sf-chip" aria-pressed={draft.status === "RELEASING"} onClick={() => updateStatus("RELEASING")}>{t("search.releasing")}</button>
               </div></section>
             </div>
-            <button type="button" className="sf-go" disabled={count === 0 || countLoading || count === null} onClick={applyFilters}>
-              {count === 0 ? t("search.noResults") : buttonLabel}
+            {countError && <button type="button" className="sf-clear" onClick={() => setCountRetry((value) => value + 1)}>Reintentar recuento</button>}
+            <button type="button" className="sf-go" disabled={count === 0 || countLoading || count === null || countError} onClick={applyFilters}>
+              {countError ? t("search.error") : count === 0 ? t("search.noResults") : buttonLabel}
             </button>
           </div>
         </div>

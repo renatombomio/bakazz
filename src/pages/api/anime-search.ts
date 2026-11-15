@@ -7,7 +7,7 @@ const PAGE_SIZE = 24;
 const MAX_PAGE = 10;
 const SEARCH_TTL = 12 * 60 * 60;
 const FILTER_TTL = 6 * 60 * 60;
-const GENRES = new Set(["Action","Adventure","Comedy","Drama","Ecchi","Fantasy","Hentai","Horror","Mahou Shoujo","Mecha","Music","Mystery","Psychological","Romance","Sci-Fi","Slice of Life","Sports","Supernatural","Thriller"]);
+const GENRES = new Set(["Action","Adventure","Comedy","Drama","Fantasy","Horror","Mahou Shoujo","Mecha","Music","Mystery","Psychological","Romance","Sci-Fi","Slice of Life","Sports","Supernatural","Thriller"]);
 const FIELDS = "id title { romaji english } startDate { year month day } coverImage { extraLarge large } format genres seasonYear status averageScore";
 type Media = { id:number; title?:{romaji?:string|null;english?:string|null}; startDate?:{year?:number|null;month?:number|null;day?:number|null}|null; coverImage?:{extraLarge?:string|null;large?:string|null}; format?:string|null; genres?:string[]; seasonYear?:number|null; status?:string|null; averageScore?:number|null };
 type Data = {items:Media[];total:number;hasNextPage:boolean;source:"anilist"|"jikan"};
@@ -117,7 +117,7 @@ async function fetchAniListMeta(query:string) {
 }
 async function loadGenres() {
   const data=await fetchAniListMeta("query { GenreCollection }");
-  return Array.isArray(data.GenreCollection)?data.GenreCollection as string[]:[];
+  return Array.isArray(data.GenreCollection)?(data.GenreCollection as string[]).filter(genre=>genre!=="Hentai"&&genre!=="Ecchi"):[];
 }
 async function loadYears() {
   const currentYear=new Date().getFullYear();
@@ -214,6 +214,7 @@ export const GET:APIRoute=async({request})=>{
       "X-Renanime-Cache":result.cache
     }});
   } catch(e) {
+    console.error("[anime-search] request failed",e instanceof Error?{name:e.name,message:e.message}:String(e));
     const limited=(e as {status?:number}).status===429;
     return fail(limited?"SEARCH_PROVIDER_RATE_LIMITED":"SEARCH_PROVIDER_UNAVAILABLE",limited?503:502,(e as {retry?:string}).retry);
   }
