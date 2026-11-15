@@ -343,7 +343,10 @@ export default function AnimeDetail({entry,lang="es"}:{entry:LibraryEntry;lang?:
  const[media,setMedia]=useState<Media|null>(null),[loading,setLoading]=useState(true),[translatedSynopsis,setTranslatedSynopsis]=useState(""),[translating,setTranslating]=useState(false),[franchiseMedia,setFranchiseMedia]=useState<Record<string,Media|null>>({}),[likeCount,setLikeCount]=useState(0),[liked,setLiked]=useState(false),[likeBusy,setLikeBusy]=useState(false),[likeNotice,setLikeNotice]=useState("");
  const cleanSynopsis=media?.description?cleanDescription(media.description):"";
  const hasSynopsis=cleanSynopsis.replace(/[\s\\n\\r]+/g,"").length>0;
- const streaming = streamingAvailability[entry.animeId];
+ const streamingEntry = streamingAvailability[entry.animeId]
+  ? entry.animeId
+  : Object.keys(streamingAvailability).find((libraryId) => Number(getRenAniListId(libraryId)) === Number(entry.animeId));
+ const streaming = streamingEntry ? streamingAvailability[streamingEntry] : undefined;
  const franchiseEntries=getPersonalFranchiseEntries(entry,getLibrary());
  useEffect(()=>{
   let cancelled=false;
@@ -451,8 +454,11 @@ export default function AnimeDetail({entry,lang="es"}:{entry:LibraryEntry;lang?:
        {streaming && <section className="anime-detail-streaming" aria-label={lang === "en" ? "Available streaming platforms in Spain" : "Plataformas disponibles en España"}>
         <span className="anime-detail-streaming-label">{lang === "en" ? "AVAILABLE ON" : "DISPONIBLE EN"}</span>
         <div className="anime-detail-streaming-providers">
-         {streaming.providers.map((provider) => <a key={provider.name} href={provider.url} target="_blank" rel="noopener noreferrer" aria-label={provider.name} title={provider.name}>
-          <img src={provider.logo} alt={provider.name} width="30" height="30" loading="eager" decoding="async" />
+         {streaming.providers.map((provider) => <a key={provider.key} className={`anime-detail-provider provider-${provider.key}`} href={provider.url} target="_blank" rel="noopener noreferrer" aria-label={provider.name} title={provider.name}>
+          {provider.key === "netflix" && <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 2h4l6 15V2h4v20h-4L9 7v15H5z" fill="currentColor"/></svg>}
+          {provider.key === "prime" && <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 16.5c5.2 3.4 12.1 3.3 17.5-.6M17.3 13.7l3.6 2.2-2.4 3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+          {provider.key === "disney" && <span className="anime-detail-disney-wordmark">Disney<span>+</span></span>}
+          {provider.key === "crunchyroll" && <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" strokeWidth="2.5"/><path d="M15.8 7.4a5.4 5.4 0 1 0 1.1 7.7 4.4 4.4 0 1 1-1.1-7.7Z" fill="currentColor"/></svg>}
           <span>{provider.name}</span>
          </a>)}
         </div>
