@@ -9,9 +9,8 @@ interface Props {
 const { image, video = null, subtitle, primary, secondary } = Astro.props;
 ---
 <section class="hh" aria-label="Renanime World">
-  <img class="hh-poster" src={image} alt="" fetchpriority="high" decoding="async" />
   {video && (
-    <video class="hh-video" autoplay muted loop playsinline preload="metadata" poster={image} aria-hidden="true">
+    <video class="hh-video" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
       {video.webm && <source src={video.webm} type="video/webm" />}
       <source src={video.mp4} type="video/mp4" />
     </video>
