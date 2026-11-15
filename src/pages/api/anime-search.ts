@@ -60,9 +60,20 @@ async function releaseCacheLock(key:string,owner:string) {
 async function anilist(query:string,variables:Record<string,unknown>) {
   const r=await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({query,variables}),signal:AbortSignal.timeout(10000)});
   if(r.status===429) throw Object.assign(new Error("RATE_LIMIT"),{status:429,retry:r.headers.get("Retry-After")||"30"});
-  if(!r.ok) throw new Error("ANILIST_HTTP_"+r.status);
-  const p=await r.json();
-  if(p.errors?.length||!p.data?.Page||!Array.isArray(p.data.Page.media)) throw new Error("ANILIST_INVALID_RESPONSE");
+  const body=await r.text();
+  if(!r.ok) {
+    console.error("[anime-search] AniList HTTP error",r.status,body.slice(0,1200));
+    throw new Error("ANILIST_HTTP_"+r.status);
+  }
+  let p:any;
+  try { p=JSON.parse(body); } catch {
+    console.error("[anime-search] AniList returned invalid JSON",body.slice(0,500));
+    throw new Error("ANILIST_INVALID_JSON");
+  }
+  if(p.errors?.length||!p.data?.Page||!Array.isArray(p.data.Page.media)) {
+    console.error("[anime-search] AniList GraphQL error",JSON.stringify(p.errors??p).slice(0,1600));
+    throw new Error("ANILIST_INVALID_RESPONSE");
+  }
   return p.data.Page;
 }
 async function searchAnime(q:string,page:number,perPage=PAGE_SIZE):Promise<Data> {
@@ -92,9 +103,16 @@ async function popularAnime(page:number,perPage:number):Promise<Data> {
 }
 async function fetchAniListMeta(query:string) {
   const response=await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({query}),signal:AbortSignal.timeout(10000)});
-  if(!response.ok) throw new Error("ANILIST_META_HTTP_"+response.status);
-  const payload=await response.json();
-  if(payload.errors?.length||!payload.data) throw new Error("ANILIST_META_INVALID");
+  const body=await response.text();
+  if(!response.ok) {
+    console.error("[anime-search] AniList metadata HTTP error",response.status,body.slice(0,1000));
+    throw new Error("ANILIST_META_HTTP_"+response.status);
+  }
+  const payload=JSON.parse(body);
+  if(payload.errors?.length||!payload.data) {
+    console.error("[anime-search] AniList metadata GraphQL error",JSON.stringify(payload.errors??payload).slice(0,1400));
+    throw new Error("ANILIST_META_INVALID");
+  }
   return payload.data;
 }
 async function loadGenres() {
@@ -141,7 +159,7 @@ async function loadCached(key:string,type:"search"|"filters",filters:Record<stri
 
 export const GET:APIRoute=async({request})=>{
   const params=new URL(request.url).searchParams;
-  const q=(params.get("q")||"").trim().replace(/\\s+/g," ");
+  const q=(params.get("q")||"").trim().replace(/\s+/g," ");
   const page=Number(params.get("page")||"1");
   const genres=[...new Set((params.get("genre")||"").split(",").concat(params.getAll("genre")).map(x=>x.trim()).filter(Boolean))].sort();
   const year=params.get("year")||"";
@@ -164,7 +182,7 @@ export const GET:APIRoute=async({request})=>{
   if(!Number.isInteger(page)||page<1||page>MAX_PAGE) return fail("INVALID_PAGE",400);
   if(q.length>80||(q&&q.length<2)) return fail("INVALID_QUERY",400);
   if(genres.some(x=>!GENRES.has(x))) return fail("INVALID_GENRE",400);
-  if(year&&year!=="before2020"&&(!/^\\d{4}$/.test(year)||Number(year)<1900||Number(year)>now)) return fail("INVALID_YEAR",400);
+  if(year&&year!=="before2020"&&(!/^\d{4}$/.test(year)||Number(year)<1900||Number(year)>now)) return fail("INVALID_YEAR",400);
   if(status&&!["FINISHED","RELEASING"].includes(status)) return fail("INVALID_STATUS",400);
   if(popular&&(q||genres.length||year||status)) return fail("INVALID_POPULAR_FILTERS",400);
   if(!popular&&!q&&!genres.length&&!year&&!status) return fail("MISSING_SEARCH_OR_FILTER",400);
