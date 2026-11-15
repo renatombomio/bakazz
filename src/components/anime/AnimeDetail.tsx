@@ -23,6 +23,8 @@ interface Media {
   status?: string|null;
   episodes?: number|null;
   duration?: number|null;
+  averageScore?: number|null;
+  seasonYear?: number|null;
   studios?: { nodes?: { name:string }[] };
   coverImage?: { extraLarge?: string|null; large?: string|null };
   bannerImage?: string|null;
@@ -126,6 +128,8 @@ async function findAnime(entry: LibraryEntry): Promise<Media|null> {
           status
           episodes
           duration
+          averageScore
+          seasonYear
           studios(isMain:true){nodes{name}}
           coverImage{extraLarge large}
           bannerImage
@@ -168,6 +172,8 @@ async function findAnime(entry: LibraryEntry): Promise<Media|null> {
             status
             episodes
             duration
+            averageScore
+            seasonYear
             studios(isMain:true){nodes{name}}
             coverImage{extraLarge large}
             bannerImage
@@ -394,7 +400,7 @@ export default function AnimeDetail({entry,lang="es"}:{entry:LibraryEntry;lang?:
  const title=getDisplayTitle(media?.title,entry.title);
  const nativeTitle=getNativeTitle(media?.title);
  const poster=media?.coverImage?.extraLarge||media?.coverImage?.large;
- const banner=media?.bannerImage||poster;
+ const banner=media?.bannerImage||null;
  const personal=entry.state;
  const relations=(media?.relations?.edges??[]).filter(edge=>edge?.node?.type==="ANIME"&&edge.node.id!==media?.id);
  return <div className="anime-detail">
@@ -427,18 +433,53 @@ export default function AnimeDetail({entry,lang="es"}:{entry:LibraryEntry;lang?:
     .anime-detail-recommendation-title{display:block;margin-top:.48rem;font-size:.72rem;line-height:1.25;font-weight:500}
     .anime-detail-recommendation-meta{display:block;margin-top:.22rem;font-family:var(--font-meta);font-size:.5rem;letter-spacing:.06em;text-transform:uppercase;opacity:.58}
     @media(max-width:760px){.anime-detail:not(.anime-detail--ghibli) .anime-detail-synopsis-wrap{margin-top:1rem;padding:.85rem .9rem .95rem;border-radius:12px}.anime-detail-recommendations{grid-column:1 / -1;width:100%;margin-top:1.35rem}.anime-detail-recommendations-track{width:100%;max-width:none}.anime-detail-recommendation{flex:0 0 104px}.anime-detail-recommendation-title{font-size:.68rem}}
-  `}</style>
-  <section className="anime-detail-hero" style={banner?{backgroundImage:`linear-gradient(90deg,rgba(9,9,9,.98) 0%,rgba(9,9,9,.78) 43%,rgba(9,9,9,.35) 72%,rgba(9,9,9,.72) 100%),linear-gradient(0deg,rgba(9,9,9,.98),transparent 42%),url("${banner}")`}:undefined}>
-   <div className="anime-detail-inner">
-    <div className="anime-detail-layout">
-      <div className="anime-detail-poster-column">
-      <div className="anime-detail-poster">{poster?<img src={poster} alt={title}/>:<div className="anime-detail-placeholder">RENANIME</div>}
-        {typeof media?.id === "number"&&<button type="button" className={"anime-detail-like"+(liked?" is-liked":"")} onClick={toggleLike} disabled={likeBusy} aria-pressed={liked} aria-label={liked?(lang==="en"?"Unlike anime":"Quitar like"):(lang==="en"?"Like anime":"Dar like")}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.2-8.8 10-8.8 10s-8.8-4.8-8.8-10a4.6 4.6 0 0 1 8.8-1.9 4.6 4.6 0 0 1 8.8 1.9Z"/></svg><span>{likeCount.toLocaleString(lang==="en"?"en":"es")}</span></button>}
-       </div>
-       {likeNotice&&<p className="anime-detail-like-notice" role="status">{likeNotice}</p>}
-       {media?.id && <div className="anime-detail-library-actions"><PersonalLibraryActions animeId={entry.animeId} lang={lang} /></div>}
-      </div>
-      <div className="anime-detail-copy">
+    .ad-top{b  <section className="ad-top" data-mode={banner ? "banner" : poster ? "poster" : "empty"}>
+   <div className="ad-visual">
+    {banner && <img className="ad-banner" src={banner} alt="" fetchPriority="high" />}
+    {!banner && poster && <>
+     <img className="ad-bg" src={poster} alt="" aria-hidden="true" />
+     <img className="ad-pos" src={poster} alt={title} fetchPriority="high" width={320} height={480} />
+    </>}
+    <div className="ad-actions">
+     {typeof media?.id === "number" && <button type="button" className={"ad-ic anime-detail-like"+(liked?" is-liked":"")} onClick={toggleLike} disabled={likeBusy} aria-pressed={liked} aria-label={lang==="en"?"Like anime":"Me gusta este anime"}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.2-8.8 10-8.8 10s-8.8-4.8-8.8-10a4.6 4.6 0 0 1 8.8-1.9 4.6 4.6 0 0 1 8.8 1.9Z"/></svg><span>{likeCount.toLocaleString(lang==="en"?"en":"es")}</span></button>}
+     {typeof media?.id === "number" && <ShareAnime title={title} animeId={media.id} lang={lang} />}
+    </div>
+   </div>
+   {likeNotice&&<p className="anime-detail-like-notice" role="status">{likeNotice}</p>}
+   <div className="ad-body">
+    <h1>{title}</h1>
+    <div className="ad-meta">
+     {media?.averageScore != null && <span className="ad-score">★ {(media.averageScore/10).toFixed(1)}</span>}
+     {media?.averageScore != null && media?.seasonYear != null && <span>·</span>}
+     {media?.seasonYear != null && <span>{media.seasonYear}</span>}
+     {media?.format && <span className="ad-chip">{format(media.format,lang)}</span>}
+     {media?.episodes != null && <span className="ad-chip">{media.episodes} {t("detail.episodes")}</span>}
+     {media?.duration != null && <span className="ad-chip">{media.duration} min</span>}
+    </div>
+    {media?.id && <div className="ad-cta"><PersonalLibraryActions animeId={entry.animeId} lang={lang} /></div>}
+    {streaming?.providers.length ? <section className="ad-avail" aria-label={t("detail.availableOn")}>
+     <span>{t("detail.availableOn")}</span>
+     <div className="anime-detail-streaming-providers">
+      {streaming.providers.map((provider) => <a key={provider.key} className={`anime-detail-provider provider-${provider.key}`} href={provider.url} target="_blank" rel="noopener noreferrer" aria-label={provider.name} title={provider.name}>
+       {provider.key === "netflix" && <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 2h4l6 15V2h4v20h-4L9 7v15H5z" fill="currentColor"/></svg>}
+       {provider.key === "prime" && <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 16.5c5.2 3.4 12.1 3.3 17.5-.6M17.3 13.7l3.6 2.2-2.4 3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+       {provider.key === "disney" && <span className="anime-detail-disney-wordmark">Disney<span>+</span></span>}
+       {provider.key === "crunchyroll" && <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" strokeWidth="2.5"/><path d="M15.8 7.4a5.4 5.4 0 1 0 1.1 7.7 4.4 4.4 0 1 1-1.1-7.7Z" fill="currentColor"/></svg>}
+      </a>)}
+     </div>
+    </section> : null}
+    {media?.genres?.length ? <p className="ad-genres"><b>{t("detail.genres")}:</b> {media.genres.join(", ")}</p> : null}
+    <h2>{t("detail.synopsis")}</h2>
+    <p className="ad-syn">{loading?t("detail.loading"):(lang==="es"&&translatedSynopsis)||cleanSynopsis||t("detail.noSynopsis")}</p>
+    {lang==="es"&&hasSynopsis&&media?.description&&<button type="button" className="anime-detail-translate" onClick={translateSynopsis} disabled={translating}>{translating?t("detail.translating"):translatedSynopsis?t("detail.translated"):t("detail.translate")}</button>}
+   </div>
+  </section>
+  <section className="anime-detail-trailer">
+        <span className="anime-detail-label">{t("detail.trailer")}</span>
+        <div className="anime-detail-video"><iframe src={"https://www.youtube.com/embed/"+media.trailer.id+"?rel=0"} title={(lang==="en"?"Trailer for ":"Tráiler de ")+title} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen /></div>
+       </section>}
+       {typeof media?.id === "number" && <CharacterCarousel animeId={media.id} lang={lang} />}
+       {typeof media?.id === "number" && <AnimeComments animeId={media.id} lang={lang} />}
        <div className="anime-detail-copy-main">
        
        <h1>{title}</h1>

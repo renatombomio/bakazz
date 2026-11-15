@@ -46,6 +46,8 @@
   "detail.durationEpisode": "DURATION / EPISODE",
   "detail.seasons": "SEASONS",
   "detail.synopsis": "Synopsis",
+  "detail.genres": "Genres",
+  "detail.availableOn": "Available on",
   "detail.loading": "Loading anime…",
   "detail.noSynopsis": "No synopsis is available for this title yet.",
   "detail.translate": "Translate to Spanish",

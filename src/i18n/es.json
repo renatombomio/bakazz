@@ -46,6 +46,8 @@
   "detail.durationEpisode": "DURACIÓN / EPISODIO",
   "detail.seasons": "TEMPORADAS",
   "detail.synopsis": "Sinopsis",
+  "detail.genres": "Géneros",
+  "detail.availableOn": "Disponible en",
   "detail.loading": "Cargando ficha…",
   "detail.noSynopsis": "Todavía no hay una sinopsis disponible para este título.",
   "detail.translate": "Traducir al español",
