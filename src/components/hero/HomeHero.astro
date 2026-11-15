@@ -74,7 +74,14 @@ const { image, video = null, subtitle, primary, secondary } = Astro.props;
     object-position: center;
   }
   .hh-poster { filter: saturate(.9) brightness(.58); }
-  .hh-video { filter: saturate(.9) brightness(.58); }
+  .hh-video {
+    filter: saturate(.9) brightness(.58);
+    transform: rotate(90deg) scale(1.9);
+    transform-origin: center;
+  }
+  @media (max-width: 767px) {
+    .hh-video { transform: rotate(90deg) scale(1.8); }
+  }
   .hh-veil {
     position: absolute;
     z-index: -1;
