@@ -1,24 +1,28 @@
 ---
 interface Props {
+  image: string;
   video?: { mp4: string; webm?: string } | null;
+  imagePosition?: string;
   subtitle: string;
   primary: { label: string; href: string };
   secondary?: { label: string; href: string };
 }
-const { video = null, subtitle, primary, secondary } = Astro.props;
+const { image, video = null, imagePosition = "50% 40%", subtitle, primary, secondary } = Astro.props;
 ---
-<section class="hh" aria-label="Renanime World">
-  {video && (
-    <video class="hh-video" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
-      {video.webm && <source src={video.webm} type="video/webm" />}
-      <source src={video.mp4} type="video/mp4" />
-    </video>
-  )}
+<section class="hh">
+  {video
+    ? (
+      <video class="hh-img" autoplay muted loop playsinline preload="metadata" poster={image} aria-hidden="true"
+        style={`object-position:${imagePosition}`}>
+        {video.webm && <source src={video.webm} type="video/webm" />}
+        <source src={video.mp4} type="video/mp4" />
+      </video>
+    )
+    : <img class="hh-img" src={image} alt="" style={`object-position:${imagePosition}`} fetchpriority="high" />}
   <div class="hh-veil" aria-hidden="true"></div>
   <div class="hh-body">
     <h1 class="hh-word" aria-label="Renanime World">
-      <span class="hh-world" aria-hidden="true">WORLD</span>
-      <span class="hh-name" aria-hidden="true"><b>REN</b>ANIME</span>
+      <span aria-hidden="true"><b>REN</b>ANI<span class="hh-me">ME<span class="hh-world">WORLD</span></span></span>
     </h1>
     <p class="hh-sub">{subtitle}</p>
     <div class="hh-actions">
@@ -27,126 +31,32 @@ const { video = null, subtitle, primary, secondary } = Astro.props;
     </div>
   </div>
 </section>
-<script>
-  const setupHomeHero = () => {
-    const hero = document.querySelector<HTMLElement>(".hh");
-    const video = hero?.querySelector<HTMLVideoElement>(".hh-video");
-    if (!video) return;
-    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const syncMotion = () => {
-      if (motion.matches) {
-        video.pause();
-        video.removeAttribute("autoplay");
-      } else {
-        video.setAttribute("autoplay", "");
-        void video.play().catch(() => {});
-      }
-    };
-    syncMotion();
-    motion.addEventListener("change", syncMotion);
-  };
-  document.addEventListener("astro:page-load", setupHomeHero);
-  setupHomeHero();
-</script>
 <style>
-  .hh {
-    container-type: inline-size;
-    position: relative;
-    display: flex;
-    align-items: flex-end;
-    min-height: 760px;
-    overflow: hidden;
-    isolation: isolate;
-    background: #09090b;
-    color: #f2efe9;
-  }
-  .hh-video {
-    position: absolute;
-    z-index: -2;
-    inset: 0;
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-  }
-  .hh-video {
-    filter: saturate(.9) brightness(.58);
-    transform: rotate(90deg) scale(1.9);
-    transform-origin: center;
-  }
-  @media (max-width: 767px) {
-    .hh-video { transform: rotate(90deg) scale(1.8); }
-  }
-  .hh-veil {
-    position: absolute;
-    z-index: -1;
-    inset: 0;
-    background: linear-gradient(to top, #09090b 0, rgba(9,9,11,.05) 62%);
-    pointer-events: none;
-  }
-  .hh-body {
-    position: relative;
-    width: 100%;
-    margin: 0 auto;
-    padding: 0 1.4cqw 64px;
-  }
-  .hh-word {
-    position: relative;
-    display: block;
-    width: 100%;
-    margin: 0;
-    font-family: "Anton", Impact, "Arial Narrow", sans-serif;
-    font-size: calc(100cqw / 3.8);
-    font-weight: 400;
-    line-height: .9;
-    letter-spacing: -.025em;
-    text-transform: uppercase;
-    white-space: nowrap;
-    color: #f2efe9;
-  }
-  .hh-name { display: block; width: 100%; }
-  .hh-name b { color: #ec4899; font-weight: 400; }
-  .hh-world {
-    position: absolute;
-    top: -1.15em;
-    right: 0;
-    font-family: "Anton", Impact, "Arial Narrow", sans-serif;
-    font-size: .145em;
-    font-weight: 400;
-    letter-spacing: .08em;
-    line-height: 1;
-    color: #f2efe9;
-  }
-  .hh-sub {
-    margin: 18px 0 0;
-    color: #e4e0e8;
-    font-size: clamp(15px, 1.5vw, 22px);
-    line-height: 1.4;
-  }
+  .hh { position: relative; display: flex; align-items: flex-end; min-height: min(80svh, 640px); overflow: hidden; background: #0f0f12; color: #f2efe9; }
+  .hh-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: saturate(.85) brightness(.55); }
+  .hh-veil { position: absolute; inset: 0; background: linear-gradient(to top, #09090b 0, rgba(9,9,11,0) 40%); }
+  .hh-body { position: relative; width: 100%; max-width: 1400px; margin: 0 auto; padding: 0 16px 40px; box-sizing: border-box; container-type: inline-size; }
+  .hh-word { position: relative; margin: 0; font-family: "Anton", "Impact", "Arial Narrow", sans-serif; font-weight: 400;
+    font-size: calc(100cqw / 3.8); line-height: .9; letter-spacing: .005em; text-transform: uppercase; color: #f2efe9; white-space: nowrap; }
+  .hh-word b { font-weight: 400; color: #ec4899; }
+  .hh-me { position: relative; display: inline-block; }
+  .hh-world { position: absolute; left: 0; bottom: 100%; margin-bottom: .06em; font-size: .405em; line-height: 1; letter-spacing: .08em;
+    margin-right: -.08em; white-space: nowrap; color: #f2efe9; }
+  .hh-sub { margin: 18px 0 0; font-size: 18px; line-height: 1.4; color: #e4e0e8; }
   .hh-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
-  .hh-btn {
-    display: inline-flex;
-    min-height: 46px;
-    align-items: center;
-    justify-content: center;
-    padding: 13px 24px;
-    border: 1px solid #ec4899;
-    border-radius: 999px;
-    background: #ec4899;
-    color: #fff;
-    font-size: 14px;
-    font-weight: 700;
-    text-decoration: none;
-  }
-  .hh-ghost { border-color: rgba(255,255,255,.35); background: transparent; color: #f2efe9; }
-  .hh-btn:focus-visible { outline: 2px solid #f472b6; outline-offset: 4px; }
+  .hh-btn { padding: 13px 24px; border-radius: 999px; background: #ec4899; color: #fff; font-size: 14px; font-weight: 700; text-decoration: none; }
+  .hh-ghost { background: transparent; border: 1px solid rgba(255,255,255,.35); color: #f2efe9; font-weight: 600; }
+  @media (prefers-reduced-motion: reduce) { .hh-img { animation: none; } }
   @media (max-width: 767px) {
-    .hh { min-height: min(760px, calc(100svh - 68px)); }
-    .hh-body { padding: 0 4.1cqw 30px; }
-    .hh-sub { max-width: 28ch; }
+    .hh { display: block; min-height: 0; background: #09090b; }
+    .hh-img { position: relative; inset: auto; display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; }
+    .hh-veil { inset: 0 0 auto 0; height: calc(100vw * 9 / 16); background: linear-gradient(to top, #09090b 0, rgba(9,9,11,0) 55%); }
+    .hh-body { margin-top: -22vw; padding-top: 0; }
   }
-  @media (prefers-reduced-motion: reduce) {
-    .hh-video { display: none; }
+  .hh-btn:focus-visible { outline: 2px solid #f472b6; outline-offset: 4px; }
+  @media (min-width: 768px) {
+    .hh { min-height: min(88svh, 760px); }
+    .hh-sub { font-size: 22px; }
+    .hh-body { padding-bottom: 64px; }
   }
 </style>
