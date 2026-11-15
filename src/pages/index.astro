@@ -136,7 +136,10 @@ try {
     />
 
     <HomeCommunity
-      members={communityMembers}
+      members={communityMembers.map((member) => ({
+        ...member,
+        href: localizedPath(lang, `/u/${encodeURIComponent(member.aka)}/`),
+      }))}
       labels={{
         title: isEnglish ? "Community" : "Comunidad",
         members: isEnglish ? "People on Renanime" : "Gente en Renanime",
