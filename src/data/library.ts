@@ -116,8 +116,6 @@ export const animeLibrary: LibraryEntry[] = [
   { animeId: "personal-120", title: "Wind Breaker", state: { status: "WATCHED", favorite: false, recommended: true } },
   { animeId: "personal-121", title: "Bartender: Glass of God", state: { status: "WATCHED", favorite: false, recommended: false } },
   { animeId: "personal-122", title: "Kenka Dokugaku", state: { status: "WATCHED", favorite: false, recommended: false } },
-  { animeId: "personal-123", title: "Shinmai Ossan Boukensha", state: { status: "WATCHED", favorite: false, recommended: false } },
-  { animeId: "personal-124", title: "Sentai Daishikkai", state: { status: "WATCHED", favorite: false, recommended: false } },
   { animeId: "personal-125", title: "Nige Jouzu no Wakagimi", state: { status: "WATCHED", favorite: false, recommended: true } },
   { animeId: "personal-126", title: "Sousou no Frieren", state: { status: "WATCHED", favorite: false, recommended: true } },
   { animeId: "personal-127", title: "Sakamoto Days", state: { status: "WATCHED", favorite: false, recommended: true } },

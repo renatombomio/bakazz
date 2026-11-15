@@ -2,7 +2,7 @@
   "version": 2,
   "generatedAt": "2026-11-04T13:17:34.977Z",
   "source": "static-library-and-reviewed-anilist-catalogue",
-  "total": 135,
+  "total": 133,
   "entries": [
     {
       "animeId": "personal-001",
@@ -1265,28 +1265,6 @@
       "provider": "anilist",
       "externalId": "174653",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx174653-OsnK4BuENjUT.jpg",
-      "status": "resolved",
-      "color": "#3a3a44",
-      "popularity": 0
-    },
-    {
-      "animeId": "personal-123",
-      "title": "Shinmai Ossan Boukensha",
-      "format": "SERIES",
-      "provider": "anilist",
-      "externalId": "163292",
-      "posterUrl": null,
-      "status": "resolved",
-      "color": "#3a3a44",
-      "popularity": 0
-    },
-    {
-      "animeId": "personal-124",
-      "title": "Sentai Daishikkai",
-      "format": "SERIES",
-      "provider": "anilist",
-      "externalId": "158417",
-      "posterUrl": null,
       "status": "resolved",
       "color": "#3a3a44",
       "popularity": 0
