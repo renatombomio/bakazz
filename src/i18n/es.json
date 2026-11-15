@@ -222,5 +222,9 @@
   "homeSeasonal.eyebrow": "En emisión",
   "homeSeasonal.title": "Estrenos de temporada",
   "homeSeasonal.subtitle": "Los cinco animes más populares de la temporada actual · AniList",
-  "homeSeasonal.ariaLabel": "Animes destacados de la temporada actual"
+  "homeSeasonal.ariaLabel": "Animes destacados de la temporada actual",
+  "renCollection.title": "Colección de Ren",
+  "renCollection.recommended": "Los que recomiendo",
+  "renCollection.watched": "También los he visto",
+  "renCollection.view": "Ver ficha"
 }

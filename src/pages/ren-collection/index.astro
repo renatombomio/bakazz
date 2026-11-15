@@ -1,40 +1,28 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { useT } from "../../i18n";
 import Navbar from "../../components/layout/Navbar.astro";
-import RenCollectionGallery from "../../components/archive/RenCollectionGallery";
-import { getWatchedLibrary } from "../../data/library";
+import RenCollectionGallery from "../../components/archive/RenCollectionGallery.astro";
+import { getRenCollectionItems } from "../../lib/ren-collection";
+import { useT } from "../../i18n";
 
-const collectionEntries = getWatchedLibrary();
 const lang = Astro.locals.lang;
 const t = useT(lang);
-const description = lang === "en"
-  ? `${collectionEntries.length} anime watched · Finished stories, discoveries, and years of obsession.`
-  : `${collectionEntries.length} animes vistos · Historias terminadas, descubrimientos y años de obsesión.`;
+const items = await getRenCollectionItems(lang);
 ---
-
-<Layout title={`${t("renCollection.pageTitle")} — Renanime's Gallery`} description={description}>
+<Layout title={`${t("renCollection.pageTitle")} — Renanime World`}>
   <Navbar />
-
   <main id="main-content" class="ren-collection-page">
-    <h1 class="sr-only">{t("renCollection.heading")}</h1>
-    <section class="ren-collection-content" aria-label={lang === "en" ? "Ren's anime collection" : "Colección de Ren"}>
-      <RenCollectionGallery entries={collectionEntries} lang={lang} client:load />
-    </section>
+    <RenCollectionGallery items={items} lang={lang} />
   </main>
 </Layout>
 
 <style>
   .ren-collection-page {
+    width: min(calc(100% - (var(--gutter) * 2)), var(--container-max));
     min-height: 70vh;
+    margin-inline: auto;
     padding-block: clamp(6rem, 11vw, 10rem) var(--section-space);
   }
-
-  .ren-collection-content {
-    width: min(calc(100% - (var(--gutter) * 2)), var(--container-max));
-    margin-inline: auto;
-  }
-
   @media (max-width: 700px) {
     .ren-collection-page { padding-top: 5rem; }
   }
