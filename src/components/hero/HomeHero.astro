@@ -1,17 +1,18 @@
 ---
 interface Props {
   video?: { mp4: string; webm?: string } | null;
+  rotate?: 0 | 180;
   imagePosition?: string;
   subtitle: string;
   primary: { label: string; href: string };
   secondary?: { label: string; href: string };
 }
-const { video = null, subtitle, primary, secondary } = Astro.props;
+const { video = null, rotate = 180, subtitle, primary, secondary } = Astro.props;
 ---
 <section class="hh">
   {video
     ? (
-      <video class="hh-img" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
+      <video class="hh-img" autoplay muted loop playsinline preload="metadata" aria-hidden="true" style={`transform: rotate(${rotate}deg)`}>
         {video.webm && <source src={video.webm} type="video/webm" />}
         <source src={video.mp4} type="video/mp4" />
       </video>
