@@ -1,13 +1,13 @@
 ---
 interface Props {
   video?: { mp4: string; webm?: string } | null;
-  rotate?: 0 | 180;
+  rotate?: 0 | 90 | 180;
   imagePosition?: string;
   subtitle: string;
   primary: { label: string; href: string };
   secondary?: { label: string; href: string };
 }
-const { video = null, rotate = 180, subtitle, primary, secondary } = Astro.props;
+const { video = null, rotate = 90, subtitle, primary, secondary } = Astro.props;
 ---
 <section class="hh">
   {video
@@ -32,7 +32,7 @@ const { video = null, rotate = 180, subtitle, primary, secondary } = Astro.props
 </section>
 <style>
   .hh { position: relative; display: flex; align-items: flex-end; min-height: min(80svh, 640px); overflow: hidden; background: #0f0f12; color: #f2efe9; }
-  .hh-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: saturate(.85) brightness(.55); }
+  .hh-img { position: absolute; inset: auto; top: 50%; left: 50%; width: min(88svh, 760px); height: 100vw; translate: -50% -50%; object-fit: cover; filter: saturate(.85) brightness(.55); }
   .hh-veil { position: absolute; inset: 0; background: linear-gradient(to top, #09090b 0, rgba(9,9,11,0) 40%); }
   .hh-body { position: relative; width: 100%; max-width: 1400px; margin: 0 auto; padding: 0 16px 40px; box-sizing: border-box; container-type: inline-size; }
   .hh-word { position: relative; margin: 0; font-family: "Anton", "Impact", "Arial Narrow", sans-serif; font-weight: 400;
@@ -48,7 +48,8 @@ const { video = null, rotate = 180, subtitle, primary, secondary } = Astro.props
   @media (prefers-reduced-motion: reduce) { .hh-img { animation: none; } }
   @media (max-width: 767px) {
     .hh { display: block; min-height: 0; background: #09090b; }
-    .hh-img { position: relative; inset: auto; display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; }
+    .hh::before { content: ""; display: block; width: 100%; aspect-ratio: 16 / 9; }
+    .hh-img { top: 28.125vw; left: 50%; width: 56.25vw; height: 100vw; }
     .hh-veil { inset: 0 0 auto 0; height: calc(100vw * 9 / 16); background: linear-gradient(to top, #09090b 0, rgba(9,9,11,0) 55%); }
     .hh-body { margin-top: -22vw; padding-top: 0; }
   }
