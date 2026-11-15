@@ -2,78 +2,6 @@ export type StreamingProvider = {
   key: "netflix" | "prime" | "disney" | "crunchyroll";
   name: string;
   url: string;
-  "personal-002": {
-    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/dragon-ball-z",
-    providers: [],
-  },
-  "personal-007": {
-    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/akame-ga-kill",
-    providers: [],
-  },
-  "personal-009": {
-    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/fullmetal-alchemist",
-    providers: [],
-  },
-  "personal-016": {
-    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/ballroom-e-youkoso",
-    providers: [],
-  },
-  "personal-025": {
-    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/deadman-wonderland",
-    providers: [],
-  },
-  "personal-031": {
-    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/blood-lad",
-    providers: [],
-  },
-  "personal-036": {
-    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/shingeki-no-bahamut",
-    providers: [],
-  },
-  "personal-042": {
-    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/danganronpa-the-animation",
-    providers: [],
-  },
-  "personal-044": {
-    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/servamp",
-    providers: [],
-  },
-  "personal-045": {
-    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/strike-the-blood",
-    providers: [],
-  },
-  "personal-046": {
-    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/killing-bites",
-    providers: [],
-  },
-  "personal-047": {
-    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/kekkai-sensen",
-    providers: [],
-  },
-  "personal-049": {
-    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/tenrou-sirius-the-jaeger",
-    providers: [],
-  },
-  "personal-050": {
-    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/wolfs-rain",
-    providers: [],
-  },
-  "personal-063": {
-    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/hinomaruzumou",
-    providers: [],
-  },
-  "personal-072": {
-    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/fuuka",
-    providers: [],
-  },
-  "personal-083": {
-    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/another",
-    providers: [],
-  },
-  "personal-118": {
-    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/gangsta",
-    providers: [],
-  },
 };
 export type StreamingAvailability = {
   region: "ES";
@@ -431,5 +359,77 @@ export const streamingAvailability: Record<string, StreamingAvailability> = {
   "personal-142": {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/death-note",
     providers: [provider.crunchyroll],
+  },
+  "personal-002": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/dragon-ball-z",
+    providers: [],
+  },
+  "personal-007": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/akame-ga-kill",
+    providers: [],
+  },
+  "personal-009": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/fullmetal-alchemist",
+    providers: [],
+  },
+  "personal-016": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/ballroom-e-youkoso",
+    providers: [],
+  },
+  "personal-025": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/deadman-wonderland",
+    providers: [],
+  },
+  "personal-031": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/blood-lad",
+    providers: [],
+  },
+  "personal-036": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/shingeki-no-bahamut",
+    providers: [],
+  },
+  "personal-042": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/danganronpa-the-animation",
+    providers: [],
+  },
+  "personal-044": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/servamp",
+    providers: [],
+  },
+  "personal-045": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/strike-the-blood",
+    providers: [],
+  },
+  "personal-046": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/killing-bites",
+    providers: [],
+  },
+  "personal-047": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/kekkai-sensen",
+    providers: [],
+  },
+  "personal-049": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/tenrou-sirius-the-jaeger",
+    providers: [],
+  },
+  "personal-050": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/wolfs-rain",
+    providers: [],
+  },
+  "personal-063": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/hinomaruzumou",
+    providers: [],
+  },
+  "personal-072": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/fuuka",
+    providers: [],
+  },
+  "personal-083": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/another",
+    providers: [],
+  },
+  "personal-118": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/gangsta",
+    providers: [],
   },
 };
