@@ -54,7 +54,7 @@ export default function BookshelfSelection({ items, lang }: Props) {
 
       {selected && (
         <div className="book-preview" aria-live="polite">
-          {selected.cover && <img src={selected.cover} alt="" width="230" height="345" loading="lazy" />}
+          {selected.cover && <img src={selected.cover} alt="" width="230" height="345" loading="eager" fetchPriority="high" decoding="async" />}
           <div className="book-preview-copy">
             <h3>{selected.title}</h3>
             <a href={selected.href}>{viewLabel}</a>

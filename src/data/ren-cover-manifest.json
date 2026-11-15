@@ -1043,19 +1043,19 @@
       "animeId": "personal-123",
       "title": "Shinmai Ossan Boukensha",
       "format": null,
-      "provider": null,
-      "externalId": null,
+      "provider": "anilist",
+      "externalId": "163292",
       "posterUrl": null,
-      "status": "unresolved"
+      "status": "resolved"
     },
     {
       "animeId": "personal-124",
       "title": "Sentai Daishikkai",
       "format": null,
-      "provider": null,
-      "externalId": null,
+      "provider": "anilist",
+      "externalId": "158417",
       "posterUrl": null,
-      "status": "unresolved"
+      "status": "resolved"
     },
     {
       "animeId": "personal-125",
