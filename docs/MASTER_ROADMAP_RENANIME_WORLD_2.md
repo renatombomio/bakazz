@@ -2,7 +2,7 @@
 **Last audited:** 2026-11-15 (Europe/Amsterdam)  
 **Repository:** `renatombomio/renanime`  
 **Working branch:** `feature/renanime-2.0-workspace`  
-**Audited HEAD:** `3b77269f80a13439d4f4affb3b41a46368fcecca`  
+**Roadmap revision based on HEAD:** `2733d4d709d39e1896a44b16d3138a553e4ccd3b`  
 **Preview:** https://renanime-9d2ugxys1-rene-webs1.vercel.app  
 **Deployment:** `dpl_8obHwj3sT8ttvVu6dvyUbQHqVYDh` — READY  
 **Status:** final product polish + brand redesign + pre-launch hardening. Not production-approved.
@@ -30,7 +30,7 @@ The product must be designed for thousands of users, concurrent activity, traffi
 9. Do not expose secrets, tokens, service-role/secret keys, user data, or private environment values in chat, logs, commits, or client bundles.
 10. Inspect the current implementation before changing it. Do not recreate working functionality or duplicate data already held by AniList/Jikan/Supabase.
 11. Every feature must have loading, empty, error, and success states where relevant; responsive and accessibility checks; validation; and tests appropriate to its risk.
-12. Preserve Ghibli’s separate visual identity and isolate it from the automatic day/night theme.
+12. Renanime’s standard experience is permanently dark. Ghibli is the sole visual exception and retains its independent identity.
 
 ## 3. Current system map
 
@@ -110,10 +110,10 @@ Development migration history contains 21 entries, including auth/profile/librar
 - Anime-of-the-month cron endpoint exists and requires a bearer cron secret plus server-side Supabase secret.
 
 ### Visual and brand work
-- Automatic day/night theme based on locally stored geolocation and calculated sunrise/sunset; refreshed every minute.
-- Ghibli is explicitly excluded from the global solar theme.
-- Day-mode contrast overrides were added in commit `3b77269`, covering shared tokens, profile/public profile, community/debates, search/discovery, monthly anime/home sections, collection cards, and anime details.
-- The last screenshots showed major low-contrast/day-mode defects. The new CSS deployment is READY, but visual QA must be performed in a real browser with a signed-in session and actual daytime theme. Do not call this fully validated yet.
+- Previous implementation included an automatic day/night theme and day-mode CSS overrides. This is now obsolete product behavior and must be retired.
+- Product decision (2026-11-15): all standard Renanime routes remain dark at all times; no light mode, solar schedule, geolocation-based theme, or theme preference.
+- Ghibli remains the sole exception, with its existing independent palette, typography, and visual identity. Do not apply global dark-theme overrides to Ghibli.
+- The current `Layout.astro` explicitly applies `theme-ghibli` and its cream/green styling. Preserve this boundary while auditing/removing obsolete day-mode code.
 - Brand direction: Renanime World; visual, colourful world/globe identity, wolf mascot, distinctive wordmark. The identity redesign and asset system are still in progress.
 - Product monetization concepts include Amazon affiliate links, merchandise, and milestone giveaways. These are ideas/plans, not release-ready functionality.
 
@@ -142,7 +142,7 @@ Development migration history contains 21 entries, including auth/profile/librar
 1. GitHub Actions quality workflow triggers on push/PR to `main`, not the current feature branch. Ensure the final branch is tested with an explicit CI run or PR gate before production.
 2. Existing Vitest suite has only a small number of test files (anime normalization/franchise/search, poster fallback, gamification ranks). Add API, auth/RLS, cache, pagination, and regression tests.
 3. No dedicated load/stress/soak test suite was found.
-4. Day-theme CSS has been deployed but not visually browser-verified for every route and state.
+4. Obsolete day-theme CSS and any controller/references must be fully removed; standard routes must remain dark, while Ghibli must retain its independent styling.
 5. Latest deployment is Preview-only; custom domain verification does not mean the production application is live.
 
 ### P2 — Product completeness
@@ -189,11 +189,12 @@ Development migration history contains 21 entries, including auth/profile/librar
 
 ## 8. Roadmap — execution order
 
-### Phase 0 — Lock the baseline and validate the latest visual fix
+### Phase 0 — Lock the baseline and retire obsolete theme behavior
 - Confirm branch + HEAD + READY Preview before every task.
-- Browser QA day/night on home, profile (own + public), community, debate list/detail, search, genres, collection, favourites, anime detail, notifications, Ghibli.
-- Validate theme transitions, geolocation denied/stale, no location, sunrise/sunset edge, mobile menu, forms, overlays and contrast.
-- Fix regressions in isolated commits; Ghibli must remain unchanged.
+- Map all day-mode CSS, selectors, scripts, persisted preferences, geolocation/solar calculations, imports and route-level overrides.
+- Remove only obsolete light/day-mode behavior after verifying every dependency; do not touch auth/middleware as part of this work.
+- Verify standard routes remain dark across navigation/reload and Ghibli retains its current independent palette and styling.
+- Run responsive/accessibility checks for contrast, mobile menu, forms and overlays; fix regressions in isolated commits.
 
 ### Phase 1 — Security hardening (release blocker)
 - Resolve cache-config RLS advisor finding safely.
@@ -235,7 +236,7 @@ Development migration history contains 21 entries, including auth/profile/librar
 
 ### Phase 5 — Product polish and Renanime World brand
 - Finalize logo/wordmark, wolf mascot, colourful 3D-like globe/world mark, palette, typography, favicon and social identity.
-- Apply brand system consistently across light/night modes and mobile/desktop.
+- Apply the brand system consistently across the permanent dark experience and mobile/desktop; preserve Ghibli as a separate visual system.
 - Finalize home hierarchy: hero, monthly anime, weekly episodes, news, upcoming releases, community.
 - Refine profiles, community and debates as a coherent social product.
 - Complete ranking and character sections; verify aggregate counts under concurrency.
@@ -269,7 +270,7 @@ A feature is not done until:
 - It has validation and automated tests appropriate to risk.
 - It does not create N+1 calls or unbounded reads/writes.
 - It uses cache/provider timeouts/rate limits where applicable.
-- It does not break other routes, locale, night/day, or Ghibli.
+- It does not break other routes, locale, the permanent dark experience, or Ghibli.
 - Its commit is on the required branch.
 - Vercel confirms the matching deployment is READY.
 - Relevant Preview checks are performed and recorded.
@@ -290,7 +291,7 @@ Paste the following into a new conversation in the FREELANCE WORK project:
 >
 > Current baseline at audit: HEAD `3b77269f80a13439d4f4affb3b41a46368fcecca`; Preview deployment `dpl_8obHwj3sT8ttvVu6dvyUbQHqVYDh` READY at https://renanime-9d2ugxys1-rene-webs1.vercel.app. Start with Phase 0 visual QA and Phase 1 security hardening in the roadmap. Important current Supabase advisor findings: RLS disabled on `private.anime_search_cache_config`; public SECURITY DEFINER RPC `sync_anime_character_catalog` executable by anon/authenticated; leaked-password protection disabled. Do not auto-fix or run suggested SQL without reviewing access design. Performance findings: missing FK indexes, one RLS initplan warning, redundant permissive SELECT policies; unused-index warnings are not grounds for deletion on a tiny dev dataset.
 >
-> Keep the night theme unchanged, improve daytime contrast, and keep Ghibli isolated. Continue the colourful Renanime World brand redesign (globe/world, wolf mascot, distinctive wordmark). One focused commit per screen/feature; verify build and Vercel READY before reporting success. First inspect, then plan, then implement; never assume prior code state without reading it.
+> Keep all standard Renanime routes permanently dark. Do not add a light mode, automatic solar theme, geolocation theme logic, or theme preference. Ghibli is the only exception and must retain its independent visual identity. Continue the colourful Renanime World brand redesign (wolf mascot, distinctive wordmark and world identity). One focused commit per change; verify build and Vercel READY before reporting success. First inspect, then plan, then implement; never assume prior code state without reading it.
 
 ---
 
