@@ -89,11 +89,42 @@ async function searchAnime(q:string,page:number,perPage=PAGE_SIZE):Promise<Data>
   }
 }
 async function filterAnime(genres:string[],year:string,status:string,q:string,page:number,perPage:number):Promise<Data> {
-  const y=year&&year!=="before2020"?Number(year):null;
-  const after=y?y*10000-1:null;
-  const before=y?(y+1)*10000:year==="before2020"?20200000:null;
-  const query="query FilterAnime($genres:[String],$status:MediaStatus,$after:FuzzyDateInt,$before:FuzzyDateInt,$search:String,$page:Int!,$perPage:Int!){Page(page:$page,perPage:$perPage){pageInfo{total hasNextPage} media(type:ANIME,search:$search,genre_in:$genres,status:$status,startDate_greater:$after,startDate_lesser:$before,sort:POPULARITY_DESC,isAdult:false){"+FIELDS+"}}}";
-  const p=await anilist(query,{genres:genres.length?genres:null,status:status||null,after,before,search:q||null,page,perPage});
+  const definitions=["$page:Int!","$perPage:Int!"];
+  const args=["type:ANIME","sort:POPULARITY_DESC","isAdult:false"];
+  const variables:Record<string,unknown>={page,perPage};
+
+  // Only send AniList filter operators when they have an actual value.
+  // AniList rejects explicit null values for some operator arguments.
+  if(genres.length) {
+    definitions.push("$genres:[String]");
+    args.push("genre_in:$genres");
+    variables.genres=genres;
+  }
+  if(status) {
+    definitions.push("$status:MediaStatus");
+    args.push("status:$status");
+    variables.status=status;
+  }
+  if(year==="before2020") {
+    definitions.push("$before:FuzzyDateInt");
+    args.push("startDate_lesser:$before");
+    variables.before=20200000;
+  } else if(year) {
+    const selectedYear=Number(year);
+    definitions.push("$after:FuzzyDateInt","$before:FuzzyDateInt");
+    args.push("startDate_greater:$after","startDate_lesser:$before");
+    // AniList uses YYYY0000 fuzzy dates for whole-year boundaries.
+    variables.after=selectedYear*10000;
+    variables.before=(selectedYear+1)*10000;
+  }
+  if(q) {
+    definitions.push("$search:String");
+    args.push("search:$search");
+    variables.search=q;
+  }
+
+  const query="query FilterAnime("+definitions.join(",")+"){Page(page:$page,perPage:$perPage){pageInfo{total hasNextPage} media("+args.join(",")+"){"+FIELDS+"}}}";
+  const p=await anilist(query,variables);
   return {items:p.media,total:p.pageInfo?.total??0,hasNextPage:Boolean(p.pageInfo?.hasNextPage),source:"anilist"};
 }
 async function popularAnime(page:number,perPage:number):Promise<Data> {
@@ -122,7 +153,7 @@ async function loadGenres() {
 async function loadYears() {
   const currentYear=new Date().getFullYear();
   const candidates=Array.from({length:20},(_,index)=>currentYear-index);
-  const aliases=candidates.map((year)=>`y${year}: Page(page:1,perPage:1) { pageInfo { total } media(type:ANIME,startDate_greater:${year*10000-1},startDate_lesser:${(year+1)*10000},isAdult:false) { id } }`).join(" ");
+  const aliases=candidates.map((year)=>`y${year}: Page(page:1,perPage:1) { pageInfo { total } media(type:ANIME,startDate_greater:${year*10000},startDate_lesser:${(year+1)*10000},isAdult:false) { id } }`).join(" ");
   const data=await fetchAniListMeta("query RecentAnimeYears { "+aliases+" older: Page(page:1,perPage:1) { pageInfo { total } media(type:ANIME,startDate_lesser:20200000,isAdult:false) { id } } }");
   const recent=candidates.filter((year)=>Number(data["y"+year]?.pageInfo?.total??0)>0).slice(0,7).map(String);
   if(Number(data.older?.pageInfo?.total??0)>0) recent.push("before2020");
