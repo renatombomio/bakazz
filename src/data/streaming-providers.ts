@@ -128,6 +128,34 @@ export const streamingAvailability: Record<string, StreamingAvailability> = {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/parasyte-kiseijuu-sei-no-kakuritsu",
     providers: [provider.netflix],
   },
+  "personal-085": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/dorohedoro",
+    providers: [provider.netflix, provider.disney, provider.crunchyroll],
+  },
+  "personal-105": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/youkoso-jitsuryoku-shijou-shugi-no-kyoushitsu-e",
+    providers: [provider.crunchyroll],
+  },
+  "personal-107": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/tower-of-god",
+    providers: [provider.crunchyroll],
+  },
+  "personal-112": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/hajime-no-ippo",
+    providers: [provider.netflix],
+  },
+  "personal-113": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/jigokuraku",
+    providers: [provider.crunchyroll],
+  },
+  "personal-137": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/cike-wu-liuqi",
+    providers: [provider.netflix],
+  },
+  "personal-139": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/cowboy-bebop",
+    providers: [provider.netflix],
+  },
   "personal-119": {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/kaiju-no-8",
     providers: [provider.crunchyroll],
