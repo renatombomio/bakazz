@@ -110,10 +110,9 @@ Development migration history contains 21 entries, including auth/profile/librar
 - Anime-of-the-month cron endpoint exists and requires a bearer cron secret plus server-side Supabase secret.
 
 ### Visual and brand work
-- Previous implementation included an automatic day/night theme and day-mode CSS overrides. This is now obsolete product behavior and must be retired.
-- Product decision (2026-11-15): all standard Renanime routes remain dark at all times; no light mode, solar schedule, geolocation-based theme, or theme preference.
-- Ghibli remains the sole exception, with its existing independent palette, typography, and visual identity. Do not apply global dark-theme overrides to Ghibli.
-- The current `Layout.astro` explicitly applies `theme-ghibli` and its cream/green styling. Preserve this boundary while auditing/removing obsolete day-mode code.
+- The automatic day/night theme has already been removed. There is no day-mode controller to build, audit, or maintain.
+- Product decision (2026-11-15): all standard Renanime routes are permanently dark. No light mode, solar schedule, geolocation-based theme, or theme preference.
+- Ghibli remains the sole exception, with its independent palette, typography, and visual identity. Preserve its existing implementation; do not apply global theme changes to it.
 - Brand direction: Renanime World; visual, colourful world/globe identity, wolf mascot, distinctive wordmark. The identity redesign and asset system are still in progress.
 - Product monetization concepts include Amazon affiliate links, merchandise, and milestone giveaways. These are ideas/plans, not release-ready functionality.
 
@@ -142,7 +141,7 @@ Development migration history contains 21 entries, including auth/profile/librar
 1. GitHub Actions quality workflow triggers on push/PR to `main`, not the current feature branch. Ensure the final branch is tested with an explicit CI run or PR gate before production.
 2. Existing Vitest suite has only a small number of test files (anime normalization/franchise/search, poster fallback, gamification ranks). Add API, auth/RLS, cache, pagination, and regression tests.
 3. No dedicated load/stress/soak test suite was found.
-4. Obsolete day-theme CSS and any controller/references must be fully removed; standard routes must remain dark, while Ghibli must retain its independent styling.
+4. The automatic day/night theme has been removed. Do not reintroduce a day-mode controller, solar/geolocation logic, light-theme CSS, or theme preference. Standard routes stay dark; Ghibli retains its independent styling.
 5. Latest deployment is Preview-only; custom domain verification does not mean the production application is live.
 
 ### P2 — Product completeness
@@ -189,11 +188,10 @@ Development migration history contains 21 entries, including auth/profile/librar
 
 ## 8. Roadmap — execution order
 
-### Phase 0 — Lock the baseline and retire obsolete theme behavior
+### Phase 0 — Lock the baseline and complete visual QA
 - Confirm branch + HEAD + READY Preview before every task.
-- Map all day-mode CSS, selectors, scripts, persisted preferences, geolocation/solar calculations, imports and route-level overrides.
-- Remove only obsolete light/day-mode behavior after verifying every dependency; do not touch auth/middleware as part of this work.
-- Verify standard routes remain dark across navigation/reload and Ghibli retains its current independent palette and styling.
+- Run browser QA on home, profile (own + public), community, debate list/detail, search, genres, collection, favourites, anime detail, notifications and Ghibli.
+- Confirm the standard Renanime experience remains dark and Ghibli retains its separate visual identity; this is a product invariant, not a theme feature to implement.
 - Run responsive/accessibility checks for contrast, mobile menu, forms and overlays; fix regressions in isolated commits.
 
 ### Phase 1 — Security hardening (release blocker)
