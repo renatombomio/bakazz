@@ -332,6 +332,14 @@ export const streamingAvailability: Record<string, StreamingAvailability> = {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/hijos-de-las-ballenas",
     providers: [provider.netflix],
   },
+  "personal-058": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/aho-girl",
+    providers: [provider.crunchyroll],
+  },
+  "personal-091": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/koutetsujou-no-kabaneri",
+    providers: [provider.netflix, provider.crunchyroll],
+  },
   "personal-119": {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/kaiju-no-8",
     providers: [provider.crunchyroll],
