@@ -12,7 +12,7 @@ const { video = null, rotate = 270, subtitle, primary, secondary } = Astro.props
 <section class="hh">
   {video
     ? (
-      <video class="hh-img" autoplay muted loop playsinline preload="metadata" aria-hidden="true" style={`transform: rotate(${rotate}deg)`}>
+      <video class="hh-img" autoplay muted loop playsinline preload="metadata" aria-hidden="true" controlslist="nodownload noplaybackrate" disablepictureinpicture style={`transform: rotate(${rotate}deg)`}>
         {video.webm && <source src={video.webm} type="video/webm" />}
         <source src={video.mp4} type="video/mp4" />
       </video>
@@ -29,7 +29,25 @@ const { video = null, rotate = 270, subtitle, primary, secondary } = Astro.props
       {secondary && <a class="hh-btn hh-ghost" href={secondary.href}>{secondary.label}</a>}
     </div>
   </div>
-</section>
+</section>\n<script>
+  const silenceHero = () => {
+    document.querySelectorAll<HTMLVideoElement>(".hh video").forEach((video) => {
+      video.muted = true;
+      video.defaultMuted = true;
+      video.volume = 0;
+      video.removeAttribute("controls");
+      video.addEventListener("volumechange", () => {
+        if (!video.muted || video.volume !== 0) {
+          video.muted = true;
+          video.volume = 0;
+        }
+      });
+    });
+  };
+  document.addEventListener("astro:page-load", silenceHero);
+  silenceHero();
+</script>
+
 <style>
   .hh { position: relative; display: flex; align-items: flex-end; min-height: min(80svh, 640px); overflow: hidden; background: #0f0f12; color: #f2efe9; }
   .hh-img { position: absolute; inset: auto; top: 50%; left: 50%; width: min(88svh, 760px); height: 100vw; translate: -50% -50%; object-fit: cover; filter: saturate(.85) brightness(.55); }
