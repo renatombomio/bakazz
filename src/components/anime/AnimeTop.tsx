@@ -1,10 +1,10 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import "./AnimeTop.css";
 type Props={title:string;bannerImage?:string|null;poster?:string|null;score?:number|null;year?:number|null;formatLabel?:string|null;episodes?:number|null;duration?:number|null;likes:number;liked:boolean;likeBusy?:boolean;likeNotice?:string;onLike:()=>void;share?:ReactNode;libraryActions?:ReactNode;availability?:ReactNode;genres?:string[];synopsis:ReactNode;labels:{like:string;availableOn:string;genres:string;synopsis:string;episodes:string}};
 export default function AnimeTop(p:Props){
  const mode=p.bannerImage?"banner":p.poster?"poster":"empty";
  return <section className="ad-top" data-mode={mode}>
-  <div className="ad-visual">
+  <div className="ad-visual" style={mode==="banner" ? {"--ad-banner": `url("${p.bannerImage}")`} as CSSProperties : undefined}>
    {mode==="banner"&&<img className="ad-banner" src={p.bannerImage!} alt="" fetchPriority="high"/>}
    {mode==="poster"&&<><img className="ad-bg" src={p.poster!} alt="" aria-hidden="true"/><img className="ad-pos" src={p.poster!} alt={p.title} width={320} height={480} fetchPriority="high"/></>}
    {mode==="empty"&&<div className="ad-empty-space" aria-hidden="true"/>}
