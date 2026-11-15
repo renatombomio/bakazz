@@ -81,7 +81,7 @@ try {
   <main id="main-content">
     <HomeHero
       image="/images/login1.jpg"
-      video={{ webm: "/videos/hero-horizontal.webm", mp4: "/videos/hero-horizontal.mp4" }}
+      video={{ mp4: "/videos/hero2.mp4" }}
       subtitle={isEnglish ? "Discover anime and debate it." : "Descubre anime y debate sobre él."}
       primary={{ label: isEnglish ? "Explore anime" : "Explorar anime", href: localizedPath(lang, "/search/") }}
       secondary={{ label: isEnglish ? "View debates" : "Ver debates", href: localizedPath(lang, "/community/debates/") }}
@@ -146,18 +146,7 @@ try {
 
   </main>
 
-  <CommunityFooter
-    members={communityMembers.map((member) => ({ username: member.aka, avatar: member.avatar_url }))}
-    labels={{
-      invite: isEnglish ? "What do you want to debate?" : "¿Qué quieres debatir?",
-      newDebate: isEnglish ? "New debate" : "Nuevo debate",
-      privacy: isEnglish ? "Privacy" : "Privacidad",
-      contact: isEnglish ? "Contact" : "Contacto",
-    }}
-    debateHref={localizedPath(lang, "/community/debates/") + "?compose=1"}
-    privacyHref={null}
-    contactHref={null}
-  />
+  <CommunityFooter />
 </Layout>
 
 <style>

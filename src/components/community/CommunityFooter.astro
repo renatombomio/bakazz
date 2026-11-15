@@ -1,54 +1,13 @@
 ---
-interface Member { username: string; avatar?: string | null; color?: string }
-interface Props {
-  members: Member[];
-  labels: { invite: string; newDebate: string; privacy: string; contact: string };
-  debateHref: string;
-  privacyHref?: string | null;
-  contactHref?: string | null;
-}
-const { members, labels, debateHref, privacyHref = null, contactHref = null } = Astro.props;
-const seen = new Set<string>();
-const stack = members
-  .filter((member) => {
-    const username = member.username.trim().replace(/^@/, "").toLowerCase();
-    if (!username || seen.has(username)) return false;
-    seen.add(username);
-    return true;
-  })
-  .slice(0, 5);
 const year = new Date().getFullYear();
 ---
-<footer class="cf">
-  <div class="cf-in">
-    {stack.length > 0 && (
-      <div class="cf-stack" aria-hidden="true">
-        {stack.map((member) =>
-          member.avatar
-            ? <img src={member.avatar} alt="" width="40" height="40" loading="lazy" decoding="async" />
-            : <span>{member.username.replace(/^@/, "").charAt(0).toUpperCase()}</span>
-        )}
-      </div>
-    )}
-    <p class="cf-invite">{labels.invite}</p>
-    <a class="cf-btn" href={debateHref}>{labels.newDebate}</a>
-    <p class="cf-legal">
-      <span>© {year} Renanime World</span>
-      {privacyHref && <a href={privacyHref}>{labels.privacy}</a>}
-      {contactHref && <a href={contactHref}>{labels.contact}</a>}
-    </p>
+<footer class="cf" aria-label="Renanime World">
+  <div class="cf-inner">
+    <span>© {year} Renanime World. Todos los derechos reservados.</span>
   </div>
 </footer>
 <style>
-  .cf { margin-top:56px; color:#f2efe9; background:#09090b; }
-  .cf-in { max-width:1040px; margin:0 auto; padding:8px 16px calc(104px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; align-items:center; text-align:center; }
-  .cf-stack { display:flex; align-items:center; justify-content:center; padding-left:10px; }
-  .cf-stack img,.cf-stack span { width:40px; height:40px; flex:0 0 40px; margin-left:-10px; border:2px solid #09090b; border-radius:50%; object-fit:cover; background:#3b3a52; color:#fff; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:800; }
-  .cf-stack > :first-child { margin-left:0; }
-  .cf-invite { margin:16px 0 0; max-width:20ch; color:#f2efe9; font-size:clamp(22px,4vw,24px); font-weight:650; line-height:1.15; letter-spacing:-.02em; text-wrap:balance; }
-  .cf-btn { display:inline-flex; align-items:center; justify-content:center; min-height:46px; margin-top:20px; padding:13px 26px; border-radius:999px; background:#ec4899; color:#fff; font-size:14px; font-weight:700; text-decoration:none; }
-  .cf-btn:focus-visible { outline:2px solid #f472b6; outline-offset:4px; }
-  .cf-legal { display:flex; flex-wrap:wrap; justify-content:center; gap:4px 14px; margin:44px 0 0; color:#8d8993; font-size:12px; line-height:1.5; }
-  .cf-legal a { color:#8d8993; text-decoration:none; }
-  .cf-legal a:hover { color:#cfcbd3; }
+  .cf { width:100%; margin:0; border-top:1px solid rgba(255,255,255,.08); background:#09090b; color:#85858d; }
+  .cf-inner { width:100%; min-height:64px; display:flex; align-items:center; justify-content:center; padding:16px 20px calc(16px + env(safe-area-inset-bottom)); text-align:center; }
+  .cf-inner span { font-size:12px; line-height:1.5; letter-spacing:.01em; }
 </style>
