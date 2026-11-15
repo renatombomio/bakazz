@@ -268,6 +268,30 @@ export const streamingAvailability: Record<string, StreamingAvailability> = {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/gleipnir",
     providers: [provider.crunchyroll],
   },
+  "personal-039": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/big-order",
+    providers: [provider.crunchyroll],
+  },
+  "personal-043": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/mob-psycho-100-2016",
+    providers: [provider.netflix, provider.crunchyroll],
+  },
+  "personal-073": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/kiznaiver",
+    providers: [provider.crunchyroll],
+  },
+  "personal-098": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/the-faraway-paladin",
+    providers: [provider.crunchyroll],
+  },
+  "personal-108": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/juuni-taisen",
+    providers: [provider.crunchyroll],
+  },
+  "personal-117": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/saiki-kusuo-no-sainan",
+    providers: [provider.netflix],
+  },
   "personal-119": {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/kaiju-no-8",
     providers: [provider.crunchyroll],
