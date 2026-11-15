@@ -1,15 +1,13 @@
 ---
 interface Props {
-  image: string;
   video?: { mp4: string; webm?: string } | null;
   subtitle: string;
   primary: { label: string; href: string };
   secondary?: { label: string; href: string };
 }
-const { image, video = null, subtitle, primary, secondary } = Astro.props;
+const { video = null, subtitle, primary, secondary } = Astro.props;
 ---
 <section class="hh" aria-label="Renanime World">
-  <img class="hh-poster" src={image} alt="" fetchpriority="high" decoding="async" />
   {video && (
     <video class="hh-video" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
       {video.webm && <source src={video.webm} type="video/webm" />}
@@ -62,7 +60,6 @@ const { image, video = null, subtitle, primary, secondary } = Astro.props;
     background: #09090b;
     color: #f2efe9;
   }
-  .hh-poster,
   .hh-video {
     position: absolute;
     z-index: -2;
@@ -73,7 +70,6 @@ const { image, video = null, subtitle, primary, secondary } = Astro.props;
     object-fit: cover;
     object-position: center;
   }
-  .hh-poster { filter: saturate(.9) brightness(.58); }
   .hh-video {
     filter: saturate(.9) brightness(.58);
     transform: rotate(90deg) scale(1.9);
