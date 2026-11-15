@@ -146,7 +146,18 @@ try {
 
   </main>
 
-  <Footer />
+  <CommunityFooter
+    members={communityMembers.map((member) => ({ username: member.aka, avatar: member.avatar_url }))}
+    labels={{
+      invite: isEnglish ? "What do you want to debate?" : "¿Qué quieres debatir?",
+      newDebate: isEnglish ? "New debate" : "Nuevo debate",
+      privacy: isEnglish ? "Privacy" : "Privacidad",
+      contact: isEnglish ? "Contact" : "Contacto",
+    }}
+    debateHref={localizedPath(lang, "/community/debates/") + "?compose=1"}
+    privacyHref={null}
+    contactHref={null}
+  />
 </Layout>
 
 <style>
