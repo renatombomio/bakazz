@@ -104,8 +104,24 @@ export const streamingAvailability: Record<string, StreamingAvailability> = {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/jujutsu-kaisen",
     providers: [provider.netflix, provider.prime, provider.disney, provider.crunchyroll],
   },
+  "personal-119": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/kaiju-no-8",
+    providers: [provider.crunchyroll],
+  },
+  "personal-120": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/wind-breaker",
+    providers: [provider.crunchyroll],
+  },
+  "personal-127": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/sakamoto-days",
+    providers: [provider.netflix],
+  },
+  "personal-135": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/gachiakuta",
+    providers: [provider.disney, provider.crunchyroll],
+  },
   "personal-142": {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/death-note",
-    providers: [provider.netflix, provider.crunchyroll],
+    providers: [provider.crunchyroll],
   },
 };
