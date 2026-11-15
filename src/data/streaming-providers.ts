@@ -200,6 +200,18 @@ export const streamingAvailability: Record<string, StreamingAvailability> = {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/kanojo-okarishimasu",
     providers: [provider.crunchyroll],
   },
+  "personal-062": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/the-promised-neverland",
+    providers: [provider.netflix],
+  },
+  "personal-097": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/fumetsu-no-anata-e",
+    providers: [provider.crunchyroll],
+  },
+  "personal-114": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/tengoku-daimakyou",
+    providers: [provider.disney],
+  },
   "personal-119": {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/kaiju-no-8",
     providers: [provider.crunchyroll],
