@@ -1,3 +1,4 @@
+import { streamingAvailability } from "../../data/streaming-providers";
 import { getRenAniListId } from "../../lib/api/ren-anime-identities";
 import { getDisplayTitle, getNativeTitle } from "../../lib/anime/display-title";
 import { useEffect, useState } from "react";
@@ -446,6 +447,13 @@ export default function AnimeDetail({entry,lang="es"}:{entry:LibraryEntry;lang?:
   {media?.duration&&<span><small>{media?.format==="MOVIE"?t("detail.duration"):t("detail.durationEpisode")}</small><strong>{media.duration} min</strong></span>}
   {media?.format!=="MOVIE"&&getSeasonCount(media)&&<span><small>{t("detail.seasons")}</small><strong>{getSeasonCount(media)}</strong></span>}
 </div>
+       {typeof media?.id === "number" && streamingAvailability[media.id] && <section className="anime-detail-streaming" aria-label={lang === "en" ? "Available streaming platforms in Spain" : "Plataformas disponibles en España"}>
+        <span className="anime-detail-streaming-label">{lang === "en" ? "AVAILABLE ON" : "DISPONIBLE EN"}</span>
+        <div className="anime-detail-streaming-providers">
+         {streamingAvailability[media.id].providers.map((provider) => <a key={provider.name} href={provider.url} target="_blank" rel="noopener noreferrer">{provider.name}</a>)}
+        </div>
+        <a className="anime-detail-streaming-source" href={streamingAvailability[media.id].sourceUrl} target="_blank" rel="noopener noreferrer">{lang === "en" ? "Check availability" : "Comprobar disponibilidad"} ↗</a>
+       </section>}
        {media?.genres?.length&&<div className="anime-detail-genres">{media.genres.slice(0,5).map((genre)=><span key={genre}>{genre}</span>)}</div>}
        </div>
       </div>
