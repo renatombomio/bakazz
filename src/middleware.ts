@@ -23,6 +23,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
       routePath.startsWith("/_astro/") ||
       routePath.startsWith("/audio/") ||
       routePath.startsWith("/videos/") ||
+      routePath.startsWith("/video/") ||
       routePath.startsWith("/images/") ||
       routePath === "/favicon.svg" ||
       routePath === "/favicon.ico";
@@ -72,6 +73,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     routePath.startsWith("/_astro/") ||
     routePath.startsWith("/audio/") ||
     routePath.startsWith("/videos/") ||
+    routePath.startsWith("/video/") ||
     routePath.startsWith("/images/") ||
     routePath === "/favicon.svg" ||
     routePath === "/favicon.ico";
