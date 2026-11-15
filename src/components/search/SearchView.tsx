@@ -402,7 +402,7 @@ export default function SearchView({ lang = "es" }: { lang?: Lang }) {
           epsLabel={(n) => t("search.episodesShort").replace("{count}", String(n))}
         />
       )}
-      {hasNext && !loading && <button type="button" className="search-more" onClick={loadMore}>{t("search.more")}</button>}
+      {hasNext && !loading && (query.trim() || hasFilters) && <button type="button" className="search-more" onClick={loadMore}>{t("search.more")}</button>}
       {filtersOpen && (
         <div className="sf-back" onMouseDown={(event) => { if (event.target === event.currentTarget) closePanel(); }}>
           <div ref={dialogRef} className="sf-sheet" role="dialog" aria-modal="true" aria-labelledby="sf-title">
