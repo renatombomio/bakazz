@@ -52,7 +52,7 @@ const { video = null, rotate = 270, subtitle, primary, secondary } = Astro.props
 <style>
   .hh { position: relative; display: flex; align-items: flex-end; min-height: min(80svh, 640px); overflow: hidden; background: var(--hh-fade-color, #09090b); color: #f2efe9; }
   .hh-img { position: absolute; inset: auto; top: 50%; left: 50%; width: min(88svh, 760px); height: 100vw; translate: -50% -50%; object-fit: cover; filter: saturate(.85) brightness(.55); }
-  .hh-veil { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to bottom, rgba(9,9,11,0) 34%, rgba(9,9,11,.12) 52%, rgba(9,9,11,.62) 78%, var(--hh-fade-color, #09090b) 100%); }
+  .hh-veil { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to bottom, rgba(9,9,11,0) 24%, rgba(9,9,11,.12) 42%, rgba(9,9,11,.62) 66%, var(--hh-fade-color, #09090b) 88%, var(--hh-fade-color, #09090b) 100%); }
   .hh-body { position: relative; width: 100%; max-width: 1400px; margin: 0 auto; padding: 0 16px 40px; box-sizing: border-box; container-type: inline-size; }
   .hh-word { position: relative; margin: 0; font-family: "Anton", "Impact", "Arial Narrow", sans-serif; font-weight: 400;
     font-size: calc(100cqw / 3.8); line-height: .9; letter-spacing: .005em; text-transform: uppercase; color: #f2efe9; white-space: nowrap; }
@@ -69,12 +69,19 @@ const { video = null, rotate = 270, subtitle, primary, secondary } = Astro.props
     .hh { display: block; min-height: 0; background: var(--hh-fade-color, #09090b); }
     .hh::before { content: ""; display: block; width: 100%; aspect-ratio: 16 / 9; }
     .hh-img { top: 28.125vw; left: 50%; width: 56.25vw; height: 100vw; }
-    .hh-veil { inset: 0 0 auto 0; height: calc(100vw * 9 / 16); background: linear-gradient(to bottom, rgba(9,9,11,0) 38%, rgba(9,9,11,.18) 58%, rgba(9,9,11,.72) 82%, var(--hh-fade-color, #09090b) 100%); }
+    .hh-veil { inset: 0; height: auto; background: linear-gradient(to bottom, rgba(9,9,11,0) 18%, rgba(9,9,11,.12) 34%, rgba(9,9,11,.72) 52%, var(--hh-fade-color, #09090b) 72%, var(--hh-fade-color, #09090b) 100%); }
     .hh-body { margin-top: -22vw; padding-top: 0; }
   }
   :global(:root[data-time-theme="day"]) { --hh-fade-color: #fff; }
+  :global(:root[data-time-theme="day"]) .hh { color: #19181b; }
+  :global(:root[data-time-theme="day"]) .hh-sub { color: #49464e; }
+  :global(:root[data-time-theme="day"]) .hh-ghost { color: #19181b; border-color: rgba(25,24,27,.35); }
+  :global(:root[data-time-theme="day"]) .hh-world { color: #fff; }
   :global(:root[data-time-theme="night"]) { --hh-fade-color: #09090b; }
   :global(body.theme-ghibli) { --hh-fade-color: #fff; }
+  :global(body.theme-ghibli) .hh { color: #19181b; }
+  :global(body.theme-ghibli) .hh-sub { color: #49464e; }
+  :global(body.theme-ghibli) .hh-ghost { color: #19181b; border-color: rgba(25,24,27,.35); }
   .hh-btn:focus-visible { outline: 2px solid #f472b6; outline-offset: 4px; }
   @media (min-width: 768px) {
     .hh { min-height: min(88svh, 760px); }
