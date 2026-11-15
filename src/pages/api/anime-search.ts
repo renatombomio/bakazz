@@ -170,7 +170,7 @@ async function filterAnime(genres:string[],year:string,status:string,q:string,pa
 const DISCOVERY_AFTER = 20240000;
 const DISCOVERY_BEFORE = 20260000;
 const HISTORICAL_POPULAR_AFTER = 19891231;
-const HISTORICAL_POPULAR_BEFORE = 20170101;
+const HISTORICAL_POPULAR_BEFORE = 20261116;
 async function discoveryAnime(page:number,perPage:number):Promise<Data> {
   const query="query DiscoveryAnime($page:Int!,$perPage:Int!,$after:FuzzyDateInt!,$before:FuzzyDateInt!){Page(page:$page,perPage:$perPage){pageInfo{total hasNextPage} media(type:ANIME,sort:START_DATE_DESC,isAdult:false,startDate_greater:$after,startDate_lesser:$before){"+FIELDS+"}}}";
   const p=await anilist(query,{page,perPage,after:DISCOVERY_AFTER,before:DISCOVERY_BEFORE});
@@ -259,7 +259,7 @@ export const GET:APIRoute=async({request})=>{
   const isSearch=q.length>=2;
   const isFiltered=genres.length>0||Boolean(year||status);
   const filterState={query:normalizedQuery,genres,year,status,page,perPage,popular};
-  const rawKey="v5:"+(discovery?"discovery:":gems?"gems:":popular?"popular:":isFiltered?"filters:":"search:")+JSON.stringify(filterState);
+  const rawKey="v6:"+(discovery?"discovery:":gems?"gems:":popular?"popular:":isFiltered?"filters:":"search:")+JSON.stringify(filterState);
   const key=await digest(rawKey);
   const localKey=key;
 
