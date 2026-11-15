@@ -279,10 +279,17 @@ export default function SearchView({ lang = "es" }: { lang?: Lang }) {
   });
   const discoveryItems = toDisplayItems(discoveryResults);
   const popularItems = toDisplayItems(results);
-  const usedAfterDiscovery = new Set([...discoveryItems, ...popularItems].map((item) => item.id));
-  const gemsItems = toDisplayItems(gemsResults).filter((item) => !usedAfterDiscovery.has(item.id));
+  const normalizeTitle = (title: string) => title.trim().toLocaleLowerCase("es");
   const discoveryIds = new Set(discoveryItems.map((item) => item.id));
-  const popularUniqueItems = popularItems.filter((item) => !discoveryIds.has(item.id));
+  const discoveryTitles = new Set(discoveryItems.map((item) => normalizeTitle(item.title)));
+  const popularUniqueItems = popularItems.filter((item) =>
+    !discoveryIds.has(item.id) && !discoveryTitles.has(normalizeTitle(item.title))
+  );
+  const usedIds = new Set([...discoveryItems, ...popularUniqueItems].map((item) => item.id));
+  const usedTitles = new Set([...discoveryItems, ...popularUniqueItems].map((item) => normalizeTitle(item.title)));
+  const gemsItems = toDisplayItems(gemsResults).filter((item) =>
+    !usedIds.has(item.id) && !usedTitles.has(normalizeTitle(item.title))
+  );
 
   const buttonLabel = countError
     ? t("search.error")
