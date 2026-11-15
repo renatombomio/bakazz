@@ -1,24 +1,22 @@
 ---
 interface Props {
-  image: string;
   video?: { mp4: string; webm?: string } | null;
   imagePosition?: string;
   subtitle: string;
   primary: { label: string; href: string };
   secondary?: { label: string; href: string };
 }
-const { image, video = null, imagePosition = "50% 40%", subtitle, primary, secondary } = Astro.props;
+const { video = null, subtitle, primary, secondary } = Astro.props;
 ---
 <section class="hh">
   {video
     ? (
-      <video class="hh-img" autoplay muted loop playsinline preload="metadata" poster={image} aria-hidden="true"
-        style={`object-position:${imagePosition}`}>
+      <video class="hh-img" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
         {video.webm && <source src={video.webm} type="video/webm" />}
         <source src={video.mp4} type="video/mp4" />
       </video>
     )
-    : <img class="hh-img" src={image} alt="" style={`object-position:${imagePosition}`} fetchpriority="high" />}
+    : null}
   <div class="hh-veil" aria-hidden="true"></div>
   <div class="hh-body">
     <h1 class="hh-word" aria-label="Renanime World">
