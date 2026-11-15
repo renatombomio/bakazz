@@ -41,6 +41,7 @@ const posters = new Map<string, ManifestEntry>(
 const ANILIST_ENDPOINT = "https://graphql.anilist.co";
 const CACHE_TTL_SECONDS = 30 * 24 * 60 * 60;
 const BATCH_SIZE = 50;
+const METADATA_WAIT_MS = 700;
 
 async function fetchAniListBatch(ids: number[]): Promise<AniListMedia[]> {
   const cached = await getPersistentCache<AniListMedia[]>("ren-collection-cover-colors", { ids }, CACHE_TTL_SECONDS, async () => {
@@ -90,7 +91,11 @@ export async function getRenCollectionItems(lang: "es" | "en"): Promise<RenColle
   );
   const results = await Promise.all(batches.map(async (batch) => {
     try {
-      return await fetchAniListBatch(batch);
+      const metadata = fetchAniListBatch(batch);
+      const timeout = new Promise<AniListMedia[]>((resolve) => {
+        setTimeout(() => resolve([]), METADATA_WAIT_MS);
+      });
+      return await Promise.race([metadata, timeout]);
     } catch (error) {
       console.warn("[ren-collection] AniList metadata unavailable:", error);
       return [];
@@ -106,11 +111,11 @@ export async function getRenCollectionItems(lang: "es" | "en"): Promise<RenColle
     const anilistId = Number(manifest?.externalId ?? identity?.anilistId);
     const media = Number.isInteger(anilistId) ? mediaById.get(anilistId) : undefined;
     if (media?.format === "MOVIE") return [];
-    const cover = media?.coverImage?.extraLarge
+    const cover = manifest?.posterUrl
+      || media?.coverImage?.extraLarge
       || media?.coverImage?.large
       || identity?.coverImage?.extraLarge
       || identity?.coverImage?.large
-      || manifest?.posterUrl
       || "";
     const title = media?.title?.romaji || media?.title?.english || identity?.providerTitles?.romaji || identity?.displayTitle || entry.title;
     return [{

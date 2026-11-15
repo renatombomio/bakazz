@@ -43,7 +43,7 @@ export default function BookshelfSelection({ items, lang }: Props) {
               aria-label={item.title}
               aria-pressed={active}
               onClick={() => setSelectedId(item.animeId)}
-              onMouseEnter={() => setSelectedId(item.animeId)}
+              onPointerEnter={(event) => { if (event.pointerType === "mouse") setSelectedId(item.animeId); }}
               onFocus={() => setSelectedId(item.animeId)}
             >
               <span>{item.title}</span>
@@ -54,7 +54,7 @@ export default function BookshelfSelection({ items, lang }: Props) {
 
       {selected && (
         <div className="book-preview" aria-live="polite">
-          {selected.cover && <img src={selected.cover} alt="" width="230" height="345" loading="eager" fetchPriority="high" decoding="async" />}
+          {selected.cover && <img key={selected.animeId} src={selected.cover} alt="" width="230" height="345" loading="eager" fetchPriority="high" decoding="async" />}
           <div className="book-preview-copy">
             <h3>{selected.title}</h3>
             <a href={selected.href}>{viewLabel}</a>
