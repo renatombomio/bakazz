@@ -1,26 +1,23 @@
 import { getWatchedLibrary } from "../data/library";
 import identityCatalogue from "../data/ren-anime-identities.json";
 import coverManifest from "../data/ren-cover-manifest.json";
-import { getPersistentCache } from "./server/persistent-cache";
 import { localizedPath } from "../i18n";
 
 type Identity = {
   animeId: string;
-  anilistId: number;
   format: "SERIES" | "MOVIE";
   displayTitle: string;
   providerTitles?: { romaji?: string | null; english?: string | null };
   coverImage?: { extraLarge?: string | null; large?: string | null } | null;
 };
-type ManifestEntry = { animeId: string; externalId?: string | null; posterUrl?: string | null };
-type AniListMedia = {
-  id: number;
-  title?: { romaji?: string | null; english?: string | null };
-  format?: string | null;
-  popularity?: number | null;
-  coverImage?: { extraLarge?: string | null; large?: string | null; color?: string | null } | null;
+type ManifestEntry = {
+  animeId: string;
+  format?: "SERIES" | "MOVIE";
+  displayTitle?: string;
+  posterUrl?: string | null;
+  color?: string | null;
+  popularity?: number;
 };
-type AniListPayload = { data?: { Page?: { media?: AniListMedia[] } }; errors?: { message?: string }[] };
 
 export type RenCollectionItem = {
   animeId: string;
@@ -35,99 +32,26 @@ export type RenCollectionItem = {
 const identities = new Map<string, Identity>(
   (identityCatalogue as { entries?: Identity[] }).entries?.map((entry) => [entry.animeId, entry]) ?? [],
 );
-const posters = new Map<string, ManifestEntry>(
+const catalogue = new Map<string, ManifestEntry>(
   (coverManifest as { entries?: ManifestEntry[] }).entries?.map((entry) => [entry.animeId, entry]) ?? [],
 );
-const ANILIST_ENDPOINT = "https://graphql.anilist.co";
-const CACHE_TTL_SECONDS = 30 * 24 * 60 * 60;
-const BATCH_SIZE = 50;
-const METADATA_WAIT_MS = 700;
 
-async function fetchAniListBatch(ids: number[]): Promise<AniListMedia[]> {
-  const cached = await getPersistentCache<AniListMedia[]>("ren-collection-cover-colors", { ids }, CACHE_TTL_SECONDS, async () => {
-    const response = await fetch(ANILIST_ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify({
-        query: `query RenCollectionCovers($ids: [Int]) {
-          Page(page: 1, perPage: 50) {
-            media(id_in: $ids, type: ANIME) {
-              id
-              title { romaji english }
-              format
-              popularity
-              coverImage { extraLarge large color }
-            }
-          }
-        }`,
-        variables: { ids },
-      }),
-      signal: AbortSignal.timeout(12_000),
-    });
-    if (!response.ok) throw new Error(`AniList returned HTTP ${response.status}`);
-    const payload = await response.json() as AniListPayload;
-    if (payload.errors?.length) throw new Error(payload.errors.map((error) => error.message).filter(Boolean).join("; "));
-    const media = payload.data?.Page?.media;
-    if (!Array.isArray(media)) throw new Error("AniList returned an invalid collection response.");
-    return media;
-  });
-  return cached.value;
-}
-
-export async function getRenCollectionItems(lang: "es" | "en"): Promise<RenCollectionItem[]> {
-  const watched = getWatchedLibrary();
-  const candidates = watched.filter((entry) => {
+/** Fixed editorial data: rendering this page never calls AniList or another API. */
+export function getRenCollectionItems(lang: "es" | "en"): RenCollectionItem[] {
+  return getWatchedLibrary().flatMap((entry): RenCollectionItem[] => {
     const identity = identities.get(entry.animeId);
-    return entry.format !== "MOVIE" && identity?.format !== "MOVIE";
-  });
-  const ids = candidates
-    .map((entry) => Number(posters.get(entry.animeId)?.externalId ?? identities.get(entry.animeId)?.anilistId))
-    .filter((id) => Number.isInteger(id) && id > 0);
-  const uniqueIds = [...new Set(ids)];
-  const mediaById = new Map<number, AniListMedia>();
+    const metadata = catalogue.get(entry.animeId);
+    const format = entry.format ?? metadata?.format ?? identity?.format ?? "SERIES";
+    if (format === "MOVIE") return [];
 
-  const batches = Array.from({ length: Math.ceil(uniqueIds.length / BATCH_SIZE) }, (_, index) =>
-    uniqueIds.slice(index * BATCH_SIZE, (index + 1) * BATCH_SIZE),
-  );
-  const results = await Promise.all(batches.map(async (batch) => {
-    try {
-      const metadata = fetchAniListBatch(batch);
-      const timeout = new Promise<AniListMedia[]>((resolve) => {
-        setTimeout(() => resolve([]), METADATA_WAIT_MS);
-      });
-      return await Promise.race([metadata, timeout]);
-    } catch (error) {
-      console.warn("[ren-collection] AniList metadata unavailable:", error);
-      return [];
-    }
-  }));
-  for (const result of results) {
-    for (const item of result) mediaById.set(item.id, item);
-  }
-
-  const items = candidates.flatMap((entry): RenCollectionItem[] => {
-    const identity = identities.get(entry.animeId);
-    const manifest = posters.get(entry.animeId);
-    const anilistId = Number(manifest?.externalId ?? identity?.anilistId);
-    const media = Number.isInteger(anilistId) ? mediaById.get(anilistId) : undefined;
-    if (media?.format === "MOVIE") return [];
-    const cover = manifest?.posterUrl
-      || media?.coverImage?.extraLarge
-      || media?.coverImage?.large
-      || identity?.coverImage?.extraLarge
-      || identity?.coverImage?.large
-      || "";
-    const title = media?.title?.romaji || media?.title?.english || identity?.providerTitles?.romaji || identity?.displayTitle || entry.title;
     return [{
       animeId: entry.animeId,
-      title,
+      title: metadata?.displayTitle || identity?.providerTitles?.romaji || identity?.displayTitle || entry.title,
       href: localizedPath(lang, `/anime/${entry.animeId}/`),
-      cover,
-      color: media?.coverImage?.color || "#3a3a44",
-      popularity: media?.popularity ?? 0,
+      cover: metadata?.posterUrl || identity?.coverImage?.extraLarge || identity?.coverImage?.large || "",
+      color: metadata?.color || "#3a3a44",
+      popularity: metadata?.popularity ?? 0,
       recommended: entry.state.recommended || entry.state.favorite,
     }];
   });
-
-  return items;
 }

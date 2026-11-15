@@ -1,602 +1,734 @@
 {
-  "version": 1,
+  "version": 2,
   "generatedAt": "2026-11-04T13:17:34.977Z",
-  "source": "src/data/library.ts",
+  "source": "static-library-and-reviewed-anilist-catalogue",
   "total": 135,
   "entries": [
     {
       "animeId": "personal-001",
       "title": "Boku no Hero Academia",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "21459",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21459-nYh85uj2Fuwr.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-002",
       "title": "Dragon Ball Z",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "813",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx813-ZhnFNOeCU5dQ.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-003",
       "title": "Naruto",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "20",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20-dE6UHbFFg1A5.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-004",
       "title": "Bleach",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "269",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx269-d2GmRkJbMopq.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-005",
       "title": "Shingeki no Kyojin",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "16498",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx16498-buvcRTBx4NSm.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-006",
       "title": "One Piece",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "21",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21-ELSYx3yMPcKM.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-007",
       "title": "Akame ga Kill!",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "20613",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20613-HXHpec4bemk5.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-008",
       "title": "Toradora!",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "4224",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx4224-PXVMBLNwy2aF.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-009",
       "title": "Fullmetal Alchemist",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "121",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx121-zjmixZ428Mwv.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-010",
       "title": "One Punch Man",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "21087",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21087-B5DHjqZ3kW4b.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-011",
       "title": "Soul Eater",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "3588",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx3588-fSMggQoFSbUI.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-012",
       "title": "Black Clover",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "97940",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx97940-fyh8o7gNbha0.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-013",
-      "title": "DanMachi",
-      "format": null,
+      "title": "Dungeon ni Deai wo Motomeru no wa Machigatteiru Darou ka",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "20920",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20920-MTREwZOG4BAD.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-014",
       "title": "Kakegurui",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "98314",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b98314-TSJykxVwCCQN.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-015",
       "title": "Kimetsu no Yaiba",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "101922",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101922-WBsBl0ClmgYL.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-016",
       "title": "Ballroom e Youkoso",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "98005",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx98005-kwoBQIEeXa8J.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-017",
       "title": "Akatsuki no Yona",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "20770",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20770-brCDvhTXlums.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-018",
       "title": "Dororo",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "101347",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101347-TGaDwEYqLfm1.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-019",
       "title": "Trinity Seven",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "20631",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20631-LdCiy3goitcT.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-020",
       "title": "Afro Samurai",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "1292",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1292-FcyYgq7Ly34H.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-021",
-      "title": "Katekyo Hitman Reborn!",
-      "format": null,
+      "title": "Katekyou Hitman REBORN!",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "1604",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1604-W2q38L4OCGLI.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-022",
       "title": "D.Gray-man",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "1482",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1482-6jc8ZVSmHuLo.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-023",
       "title": "Beelzebub",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "9513",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/nx9513-is6YiSgKbyQX.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-024",
       "title": "Ao no Exorcist",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "9919",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx9919-nXS7JOZrWHfS.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-025",
       "title": "Deadman Wonderland",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "6880",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx6880-qZ1jIqIYpST2.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-026",
       "title": "Mirai Nikki",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "10620",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx10620-dUZeNej0W4QN.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-027",
       "title": "Fairy Tail",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "6702",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b6702-KI4qgSMyI8Pm.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-028",
       "title": "Sword Art Online",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "11757",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11757-SxYDUzdr9rh2.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-029",
       "title": "K Project",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "14467",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx14467-TQjwOvq4jkYS.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-030",
       "title": "Zetsuen no Tempest",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "14075",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx14075-EIJcGXq5hd9O.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-031",
       "title": "Blood Lad",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "11633",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11633-vIjtabJq64Xt.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-032",
       "title": "Noragami",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "20447",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20447-EoQXeygHaVCK.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-033",
-      "title": "Magi: The Labyrinth of Magic",
-      "format": null,
+      "title": "Magi: The labyrinth of magic",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "14513",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx14513-HuUdrFFYftA7.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-034",
       "title": "Magi: Sinbad no Bouken",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "21394",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21394-yauvzIHGAoZv.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-035",
       "title": "Tokyo Ghoul",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "20605",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b20605-k665mVkSug8D.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-036",
       "title": "Shingeki no Bahamut",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "20590",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20590-LuMDAd75Kg3C.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-037",
       "title": "Owari no Seraph",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "20829",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20829-pgsXVjrfyI5V.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-038",
       "title": "Ansatsu Kyoushitsu",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "20755",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20755-dWrhs569YGUO.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-039",
       "title": "Big Order",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "21445",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21445-zXBAdDpNylRR.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-040",
       "title": "Bungou Stray Dogs",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "21311",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21311-hAXyT8Yoh6G9.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-041",
       "title": "Nanatsu no Taizai",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "154197",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx154197-yJZMgNynqQtW.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-042",
       "title": "Danganronpa",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "16592",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx16592-mFn1gfMXlKtw.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-043",
       "title": "Mob Psycho 100",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "21507",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21507-6YUSbh2m0N1p.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-044",
-      "title": "Servamp",
-      "format": null,
+      "title": "SERVAMP",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "21269",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21269-NU0MR6HcefqO.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-045",
       "title": "Strike the Blood",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "18277",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx18277-Vwm314Nr6vsg.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-046",
       "title": "Killing Bites",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "98389",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/nx98389-xDRFlDQwu2I9.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-047",
       "title": "Kekkai Sensen",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "20727",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20727-jgVnxLCHAKqZ.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-048",
       "title": "Goblin Slayer",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "101165",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101165-v5NwPXWPFDuD.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-049",
       "title": "Tenrou: Sirius the Jaeger",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "101361",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/nx101361-q4sHpCRgkhYQ.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-050",
       "title": "Wolf's Rain",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "202",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx202-w2OLL3j8WmDm.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-051",
       "title": "Tate no Yuusha no Nariagari",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "99263",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx99263-LcazQwdlWzMy.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-052",
       "title": "Enen no Shouboutai",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "105310",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx105310-2PKUvoaA6fTn.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-053",
       "title": "Kuroko no Basket",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "11771",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11771-uvr44RAwRxPw.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-054",
       "title": "No Game No Life",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "19815",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b19815-sEOQ9yQaPKlk.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-055",
-      "title": "Haikyuu!",
-      "format": null,
+      "title": "Haikyuu!!",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "20464",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20464-ooZUyBe4ptp9.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-056",
-      "title": "Tensei shitara Slime Datta Ken",
-      "format": null,
+      "title": "Tensei Shitara Slime Datta Ken",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "101280",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101280-tDxCVJm714nt.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-057",
-      "title": "Kangoku Gakuen",
-      "format": null,
+      "title": "Prison School",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "20807",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20807-8nFoO0AUdGsy.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-058",
-      "title": "Aho Girl",
-      "format": null,
+      "title": "Aho-Girl",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "98251",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b98251-6miVBNYEXzaF.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-059",
       "title": "Kono Subarashii Sekai ni Shukufuku wo!",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "21202",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21202-mPOr80AEjUcZ.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-060",
       "title": "Kaze ga Tsuyoku Fuiteiru",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "101903",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101903-ncgPJbbA5Nou.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-061",
       "title": "Megalo Box",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "100298",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b100298-A5VQUcw7ZC64.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-062",
       "title": "Yakusoku no Neverland",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "101759",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101759-8UR7r9MNVpz2.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-063",
-      "title": "Hinomaru Zumou",
-      "format": null,
+      "title": "Hinomaru-Zumou",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "100990",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/nx100990-NJ5mqZkYlW6y.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-064",
       "title": "Shokugeki no Souma",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "20923",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20923-pNT38pjW3RFH.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-065",
       "title": "Mahoutsukai no Yome",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "98436",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx98436-n7sK6POCd0XV.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-066",
       "title": "Tsurezure Children",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "98291",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx98291-LY6txxZTX8We.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-067",
@@ -605,619 +737,757 @@
       "provider": "anilist",
       "externalId": "20954",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20954-sYRfE5jQRtSB.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-068",
-      "title": "Anohana",
-      "format": null,
+      "title": "Ano Hi Mita Hana no Namae wo Bokutachi wa Mada Shiranai.",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "9989",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx9989-hImMg6kCMm6I.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-069",
       "title": "Domestic na Kanojo",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "103139",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/nx103139-2TfvRyGTE1qp.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-070",
       "title": "Koi to Uso",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "98320",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx98320-VwCcTBeEs08J.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-071",
       "title": "Berserk",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "33",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx33-PSwfE5B0gejI.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-072",
       "title": "Fuuka",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "21887",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21887-CAq64M7WMgY5.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-073",
       "title": "Kiznaiver",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "21421",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21421-5y8ryXsMB7aJ.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-074",
       "title": "Re:Zero kara Hajimeru Isekai Seikatsu",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "21355",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21355-wRVUrGxpvIQQ.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-075",
       "title": "Akagami no Shirayuki-hime",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "21058",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21058-GRqasG1xk3bD.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-076",
-      "title": "Kimi no Na wa",
+      "title": "Kimi no Na wa.",
       "format": "MOVIE",
       "provider": "anilist",
       "externalId": "21519",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21519-SUo3ZQuCbYhJ.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-083",
       "title": "Another",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "11111",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11111-gvvE5bBYsyFo.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-084",
       "title": "Ousama Game",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "99698",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/nx99698-5k8bDkhcJx9B.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-085",
       "title": "Dorohedoro",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "105228",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx105228-I4xr84QS9Pvk.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-086",
-      "title": "The God of High School",
-      "format": null,
+      "title": "THE GOD OF HIGH SCHOOL",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "116006",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx116006-Wt8JSA1ZQxlM.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-087",
       "title": "Baki",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "97888",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx97888-tdZ1r7qN1DRs.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-088",
       "title": "Kengan Ashura",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "100891",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx100891-vPfnfkzizYFe.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-089",
-      "title": "Vinland Saga",
-      "format": null,
+      "title": "VINLAND SAGA",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "101348",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101348-2fhDFPCuMNiz.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-090",
       "title": "Kanojo, Okarishimasu",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "113813",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx113813-SnljeXpU3Pw7.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-091",
-      "title": "Kabaneri of the Iron Fortress",
-      "format": null,
+      "title": "Koutetsujou no Kabaneri",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "21196",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21196-2PfPfIDrxKki.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-092",
-      "title": "Mushoku Tensei: Jobless Reincarnation",
-      "format": null,
+      "title": "Mushoku Tensei: Isekai Ittara Honki Dasu",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "108465",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx108465-1ANspF1EWyFx.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-093",
       "title": "Plunderer",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "101168",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101168-LY3XA61byAVo.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-094",
       "title": "Appare-Ranman!",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "112444",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx112444-S7bhKskrAqSI.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-095",
       "title": "AntiMagic Academy 35th Test Platoon",
-      "format": null,
+      "format": "SERIES",
       "provider": "kitsu",
       "externalId": "8669",
       "posterUrl": "https://media.kitsu.app/anime/poster_images/8669/original.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-096",
-      "title": "SK8 the Infinity",
-      "format": null,
+      "title": "SK∞",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "124153",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx124153-uEBI764OSavB.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-097",
       "title": "Fumetsu no Anata e",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "114535",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx114535-y3NnjexcqKG1.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-098",
       "title": "Saihate no Paladin",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "132473",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx132473-L64hP24nJyEV.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-099",
       "title": "Katsute Kami Datta Kemono-tachi e",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "107672",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx107672-HBpAeSGSTFlt.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-100",
-      "title": "Vivy: Fluorite Eye's Song",
-      "format": null,
+      "title": "Vivy: Fluorite Eye’s Song",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "128546",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx128546-UIwyhuhjxmL0.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-101",
-      "title": "Arifureta: From Commonplace to World's Strongest",
-      "format": null,
+      "title": "Arifureta Shokugyou de Sekai Saikyou",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "100668",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx100668-DvOn5bMOt4cy.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-102",
       "title": "Sono Bisque Doll wa Koi wo Suru",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "132405",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx132405-qP7FQYGmNI3d.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-104",
       "title": "Gleipnir",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "108241",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx108241-Mc28QvkdUkfp.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-105",
       "title": "Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "98659",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx98659-WNyPLIZDpGGY.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-106",
-      "title": "SWORD GAI The Animation",
-      "format": null,
+      "title": "Sword Gai The Animation",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "20875",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/nx20875-aPXVfFJ7eYxz.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-107",
-      "title": "Tower of God",
-      "format": null,
+      "title": "Kami no Tou: Tower of God",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "115230",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx115230-QHOdSN7yt8ab.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-108",
       "title": "Juuni Taisen",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "98443",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/nx98443-1d7qImgzb6Dj.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-109",
-      "title": "Parasyte -the maxim-",
-      "format": null,
+      "title": "Kiseijuu: Sei no Kakuritsu",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "20623",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20623-dUARfggnNDOe.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-110",
-      "title": "Komi Can't Communicate",
-      "format": null,
+      "title": "Komi-san wa, Komyushou desu.",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "133965",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx133965-9TZBS4m4yvED.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-111",
       "title": "Steins;Gate",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "9253",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx9253-tIUXF2gfU8Sg.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-112",
       "title": "Hajime no Ippo",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "19647",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19647-cIy7ShTL6e9h.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-113",
       "title": "Jigokuraku",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "128893",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx128893-Gc2t8b8M0mVu.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-114",
-      "title": "Tengoku Daimakyo",
-      "format": null,
+      "title": "Tengoku Daimakyou",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "155783",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx155783-YosKbsmZzuDE.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-115",
       "title": "Made in Abyss",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "97986",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx97986-TQ7dCgbS3y5s.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-116",
-      "title": "Children of the Whales",
-      "format": null,
+      "title": "Kujira no Kora wa Sajou ni Utau",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "98449",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx98449-CxVQsAWFPpMa.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-117",
       "title": "Saiki K.",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "112625",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b112625-5Qi2PEQqITCa.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-118",
-      "title": "Gangsta.",
-      "format": null,
+      "title": "GANGSTA.",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "20773",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20773-yfJQMyHqZyJr.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-119",
-      "title": "Kaiju No. 8",
-      "format": null,
+      "title": "Kaijuu 8-gou",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "153288",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx153288-25FBfFJzEQ5O.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-120",
-      "title": "Wind Breaker",
-      "format": null,
+      "title": "WIND BREAKER",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "163270",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx163270-wboZJp0ybwVK.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-121",
-      "title": "Bartender: Glass of God",
-      "format": null,
+      "title": "Bartender: Kami no Glass",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "155890",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b155890-PN3wsgVDofhB.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-122",
       "title": "Kenka Dokugaku",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "174653",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx174653-OsnK4BuENjUT.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-123",
       "title": "Shinmai Ossan Boukensha",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "163292",
       "posterUrl": null,
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-124",
       "title": "Sentai Daishikkai",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "158417",
       "posterUrl": null,
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-125",
       "title": "Nige Jouzu no Wakagimi",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "162896",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx162896-hSMTVceb50GY.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-126",
       "title": "Sousou no Frieren",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "154587",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx154587-qQTzQnEJJ3oB.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-127",
       "title": "Sakamoto Days",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "177709",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx177709-e5Qx6RlsBgD5.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-128",
-      "title": "Solo Leveling",
-      "format": null,
+      "title": "Ore dake Level Up na Ken",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "151807",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx151807-it355ZgzquUd.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-129",
       "title": "Yomi no Tsugai",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "195600",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx195600-moI0UFArtOme.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-130",
       "title": "Darwin Jihen",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "177679",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx177679-BgsgE0fQk3qN.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-131",
       "title": "Dead Account",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "187901",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx187901-T91HmZAaNwOF.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-132",
       "title": "Yuusha-kei ni Shosu",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "167152",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx167152-O1pm6DWwifBD.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-133",
       "title": "Hikaru ga Shinda Natsu",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "177689",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx177689-d0mB5nYgdnhi.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-134",
-      "title": "100 Meters",
+      "title": "Hyakuemu.",
       "format": "MOVIE",
       "provider": "anilist",
       "externalId": "177687",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx177687-T4SrtVjrmW01.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-135",
       "title": "Gachiakuta",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "178025",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx178025-cWJKEsZynkil.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-136",
       "title": "Ninja Kamui",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "151639",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx151639-7KqJ7BgaM9Mx.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-137",
-      "title": "Scissor Seven",
-      "format": null,
+      "title": "Cike Wu Liuqi",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "107912",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx107912-pLrOL1AzEIEt.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-138",
-      "title": "The Eminence in Shadow",
-      "format": null,
+      "title": "Kage no Jitsuryokusha ni Naritakute!",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "130298",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx130298-YMdcKHytpWNH.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-139",
       "title": "Cowboy Bebop",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "1",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1-GCsPm7waJ4kS.png",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-140",
       "title": "Jujutsu Kaisen",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "113415",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx113415-LHBAeoZDIsnF.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-141",
-      "title": "Hunter x Hunter",
-      "format": null,
+      "title": "HUNTER×HUNTER",
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "136",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx136-gj0bbCpDNrKG.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     },
     {
       "animeId": "personal-142",
       "title": "Death Note",
-      "format": null,
+      "format": "SERIES",
       "provider": "anilist",
       "externalId": "1535",
       "posterUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1535-kUgkcrfOrkUM.jpg",
-      "status": "resolved"
+      "status": "resolved",
+      "color": "#3a3a44",
+      "popularity": 0
     }
   ]
 }
