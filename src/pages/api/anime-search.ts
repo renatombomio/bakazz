@@ -57,24 +57,63 @@ async function releaseCacheLock(key:string,owner:string) {
   const {error}=await cacheClient.rpc("anime_search_cache_release",{p_cache_key:key,p_owner:owner});
   if(error) console.warn("[anime-search] cache lock release failed:",error.message);
 }
+const ANILIST_GLOBAL_SLOTS = 4;
+const ANILIST_SLOT_WAIT_MS = 250;
+const ANILIST_SLOT_ATTEMPTS = 8;
+let localAniListInFlight = 0;
+
+async function acquireAniListPermit():Promise<()=>Promise<void>> {
+  const owner=crypto.randomUUID();
+
+  // Supabase cache locks are shared across Vercel instances, so these four
+  // stable keys form a small distributed concurrency gate for AniList.
+  if(cacheClient&&cacheToken) {
+    const keys=await Promise.all(Array.from({length:ANILIST_GLOBAL_SLOTS},(_,slot)=>digest("anilist-global-slot:"+slot)));
+    for(let attempt=0;attempt<ANILIST_SLOT_ATTEMPTS;attempt++) {
+      for(const key of keys) {
+        if(await claimCacheLock(key,owner)) {
+          return async()=>releaseCacheLock(key,owner);
+        }
+      }
+      if(attempt<ANILIST_SLOT_ATTEMPTS-1) {
+        await new Promise(resolve=>setTimeout(resolve,ANILIST_SLOT_WAIT_MS));
+      }
+    }
+    throw Object.assign(new Error("ANILIST_CAPACITY_EXCEEDED"),{status:503,retry:"2"});
+  }
+
+  // Degraded fallback when shared cache credentials are unavailable.
+  // This only protects one warm server instance, not the whole deployment.
+  if(localAniListInFlight>=2) {
+    throw Object.assign(new Error("ANILIST_CAPACITY_EXCEEDED"),{status:503,retry:"2"});
+  }
+  localAniListInFlight+=1;
+  return async()=>{localAniListInFlight=Math.max(0,localAniListInFlight-1);};
+}
+
 async function anilist(query:string,variables:Record<string,unknown>) {
-  const r=await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({query,variables}),signal:AbortSignal.timeout(10000)});
-  if(r.status===429) throw Object.assign(new Error("RATE_LIMIT"),{status:429,retry:r.headers.get("Retry-After")||"30"});
-  const body=await r.text();
-  if(!r.ok) {
-    console.error("[anime-search] AniList HTTP error",r.status,body.slice(0,1200));
-    throw new Error("ANILIST_HTTP_"+r.status);
+  const release=await acquireAniListPermit();
+  try {
+    const r=await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({query,variables}),signal:AbortSignal.timeout(10000)});
+    if(r.status===429) throw Object.assign(new Error("RATE_LIMIT"),{status:429,retry:r.headers.get("Retry-After")||"30"});
+    const body=await r.text();
+    if(!r.ok) {
+      console.error("[anime-search] AniList HTTP error",r.status,body.slice(0,1200));
+      throw new Error("ANILIST_HTTP_"+r.status);
+    }
+    let p:any;
+    try { p=JSON.parse(body); } catch {
+      console.error("[anime-search] AniList returned invalid JSON",body.slice(0,500));
+      throw new Error("ANILIST_INVALID_JSON");
+    }
+    if(p.errors?.length||!p.data?.Page||!Array.isArray(p.data.Page.media)) {
+      console.error("[anime-search] AniList GraphQL error",JSON.stringify(p.errors??p).slice(0,1600));
+      throw new Error("ANILIST_INVALID_RESPONSE");
+    }
+    return p.data.Page;
+  } finally {
+    await release();
   }
-  let p:any;
-  try { p=JSON.parse(body); } catch {
-    console.error("[anime-search] AniList returned invalid JSON",body.slice(0,500));
-    throw new Error("ANILIST_INVALID_JSON");
-  }
-  if(p.errors?.length||!p.data?.Page||!Array.isArray(p.data.Page.media)) {
-    console.error("[anime-search] AniList GraphQL error",JSON.stringify(p.errors??p).slice(0,1600));
-    throw new Error("ANILIST_INVALID_RESPONSE");
-  }
-  return p.data.Page;
 }
 async function searchAnime(q:string,page:number,perPage=PAGE_SIZE):Promise<Data> {
   const query="query SearchAnime($search:String!,$page:Int!,$perPage:Int!){Page(page:$page,perPage:$perPage){pageInfo{total hasNextPage} media(search:$search,type:ANIME,sort:SEARCH_MATCH,isAdult:false){"+FIELDS+"}}}";
