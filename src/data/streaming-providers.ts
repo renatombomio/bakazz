@@ -104,6 +104,30 @@ export const streamingAvailability: Record<string, StreamingAvailability> = {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/jujutsu-kaisen",
     providers: [provider.netflix, provider.prime, provider.disney, provider.crunchyroll],
   },
+  "personal-018": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/dororo-2019",
+    providers: [provider.prime],
+  },
+  "personal-033": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/magi",
+    providers: [provider.crunchyroll],
+  },
+  "personal-051": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/tate-no-yuusha-no-nariagari",
+    providers: [provider.netflix, provider.disney, provider.crunchyroll],
+  },
+  "personal-086": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/the-god-of-high-school",
+    providers: [provider.crunchyroll],
+  },
+  "personal-088": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/kenganashiyura",
+    providers: [provider.netflix],
+  },
+  "personal-109": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/parasyte-kiseijuu-sei-no-kakuritsu",
+    providers: [provider.netflix],
+  },
   "personal-119": {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/kaiju-no-8",
     providers: [provider.crunchyroll],
