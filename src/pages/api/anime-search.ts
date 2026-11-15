@@ -240,7 +240,7 @@ export const GET:APIRoute=async({request})=>{
   const isSearch=q.length>=2;
   const isFiltered=genres.length>0||Boolean(year||status);
   const filterState={query:normalizedQuery,genres,year,status,page,perPage,popular};
-  const rawKey=(popular?"popular:":isFiltered?"filters:":"search:")+JSON.stringify(filterState);
+  const rawKey="v2:"+(popular?"popular:":isFiltered?"filters:":"search:")+JSON.stringify(filterState);
   const key=await digest(rawKey);
   const localKey=key;
 
