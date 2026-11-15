@@ -51,10 +51,10 @@ const { video = null, rotate = 270, subtitle, primary, secondary } = Astro.props
 
 <style>
   .hh {
-    --hh-bg: var(--color-background, #09090b);
-    --hh-fg: var(--color-text-primary, #f2efe9);
-    --hh-sub: var(--color-text-secondary, #e4e0e8);
-    --hh-line: var(--color-border-strong, rgba(255,255,255,.4));
+    --hh-bg: #09090b;
+    --hh-fg: #f2efe9;
+    --hh-sub: #e4e0e8;
+    --hh-line: rgba(255,255,255,.4);
     --hh-bright: .55;
     position: relative;
     display: flex;
@@ -146,8 +146,6 @@ const { video = null, rotate = 270, subtitle, primary, secondary } = Astro.props
   .hh::after { content: none; }
   .hh-btn:focus-visible { outline: 2px solid #f472b6; outline-offset: 4px; }
 
-  :global(:root[data-time-theme="day"]) .hh { --hh-bright: .95; }
-  :global(:root[data-time-theme="night"]) .hh { --hh-bright: .55; }
 
   @media (prefers-reduced-motion: reduce) {
     .hh-img { animation: none; }
