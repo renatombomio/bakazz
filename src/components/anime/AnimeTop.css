@@ -10,3 +10,47 @@
 .anime-detail-share-wrap{position:relative;display:inline-flex;flex-direction:column;align-items:flex-start;margin:0}.anime-detail-share-button{height:40px;min-height:40px;padding:0 16px;border:0;border-radius:999px;background:rgba(9,9,11,.75);backdrop-filter:blur(8px);color:#f2efe9;font:600 14px Inter,system-ui,sans-serif}.anime-detail-share-button svg{width:18px;height:18px}.anime-detail-share-menu{left:auto;right:0}
 @media(min-width:768px){.ad-top[data-mode="banner"] .ad-visual{height:min(56svh,520px)}.ad-top[data-mode="banner"] .ad-banner{width:100%;height:100%;object-fit:cover;object-position:50% 25%}.ad-top[data-mode="banner"] .ad-visual::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(to bottom,rgba(9,9,11,.25) 0,rgba(9,9,11,0) 30%,rgba(9,9,11,.55) 75%,#09090b 100%)}.ad-top[data-mode="banner"] .ad-body{margin-top:-72px}.ad-top[data-mode="poster"] .ad-visual{aspect-ratio:auto;height:min(56svh,520px)}.ad-body{max-width:1100px;margin-inline:auto;padding-inline:24px}.ad-actions{right:max(24px,calc((100% - 1100px)/2 + 24px))}}
 @media(prefers-reduced-motion:reduce){.ad-ic,.anime-detail-share-button{backdrop-filter:none}}
+
+@media (max-width: 767px) {
+  .ad-top[data-mode="banner"] .ad-visual {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    padding: 0;
+  }
+  .ad-top[data-mode="banner"] .ad-visual::before {
+    content: "";
+    position: absolute;
+    inset: -20px;
+    z-index: 0;
+    background: var(--ad-banner) center / cover;
+    filter: blur(22px) brightness(.5) saturate(1.2);
+  }
+  .ad-top[data-mode="banner"] .ad-visual::after { content: none; }
+  .ad-top[data-mode="banner"] .ad-banner {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    height: auto;
+    z-index: 1;
+  }
+  .ad-top[data-mode="banner"] .ad-actions {
+    top: 14px;
+    right: 16px;
+    z-index: 2;
+  }
+  .ad-top[data-mode="banner"] .ad-body {
+    margin-top: 0;
+    padding-top: 20px;
+  }
+}
+
+/* Keep the anime title independent from the legacy detail-page h1 rules. */
+.ad-top .ad-body h1 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+}
