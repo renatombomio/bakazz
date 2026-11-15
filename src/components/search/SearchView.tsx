@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { localizedPath, useT, type Lang } from "../../i18n";
+import { CategoryRail, ResultsList, type DisplayMedia } from "./SearchDisplay";
 
 interface Media {
   id: number;
@@ -8,6 +9,9 @@ interface Media {
   format?: string | null;
   startDate?: { year?: number | null } | null;
   genres?: string[];
+  episodes?: number | null;
+  averageScore?: number | null;
+  coverImage?: { extraLarge?: string | null; large?: string | null; color?: string | null };
 }
 type Status = "FINISHED" | "RELEASING";
 interface Filters { genres: string[]; year: string; status: Status | ""; }
@@ -226,20 +230,37 @@ export default function SearchView({ lang = "es" }: { lang?: Lang }) {
     finally { setLoading(false); }
   };
 
-  const renderCard = (item: Media) => {
+  const displayItems: DisplayMedia[] = results.flatMap((item) => {
     const title = lang === "en"
-      ? item.title?.english || item.title?.romaji || t("detail.noTitle")
-      : item.title?.romaji || item.title?.english || t("detail.noTitle");
+      ? item.title?.english || item.title?.romaji
+      : item.title?.romaji || item.title?.english;
     const image = item.coverImage?.extraLarge || item.coverImage?.large;
-    return (
-      <article className="search-result" key={item.id}>
-        <a className="search-card" href={localizedPath(lang, `/anime/${item.id}/`)} aria-label={title}>
-          <div className="search-poster">{image ? <img src={image} alt="" loading="lazy" /> : <span>{title}</span>}</div>
-          <h3>{title}</h3>
-        </a>
-      </article>
-    );
-  };
+    if (!title || !image) return [];
+    const formatKey: Record<string, string> = {
+      TV: "detail.formatTV",
+      TV_SHORT: "detail.formatTVShort",
+      MOVIE: "detail.formatMovie",
+      OVA: "detail.formatOVA",
+      ONA: "detail.formatONA",
+      SPECIAL: "detail.formatSpecial",
+      MUSIC: "detail.formatMusic",
+    };
+    const formatLabel = item.format && formatKey[item.format]
+      ? t(formatKey[item.format] as Parameters<typeof t>[0])
+      : null;
+    return [{
+      id: item.id,
+      title,
+      href: localizedPath(lang, `/anime/${item.id}/`),
+      image,
+      year: item.startDate?.year ?? null,
+      score: item.averageScore != null ? item.averageScore / 10 : null,
+      color: item.coverImage?.color ?? null,
+      formatLabel,
+      episodes: item.episodes ?? null,
+      genres: item.genres ?? [],
+    }];
+  });
 
   const buttonLabel = countError
     ? t("search.error")
@@ -306,12 +327,24 @@ export default function SearchView({ lang = "es" }: { lang?: Lang }) {
         {hasFilters && <span className="search-filter-summary">{summary}</span>}
         {hasFilters && <button type="button" className="search-filter-remove" aria-label={t("search.removeFilters")} onClick={removeFilters}>{t("search.removeFilters")}</button>}
       </div>
-      {!query.trim() && !hasFilters && <h2 className="search-section-title">{t("search.popular")}</h2>}
-      {(query.trim() || hasFilters) && <p className="search-results-count">{t("search.resultsCount").replace("{count}", total.toLocaleString(lang === "en" ? "en-GB" : "es-ES"))}</p>}
       {loading && <p className="search-state" role="status">{t("search.loading")}</p>}
       {error && <p className="search-state" role="alert">{t("search.error")}</p>}
-      {!loading && !error && results.length > 0 && <div className="search-grid">{results.map(renderCard)}</div>}
-      {!loading && !error && results.length === 0 && (query.trim() || hasFilters) && <p className="search-state">{t("search.noResults")}</p>}
+      {!loading && !error && !query.trim() && !hasFilters && (
+        <CategoryRail
+          title={t("search.mostViewed")}
+          subtitle={t("search.mostViewedDescription")}
+          items={displayItems}
+          showScore={false}
+        />
+      )}
+      {!loading && !error && (query.trim() || hasFilters) && (
+        <ResultsList
+          items={displayItems}
+          countLabel={t("search.resultsCount").replace("{count}", total.toLocaleString(lang === "en" ? "en-GB" : "es-ES"))}
+          emptyLabel={t("search.noResults")}
+          epsLabel={(n) => t("search.episodesShort").replace("{count}", String(n))}
+        />
+      )}
       {hasNext && !loading && <button type="button" className="search-more" onClick={loadMore}>{t("search.more")}</button>}
       {filtersOpen && (
         <div className="sf-back" onMouseDown={(event) => { if (event.target === event.currentTarget) closePanel(); }}>

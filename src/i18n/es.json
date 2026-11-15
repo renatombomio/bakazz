@@ -236,5 +236,8 @@
   "search.seeLoading": "Ver…",
   "search.seeCount": "Ver {count} animes",
   "search.noResults": "Sin resultados",
-  "search.resultsCount": "{count} resultados"
+  "search.resultsCount": "{count} resultados",
+  "search.mostViewed": "Los más vistos",
+  "search.mostViewedDescription": "Ordenados por popularidad en AniList.",
+  "search.episodesShort": "{count} eps"
 }
