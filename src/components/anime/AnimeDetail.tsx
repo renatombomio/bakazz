@@ -343,8 +343,7 @@ export default function AnimeDetail({entry,lang="es"}:{entry:LibraryEntry;lang?:
  const[media,setMedia]=useState<Media|null>(null),[loading,setLoading]=useState(true),[translatedSynopsis,setTranslatedSynopsis]=useState(""),[translating,setTranslating]=useState(false),[franchiseMedia,setFranchiseMedia]=useState<Record<string,Media|null>>({}),[likeCount,setLikeCount]=useState(0),[liked,setLiked]=useState(false),[likeBusy,setLikeBusy]=useState(false),[likeNotice,setLikeNotice]=useState("");
  const cleanSynopsis=media?.description?cleanDescription(media.description):"";
  const hasSynopsis=cleanSynopsis.replace(/[\s\\n\\r]+/g,"").length>0;
- const streamingEntryId = Number(getRenAniListId(entry.animeId) ?? media?.id);
- const streaming = Number.isSafeInteger(streamingEntryId) ? streamingAvailability[streamingEntryId] : undefined;
+ const streaming = streamingAvailability[entry.animeId];
  const franchiseEntries=getPersonalFranchiseEntries(entry,getLibrary());
  useEffect(()=>{
   let cancelled=false;
@@ -452,7 +451,10 @@ export default function AnimeDetail({entry,lang="es"}:{entry:LibraryEntry;lang?:
        {streaming && <section className="anime-detail-streaming" aria-label={lang === "en" ? "Available streaming platforms in Spain" : "Plataformas disponibles en España"}>
         <span className="anime-detail-streaming-label">{lang === "en" ? "AVAILABLE ON" : "DISPONIBLE EN"}</span>
         <div className="anime-detail-streaming-providers">
-         {streaming.providers.map((provider) => <a key={provider.name} href={provider.url} target="_blank" rel="noopener noreferrer">{provider.name}</a>)}
+         {streaming.providers.map((provider) => <a key={provider.name} href={provider.url} target="_blank" rel="noopener noreferrer" aria-label={provider.name} title={provider.name}>
+          <img src={provider.logo} alt={provider.name} width="30" height="30" loading="eager" decoding="async" />
+          <span>{provider.name}</span>
+         </a>)}
         </div>
         <a className="anime-detail-streaming-source" href={streaming.sourceUrl} target="_blank" rel="noopener noreferrer">{lang === "en" ? "Check availability" : "Comprobar disponibilidad"} ↗</a>
        </section>}

@@ -202,7 +202,7 @@ html.mobile-menu-open,html.mobile-menu-open body { overflow:hidden; }
 .anime-detail-streaming{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .65rem;margin-top:1rem;min-width:0}
 .anime-detail-streaming-label{flex:0 0 100%;color:var(--color-paper-200);font:700 .62rem/1 var(--font-mono);letter-spacing:.1em}
 .anime-detail-streaming-providers{display:flex;flex-wrap:wrap;gap:.4rem}
-.anime-detail-streaming-providers a{display:inline-flex;align-items:center;min-height:30px;padding:.35rem .6rem;border:1px solid var(--color-border);border-radius:4px;color:var(--color-paper-50);font:600 .72rem/1 var(--font-body);text-decoration:none;transition:border-color .18s ease,color .18s ease}
+.anime-detail-streaming-providers a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.35rem;min-width:54px;min-height:54px;padding:.4rem .55rem;border:1px solid var(--color-border);border-radius:6px;color:var(--color-paper-50);font:600 .62rem/1 var(--font-body);text-decoration:none;transition:border-color .18s ease,color .18s ease}.anime-detail-streaming-providers img{display:block;width:28px;height:28px;object-fit:contain}.anime-detail-streaming-providers span{white-space:nowrap}
 .anime-detail-streaming-providers a:hover{border-color:var(--color-accent-soft);color:var(--color-accent-soft)}
 .anime-detail-streaming-source{color:var(--color-muted-400);font:var(--text-xs)/1 var(--font-mono);text-underline-offset:3px}
 .anime-detail-streaming a:focus-visible{outline:2px solid #f472b6;outline-offset:3px}
