@@ -360,10 +360,6 @@ export const streamingAvailability: Record<string, StreamingAvailability> = {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/death-note",
     providers: [provider.crunchyroll],
   },
-  "personal-002": {
-    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/dragon-ball-z",
-    providers: [],
-  },
   "personal-007": {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/akame-ga-kill",
     providers: [],
