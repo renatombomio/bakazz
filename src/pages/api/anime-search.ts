@@ -197,7 +197,7 @@ export const GET:APIRoute=async({request})=>{
   const status=params.get("status")||"";
   const popular=params.get("popular")==="1";
   const countOnly=params.get("count")==="1";
-  const perPage=countOnly?1:PAGE_SIZE;
+  const perPage=countOnly?50:PAGE_SIZE;
   const now=new Date().getFullYear();
 
   if(params.get("genres")==="1"||params.get("years")==="1") {
