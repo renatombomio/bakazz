@@ -33,15 +33,14 @@
   .ad-top[data-mode="banner"] .ad-visual::after { content: none; }
   .ad-top[data-mode="banner"] .ad-banner {
     position: absolute;
-    left: 0;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
+    inset: 0;
+    display: block;
     width: 100%;
-    height: auto;
-    max-height: 100%;
-    object-fit: contain;
+    height: 100%;
+    max-height: none;
+    object-fit: cover;
     object-position: center;
+    transform: none;
     z-index: 1;
   }
   .ad-top[data-mode="banner"] .ad-actions {
