@@ -462,7 +462,7 @@ export default function AnimeDetail({entry,lang="es"}:{entry:LibraryEntry;lang?:
           <span>{provider.name}</span>
          </a>)}
         </div>
-        <a className="anime-detail-streaming-source" href={streaming.sourceUrl} target="_blank" rel="noopener noreferrer">{lang === "en" ? "Check availability" : "Comprobar disponibilidad"} ↗</a>
+        <a className="anime-detail-streaming-source" href={streaming.sourceUrl} target="_blank" rel="noopener noreferrer">{lang === "en" ? "Check availability" : "Comprobar disponibilidad"}</a>
        </section>}
        {media?.genres?.length&&<div className="anime-detail-genres">{media.genres.slice(0,5).map((genre)=><span key={genre}>{genre}</span>)}</div>}
        </div>
