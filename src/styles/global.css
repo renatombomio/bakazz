@@ -199,15 +199,14 @@ html.mobile-menu-open,html.mobile-menu-open body { overflow:hidden; }
 .anime-detail-meta small{flex:0 0 auto;color:var(--color-paper-200);font:700 .66rem/1 var(--font-mono);letter-spacing:.08em;text-transform:uppercase}
 .anime-detail-meta strong{min-width:0;color:var(--color-paper-50);font:inherit;font-weight:600;overflow-wrap:anywhere}
 .anime-detail-meta .anime-detail-meta-type strong{font-family:var(--font-body);font-size:1.05rem;font-weight:500;letter-spacing:-.01em}
-.anime-detail-streaming{display:flex;flex-wrap:wrap;align-items:center;gap:.35rem .55rem;margin-top:.7rem;min-width:0}
-.anime-detail-streaming-label{flex:0 0 100%;color:var(--color-paper-100);font:700 .66rem/1.2 var(--font-mono);letter-spacing:.09em}
-.anime-detail-streaming-providers{display:flex;flex-wrap:wrap;gap:.35rem}
-.anime-detail-streaming-providers a{display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:.42rem;min-width:0;min-height:38px;padding:.32rem .5rem;border:1px solid rgba(255,255,255,.24);border-radius:6px;background:rgba(10,10,12,.38);color:var(--color-paper-50);font:600 .72rem/1.1 var(--font-body);text-decoration:none;transition:border-color .18s ease,background .18s ease}
-.anime-detail-streaming-providers .anime-detail-provider>svg{display:block;width:19px;height:19px;flex:0 0 19px}
-.anime-detail-streaming-providers .provider-netflix{color:#ff454b}.anime-detail-streaming-providers .provider-prime{color:#28bfff}.anime-detail-streaming-providers .provider-disney{color:#fff}.anime-detail-streaming-providers .provider-crunchyroll{color:#ff914d}
-.anime-detail-disney-wordmark{font:800 12px/1 Arial,sans-serif;letter-spacing:-.08em}.anime-detail-disney-wordmark span{font-size:1.15em}
-.anime-detail-streaming-providers a>span:last-child{white-space:nowrap}
-.anime-detail-streaming-providers a:hover{border-color:var(--color-accent-soft);background:rgba(255,255,255,.08)}
+.anime-detail-streaming{display:flex;flex-wrap:wrap;align-items:center;gap:.35rem .55rem;margin-top:.55rem;min-width:0}
+.anime-detail-streaming-label{flex:0 0 100%;color:var(--color-paper-100);font:700 .62rem/1.2 var(--font-mono);letter-spacing:.09em}
+.anime-detail-streaming-providers{display:flex;flex-wrap:wrap;align-items:center;gap:.7rem}
+.anime-detail-streaming-providers a{display:inline-flex;align-items:center;justify-content:center;min-width:30px;min-height:30px;padding:2px;border:0;border-radius:0;background:transparent;color:var(--color-paper-50);text-decoration:none;transition:opacity .18s ease,transform .18s ease}
+.anime-detail-streaming-providers .anime-detail-provider>svg{display:block;width:25px;height:25px;flex:0 0 25px}
+.anime-detail-streaming-providers .provider-netflix{color:#e50914}.anime-detail-streaming-providers .provider-prime{color:#00a8e0}.anime-detail-streaming-providers .provider-disney{color:#fff}.anime-detail-streaming-providers .provider-crunchyroll{color:#f47521}
+.anime-detail-disney-wordmark{font:800 15px/1 Arial,sans-serif;letter-spacing:-.08em}.anime-detail-disney-wordmark span{font-size:1.15em}
+.anime-detail-streaming-providers a:hover{opacity:.8;transform:translateY(-1px)}
 .anime-detail-streaming-source{color:var(--color-paper-100);font:600 .68rem/1.2 var(--font-body);text-underline-offset:3px}
 .anime-detail-streaming a:focus-visible{outline:2px solid #f472b6;outline-offset:3px}
 .anime-detail-genres{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:1.2rem}

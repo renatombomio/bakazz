@@ -459,7 +459,7 @@ export default function AnimeDetail({entry,lang="es"}:{entry:LibraryEntry;lang?:
           {provider.key === "prime" && <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 16.5c5.2 3.4 12.1 3.3 17.5-.6M17.3 13.7l3.6 2.2-2.4 3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
           {provider.key === "disney" && <span className="anime-detail-disney-wordmark">Disney<span>+</span></span>}
           {provider.key === "crunchyroll" && <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" strokeWidth="2.5"/><path d="M15.8 7.4a5.4 5.4 0 1 0 1.1 7.7 4.4 4.4 0 1 1-1.1-7.7Z" fill="currentColor"/></svg>}
-          <span>{provider.name}</span>
+          
          </a>)}
         </div>
         <a className="anime-detail-streaming-source" href={streaming.sourceUrl} target="_blank" rel="noopener noreferrer">{lang === "en" ? "Check availability" : "Comprobar disponibilidad"}</a>
