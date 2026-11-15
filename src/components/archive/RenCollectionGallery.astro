@@ -13,8 +13,8 @@ const recommended = items.filter((item) => item.recommended).sort((a, b) => b.po
 const watched = items.filter((item) => !item.recommended);
 const featured = recommended.map((item, index) => ({
   ...item,
-  featured: index % 6 === 0,
-  side: Math.floor(index / 6) % 2 === 0 ? "left" : "right",
+  featured: index % 7 === 0,
+  side: Math.floor(index / 7) % 2 === 0 ? "left" : "right",
 }));
 const recommendedCount = recommended.length;
 const totalCount = items.length;
@@ -59,20 +59,20 @@ const totalCount = items.length;
   .collection-heading p strong { color: var(--color-paper-50); font-weight: 600; }
   .recommendations { margin: 0 0 clamp(2.5rem, 5vw, 4rem); }
   .recommendations h2, .watched h2 { margin: 0 0 1rem; color: var(--color-paper-50); font: 500 clamp(1.45rem, 2.6vw, 2rem)/1.2 var(--font-body); letter-spacing: -.025em; }
-  .poster-wall { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-flow: dense; gap: 6px; grid-auto-rows: calc((100cqw - 18px) / 4 * 1.5); }
+  .poster-wall { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-auto-flow: dense; gap: 6px; grid-auto-rows: calc((100cqw - 30px) / 6 * 1.5); }
   .poster-tile { position: relative; display: block; min-width: 0; min-height: 0; overflow: hidden; border-radius: 6px; background: #3a3a44; }
   .poster-tile img { display: block; width: 100%; height: 100%; object-fit: cover; }
-  .poster-tile--featured { grid-column: span 2; grid-row: span 2; }
-  .poster-tile--left { grid-column-start: 1; }
-  .poster-tile--right { grid-column-start: 3; }
+  .poster-tile { grid-column: span 2; grid-row: span 2; }
+  .poster-tile--featured { grid-column: 1 / span 4; grid-row: span 4; }
+  .poster-tile--right { grid-column: 3 / span 4; }
   .poster-title { position: absolute; inset: auto 0 0; padding: 2.5rem .7rem .7rem; background: linear-gradient(180deg, transparent, rgba(0,0,0,.88)); color: #fff; font-size: clamp(.72rem, 1.4vw, 1.1rem); font-weight: 650; line-height: 1.15; }
   .watched { margin-top: clamp(2.5rem, 5vw, 4rem); }
-  @media (min-width: 600px) {
-    .poster-wall { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-auto-rows: calc((100cqw - 30px) / 6 * 1.5); }
-    .poster-tile--right { grid-column-start: 5; }
+  @media (min-width: 768px) {
+    .poster-wall { grid-template-columns: repeat(12, minmax(0, 1fr)); grid-auto-rows: calc((100cqw - 66px) / 12 * 1.5); }
+    .poster-tile--right { grid-column: 9 / span 4; }
   }
-  @media (min-width: 1000px) {
-    .poster-wall { grid-template-columns: repeat(8, minmax(0, 1fr)); grid-auto-rows: calc((100cqw - 42px) / 8 * 1.5); }
-    .poster-tile--right { grid-column-start: 7; }
+  @media (min-width: 1100px) {
+    .poster-wall { grid-template-columns: repeat(16, minmax(0, 1fr)); grid-auto-rows: calc((100cqw - 90px) / 16 * 1.5); }
+    .poster-tile--right { grid-column: 13 / span 4; }
   }
 </style>

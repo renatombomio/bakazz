@@ -133,7 +133,7 @@ export const animeLibrary: LibraryEntry[] = [
   { animeId: "personal-137", title: "Scissor Seven", state: { status: "WATCHED", favorite: false, recommended: true } },
   { animeId: "personal-138", title: "The Eminence in Shadow", state: { status: "PENDING", favorite: false, recommended: false } },
   { animeId: "personal-139", title: "Cowboy Bebop", state: { status: "WATCHED", favorite: false, recommended: false } },
-  { animeId: "personal-140", title: "Jujutsu Kaisen", state: { status: "WATCHED", favorite: false, recommended: false } },
+  { animeId: "personal-140", title: "Jujutsu Kaisen", state: { status: "WATCHED", favorite: false, recommended: true } },
   { animeId: "personal-141", title: "Hunter x Hunter", state: { status: "WATCHED", favorite: true, recommended: false } },
   { animeId: "personal-142", title: "Death Note", state: { status: "WATCHED", favorite: true, recommended: false } },
 ];

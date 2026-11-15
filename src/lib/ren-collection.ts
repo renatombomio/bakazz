@@ -120,7 +120,7 @@ export async function getRenCollectionItems(lang: "es" | "en"): Promise<RenColle
       cover,
       color: media?.coverImage?.color || "#3a3a44",
       popularity: media?.popularity ?? 0,
-      recommended: entry.state.recommended,
+      recommended: entry.state.recommended || entry.state.favorite,
     }];
   });
 
