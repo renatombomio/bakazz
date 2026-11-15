@@ -166,6 +166,17 @@ async function filterAnime(genres:string[],year:string,status:string,q:string,pa
   const p=await anilist(query,variables);
   return {items:p.media,total:p.pageInfo?.total??0,hasNextPage:Boolean(p.pageInfo?.hasNextPage),source:"anilist"};
 }
+async function discoveryAnime(page:number,perPage:number):Promise<Data> {
+  const firstYear=new Date().getFullYear()-2;
+  const query="query DiscoveryAnime($page:Int!,$perPage:Int!,$after:FuzzyDateInt!){Page(page:$page,perPage:$perPage){pageInfo{total hasNextPage} media(type:ANIME,sort:START_DATE_DESC,isAdult:false,startDate_greater:$after){"+FIELDS+"}}}";
+  const p=await anilist(query,{page,perPage,after:firstYear*10000});
+  return {items:p.media,total:p.pageInfo?.total??0,hasNextPage:Boolean(p.pageInfo?.hasNextPage),source:"anilist"};
+}
+async function gemsAnime(page:number,perPage:number):Promise<Data> {
+  const query="query HiddenGems($page:Int!,$perPage:Int!){Page(page:$page,perPage:$perPage){pageInfo{total hasNextPage} media(type:ANIME,sort:SCORE_DESC,isAdult:false,status:FINISHED,averageScore_greater:79,popularity_lesser:25000){"+FIELDS+"}}}";
+  const p=await anilist(query,{page,perPage});
+  return {items:p.media,total:p.pageInfo?.total??0,hasNextPage:Boolean(p.pageInfo?.hasNextPage),source:"anilist"};
+}
 async function popularAnime(page:number,perPage:number):Promise<Data> {
   const query="query PopularAnime($page:Int!,$perPage:Int!){Page(page:$page,perPage:$perPage){pageInfo{total hasNextPage} media(type:ANIME,sort:POPULARITY_DESC,isAdult:false){"+FIELDS+"}}}";
   const p=await anilist(query,{page,perPage});
@@ -215,6 +226,8 @@ export const GET:APIRoute=async({request})=>{
   const year=params.get("year")||"";
   const status=params.get("status")||"";
   const popular=params.get("popular")==="1";
+  const discovery=params.get("discovery")==="1";
+  const gems=params.get("gems")==="1";
   const perPage=PAGE_SIZE;
   const now=new Date().getFullYear();
 
@@ -233,14 +246,16 @@ export const GET:APIRoute=async({request})=>{
   if(genres.some(x=>!GENRES.has(x))) return fail("INVALID_GENRE",400);
   if(year&&year!=="before2020"&&(!/^\d{4}$/.test(year)||Number(year)<1900||Number(year)>now)) return fail("INVALID_YEAR",400);
   if(status&&!["FINISHED","RELEASING"].includes(status)) return fail("INVALID_STATUS",400);
-  if(popular&&(q||genres.length||year||status)) return fail("INVALID_POPULAR_FILTERS",400);
-  if(!popular&&!q&&!genres.length&&!year&&!status) return fail("MISSING_SEARCH_OR_FILTER",400);
+  const categoryModes=[popular,discovery,gems].filter(Boolean).length;
+  if(categoryModes>1) return fail("INVALID_CATEGORY_MODE",400);
+  if(categoryModes===1&&(q||genres.length||year||status)) return fail("INVALID_CATEGORY_FILTERS",400);
+  if(categoryModes===0&&!q&&!genres.length&&!year&&!status) return fail("MISSING_SEARCH_OR_FILTER",400);
 
   const normalizedQuery=q.toLocaleLowerCase("en");
   const isSearch=q.length>=2;
   const isFiltered=genres.length>0||Boolean(year||status);
   const filterState={query:normalizedQuery,genres,year,status,page,perPage,popular};
-  const rawKey="v2:"+(popular?"popular:":isFiltered?"filters:":"search:")+JSON.stringify(filterState);
+  const rawKey="v3:"+(discovery?"discovery:":gems?"gems:":popular?"popular:":isFiltered?"filters:":"search:")+JSON.stringify(filterState);
   const key=await digest(rawKey);
   const localKey=key;
 
@@ -249,8 +264,8 @@ export const GET:APIRoute=async({request})=>{
     if(!job) {
       const useFilters=isFiltered;
       job=loadCached(
-        key,useFilters||popular?"filters":"search",filterState,popular?FILTER_TTL:useFilters?FILTER_TTL:SEARCH_TTL,
-        ()=>popular?popularAnime(page,perPage):useFilters?filterAnime(genres,year,status,q,page,perPage):searchAnime(q,page,perPage)
+        key,useFilters||popular||discovery||gems?"filters":"search",filterState,popular||discovery||gems?FILTER_TTL:useFilters?FILTER_TTL:SEARCH_TTL,
+        ()=>discovery?discoveryAnime(page,perPage):gems?gemsAnime(page,perPage):popular?popularAnime(page,perPage):useFilters?filterAnime(genres,year,status,q,page,perPage):searchAnime(q,page,perPage)
       );
       pending.set(localKey,job);
     }

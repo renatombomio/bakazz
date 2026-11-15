@@ -52,6 +52,8 @@ export default function SearchView({ lang = "es" }: { lang?: Lang }) {
   const [genres, setGenres] = useState<string[]>([]);
   const [years, setYears] = useState<string[]>([]);
   const [results, setResults] = useState<Media[]>([]);
+  const [discoveryResults, setDiscoveryResults] = useState<Media[]>([]);
+  const [gemsResults, setGemsResults] = useState<Media[]>([]);
   const [total, setTotal] = useState(0);
   const [hasNext, setHasNext] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -105,6 +107,35 @@ export default function SearchView({ lang = "es" }: { lang?: Lang }) {
     }).catch(() => {});
     return () => controller.abort();
   }, []);
+
+  useEffect(() => {
+    if (!initialized || debouncedQuery.length > 0 || hasSelectedFilters(applied)) {
+      setDiscoveryResults([]);
+      setGemsResults([]);
+      return;
+    }
+    const controller = new AbortController();
+    let cancelled = false;
+    const loadCategory = async (mode: "discovery" | "gems") => {
+      const response = await fetch(`/api/anime-search?${mode}=1`, { signal: controller.signal });
+      const payload = await response.json();
+      if (!response.ok || !payload.success) throw new Error(payload.error || `${mode} unavailable`);
+      return Array.isArray(payload.items) ? payload.items as Media[] : [];
+    };
+    Promise.all([loadCategory("discovery"), loadCategory("gems")])
+      .then(([discovery, gems]) => {
+        if (cancelled) return;
+        setDiscoveryResults(discovery);
+        setGemsResults(gems);
+      })
+      .catch((reason) => {
+        if (!cancelled && reason?.name !== "AbortError") {
+          setDiscoveryResults([]);
+          setGemsResults([]);
+        }
+      });
+    return () => { cancelled = true; controller.abort(); };
+  }, [initialized, debouncedQuery, appliedKey]);
 
   useEffect(() => {
     if (!initialized) return;
@@ -229,38 +260,6 @@ export default function SearchView({ lang = "es" }: { lang?: Lang }) {
     finally { setLoading(false); }
   };
 
-  const displayItems: DisplayMedia[] = results.flatMap((item) => {
-    const title = lang === "en"
-      ? item.title?.english || item.title?.romaji
-      : item.title?.romaji || item.title?.english;
-    const image = item.coverImage?.extraLarge || item.coverImage?.large;
-    if (!title || !image) return [];
-    const formatKey: Record<string, string> = {
-      TV: "detail.formatTV",
-      TV_SHORT: "detail.formatTVShort",
-      MOVIE: "detail.formatMovie",
-      OVA: "detail.formatOVA",
-      ONA: "detail.formatONA",
-      SPECIAL: "detail.formatSpecial",
-      MUSIC: "detail.formatMusic",
-    };
-    const formatLabel = item.format && formatKey[item.format]
-      ? t(formatKey[item.format] as Parameters<typeof t>[0])
-      : null;
-    return [{
-      id: item.id,
-      title,
-      href: localizedPath(lang, `/anime/${item.id}/`),
-      image,
-      year: item.startDate?.year ?? null,
-      score: item.averageScore != null ? item.averageScore / 10 : null,
-      color: item.coverImage?.color ?? null,
-      formatLabel,
-      episodes: item.episodes ?? null,
-      genres: item.genres ?? [],
-    }];
-  });
-
   const buttonLabel = countError
     ? t("search.error")
     : count === 0
@@ -330,15 +329,26 @@ export default function SearchView({ lang = "es" }: { lang?: Lang }) {
       {error && <p className="search-state" role="alert">{t("search.error")}</p>}
       {!loading && !error && !query.trim() && !hasFilters && (
         <CategoryRail
+          title={t("search.newDiscoveries")}
+          subtitle={t("search.newDiscoveriesDescription")}
+          items={discoveryItems}
+        />
+        <CategoryRail
           title={t("search.mostViewed")}
           subtitle={t("search.mostViewedDescription")}
-          items={displayItems}
+          items={popularUniqueItems}
           showScore={false}
+        />
+        <CategoryRail
+          title={t("search.hiddenGems")}
+          subtitle={t("search.hiddenGemsDescription")}
+          items={gemsItems}
+          showScore={true}
         />
       )}
       {!loading && !error && (query.trim() || hasFilters) && (
         <ResultsList
-          items={displayItems}
+          items={toDisplayItems(results)}
           countLabel={t("search.resultsCount").replace("{count}", total.toLocaleString(lang === "en" ? "en-GB" : "es-ES"))}
           emptyLabel={t("search.noResults")}
           epsLabel={(n) => t("search.episodesShort").replace("{count}", String(n))}

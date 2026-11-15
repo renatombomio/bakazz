@@ -239,5 +239,9 @@
   "search.resultsCount": "{count} results",
   "search.mostViewed": "Most popular",
   "search.mostViewedDescription": "Ranked by popularity on AniList.",
-  "search.episodesShort": "{count} eps"
+  "search.episodesShort": "{count} eps",
+  "search.newDiscoveries": "New discoveries",
+  "search.newDiscoveriesDescription": "Recent releases worth discovering.",
+  "search.hiddenGems": "Hidden gems",
+  "search.hiddenGemsDescription": "Highly rated anime with a smaller audience."
 }
