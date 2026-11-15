@@ -24,10 +24,6 @@ export const streamingAvailability: Record<string, StreamingAvailability> = {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/my-hero-academia",
     providers: [provider.netflix, provider.disney, provider.crunchyroll],
   },
-  "personal-002": {
-    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/dragon-ball-z",
-    providers: [],
-  },
   "personal-003": {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/naruto",
     providers: [provider.netflix, provider.prime, provider.disney, provider.crunchyroll],
@@ -44,25 +40,9 @@ export const streamingAvailability: Record<string, StreamingAvailability> = {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/one-piece",
     providers: [provider.netflix, provider.disney, provider.crunchyroll],
   },
-  "personal-007": {
-    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/akame-ga-kill",
-    providers: [],
-  },
-  "personal-008": {
-    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/toradora",
-    providers: [],
-  },
-  "personal-009": {
-    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/fullmetal-alchemist",
-    providers: [],
-  },
   "personal-010": {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/one-punch-man",
     providers: [provider.crunchyroll],
-  },
-  "personal-011": {
-    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/soul-eater",
-    providers: [],
   },
   "personal-012": {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/black-clover",
@@ -80,10 +60,6 @@ export const streamingAvailability: Record<string, StreamingAvailability> = {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/d-gray-man",
     providers: [provider.crunchyroll],
   },
-  "personal-032": {
-    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/noragami",
-    providers: [],
-  },
   "personal-035": {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/tokyo-ghoul",
     providers: [provider.netflix],
@@ -91,10 +67,6 @@ export const streamingAvailability: Record<string, StreamingAvailability> = {
   "personal-040": {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/bungou-stray-dogs",
     providers: [provider.crunchyroll],
-  },
-  "personal-042": {
-    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/danganronpa-the-animation",
-    providers: [],
   },
   "personal-048": {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/goblin-slayer",
