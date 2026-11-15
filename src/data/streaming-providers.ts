@@ -172,6 +172,34 @@ export const streamingAvailability: Record<string, StreamingAvailability> = {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/cowboy-bebop",
     providers: [provider.netflix],
   },
+  "personal-015": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/kimetsu-no-yaiba",
+    providers: [provider.netflix, provider.prime, provider.crunchyroll],
+  },
+  "personal-055": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/haikyu-los-ases-del-voley",
+    providers: [provider.netflix, provider.prime, provider.crunchyroll],
+  },
+  "personal-065": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/mahoutsukai-no-yome",
+    providers: [provider.crunchyroll],
+  },
+  "personal-074": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/re-zero-kara-hajimeru-isekai-seikatsu",
+    providers: [provider.crunchyroll],
+  },
+  "personal-110": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/komi-san-wa-komyushou-desu",
+    providers: [provider.netflix],
+  },
+  "personal-141": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/hunter-x-hunter-2011",
+    providers: [provider.prime, provider.netflix, provider.crunchyroll],
+  },
+  "personal-090": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/kanojo-okarishimasu",
+    providers: [provider.crunchyroll],
+  },
   "personal-119": {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/kaiju-no-8",
     providers: [provider.crunchyroll],
