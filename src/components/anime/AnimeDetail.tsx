@@ -343,7 +343,7 @@ export default function AnimeDetail({entry,lang="es"}:{entry:LibraryEntry;lang?:
  const[media,setMedia]=useState<Media|null>(null),[loading,setLoading]=useState(true),[translatedSynopsis,setTranslatedSynopsis]=useState(""),[translating,setTranslating]=useState(false),[franchiseMedia,setFranchiseMedia]=useState<Record<string,Media|null>>({}),[likeCount,setLikeCount]=useState(0),[liked,setLiked]=useState(false),[likeBusy,setLikeBusy]=useState(false),[likeNotice,setLikeNotice]=useState("");
  const cleanSynopsis=media?.description?cleanDescription(media.description):"";
  const hasSynopsis=cleanSynopsis.replace(/[\s\\n\\r]+/g,"").length>0;
- const streamingEntryId = media?.id != null ? Number(media.id) : NaN;
+ const streamingEntryId = Number(getRenAniListId(entry.animeId) ?? media?.id);
  const streaming = Number.isSafeInteger(streamingEntryId) ? streamingAvailability[streamingEntryId] : undefined;
  const franchiseEntries=getPersonalFranchiseEntries(entry,getLibrary());
  useEffect(()=>{
@@ -438,7 +438,7 @@ export default function AnimeDetail({entry,lang="es"}:{entry:LibraryEntry;lang?:
       </div>
       <div className="anime-detail-copy">
        <div className="anime-detail-copy-main">
-       {personal.favorite&&<span className="anime-detail-eyebrow">{t("detail.favorite")}</span>}
+       
        <h1>{title}</h1>
         {typeof media?.id === "number" && <ShareAnime title={title} animeId={media.id} lang={lang} />}
         {nativeTitle&&<p className="anime-detail-native-title" lang="ja">{nativeTitle}</p>}
