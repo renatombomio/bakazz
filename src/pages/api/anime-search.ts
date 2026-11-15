@@ -192,7 +192,7 @@ export const GET:APIRoute=async({request})=>{
   const params=new URL(request.url).searchParams;
   const q=(params.get("q")||"").trim().replace(/\s+/g," ");
   const page=Number(params.get("page")||"1");
-  const genres=[...new Set((params.get("genre")||"").split(",").concat(params.getAll("genre")).map(x=>x.trim()).filter(Boolean))].sort();
+  const genres=[...new Set(params.getAll("genre").flatMap(value=>value.split(",")).map(x=>x.trim()).filter(Boolean))].sort();
   const year=params.get("year")||"";
   const status=params.get("status")||"";
   const popular=params.get("popular")==="1";
