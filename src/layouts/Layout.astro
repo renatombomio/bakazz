@@ -14,6 +14,7 @@ const isAuth = basePath === "/login" || basePath === "/login/";
 const isAuthenticated = Boolean(Astro.locals.renanimeUser);
 
 import "../styles/global.css";
+import "@fontsource/anton/400.css";
 import { ClientRouter } from "astro:transitions";
 import SoundtrackPlayer from "../components/audio/SoundtrackPlayer";
 import Analytics from '@vercel/analytics/astro';

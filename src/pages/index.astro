@@ -2,8 +2,8 @@
 export const prerender = false;
 import Layout from "../layouts/Layout.astro";
 import Navbar from "../components/layout/Navbar.astro";
-import Footer from "../components/layout/Footer.astro";
-import Hero from "../components/hero/Hero.astro";
+import CommunityFooter from "../components/community/CommunityFooter.astro";
+import HomeHero from "../components/hero/HomeHero.astro";
 import HomeGallery from "../components/home/HomeGallery";
 import AnimeOfTheWeek from "../components/home/AnimeOfTheWeek.astro";
 import WeeklyEpisodes from "../components/home/WeeklyEpisodes.astro";
@@ -20,14 +20,14 @@ import { localizedPath } from "../i18n";
 const collectionEntries = getWatchedLibrary();
 const supabase = createSupabaseSsrClient(Astro.request, Astro.cookies);
 let communityMembers: { id: string; aka: string; avatar_url: string | null; last_seen_at: string | null }[] = [];
-let otakuCount = 0;
 try {
-  const [{ data: memberRows, error: memberError }, { count: userCount, error: userCountError }] = await Promise.all([
-    supabase.from("profiles").select("id, aka, avatar_url, last_seen_at").eq("is_private", false).not("aka", "is", null).order("last_seen_at", { ascending: false, nullsFirst: false }).limit(18),
-    supabase.from("profiles").select("id", { count: "exact", head: true }),
-  ]);
-  if (userCountError) console.error("[home] Historical otaku count unavailable:", userCountError.message);
-  otakuCount = userCountError ? 0 : userCount ?? 0;
+  const { data: memberRows, error: memberError } = await supabase
+    .from("profiles")
+    .select("id, aka, avatar_url, last_seen_at")
+    .eq("is_private", false)
+    .not("aka", "is", null)
+    .order("last_seen_at", { ascending: false, nullsFirst: false })
+    .limit(18);
   if (memberError) console.error("[home] Community members unavailable:", memberError.message);
   else communityMembers = (memberRows ?? []).filter((member) => Boolean(member.aka));
 } catch (error) { console.error("[home] Community data unavailable:", error); }
@@ -79,11 +79,12 @@ try {
   <Navbar />
 
   <main id="main-content">
-    <Hero
-      kicker=""
-      title="Renanime World"
-      copy={isEnglish ? "A world of stories. A community that brings them together." : "Un mundo de historias. Una comunidad que las une."}
-      ariaLabel="Renanime World"
+    <HomeHero
+      image="/images/login1.jpg"
+      video={{ webm: "/videos/hero-horizontal.webm", mp4: "/videos/hero-horizontal.mp4" }}
+      subtitle={isEnglish ? "Discover anime and debate it." : "Descubre anime y debate sobre él."}
+      primary={{ label: isEnglish ? "Explore anime" : "Explorar anime", href: localizedPath(lang, "/search/") }}
+      secondary={{ label: isEnglish ? "View debates" : "Ver debates", href: localizedPath(lang, "/community/debates/") }}
     />
 
     <section class="home-gallery-section" aria-label={isEnglish ? "Ren's collection" : "Colección de Ren"}>
@@ -143,10 +144,6 @@ try {
       }}
     />
 
-    <section class="otaku-counter" aria-label={isEnglish ? "Registered otakus" : "Otakus registrados"}>
-      <strong>{new Intl.NumberFormat(isEnglish ? "en" : "es").format(otakuCount)}</strong>
-      <span>otakus</span>
-    </section>
   </main>
 
   <Footer />
@@ -180,9 +177,6 @@ try {
     }
   }
 
-  .otaku-counter{display:grid;grid-template-columns:max-content;justify-items:center;gap:.35rem;width:max-content;max-width:100%;padding:3.5rem 1rem 2.5rem;margin:0 auto;text-align:center;color:#f5f2ec}
-  .otaku-counter strong{font-size:clamp(5.5rem,15vw,10rem);font-weight:900;line-height:.88;letter-spacing:-.075em;font-variant-numeric:tabular-nums}
-  .otaku-counter span{display:block;width:100%;text-align:center;color:#929297;font-size:.78rem;font-weight:650;letter-spacing:.16em;text-transform:uppercase}
   .home-gallery-section {
     width: min(calc(100% - (var(--gutter) * 2)), var(--container-max));
     margin: 0 auto;
