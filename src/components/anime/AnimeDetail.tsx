@@ -451,7 +451,7 @@ export default function AnimeDetail({entry,lang="es"}:{entry:LibraryEntry;lang?:
   {media?.duration&&<span><small>{media?.format==="MOVIE"?t("detail.duration"):t("detail.durationEpisode")}</small><strong>{media.duration} min</strong></span>}
   {media?.format!=="MOVIE"&&getSeasonCount(media)&&<span><small>{t("detail.seasons")}</small><strong>{getSeasonCount(media)}</strong></span>}
 </div>
-       {streaming && <section className="anime-detail-streaming" aria-label={lang === "en" ? "Available streaming platforms in Spain" : "Plataformas disponibles en España"}>
+       {streaming?.providers.length ? <section className="anime-detail-streaming" aria-label={lang === "en" ? "Available streaming platforms in Spain" : "Plataformas disponibles en España"}>
         <span className="anime-detail-streaming-label">{lang === "en" ? "AVAILABLE ON" : "DISPONIBLE EN"}</span>
         <div className="anime-detail-streaming-providers">
          {streaming.providers.map((provider) => <a key={provider.key} className={`anime-detail-provider provider-${provider.key}`} href={provider.url} target="_blank" rel="noopener noreferrer" aria-label={provider.name} title={provider.name}>
@@ -462,7 +462,7 @@ export default function AnimeDetail({entry,lang="es"}:{entry:LibraryEntry;lang?:
           
          </a>)}
         </div>
-       </section>}
+       </section> : null}
        {media?.genres?.length&&<div className="anime-detail-genres">{media.genres.slice(0,5).map((genre)=><span key={genre}>{genre}</span>)}</div>}
        </div>
       </div>
