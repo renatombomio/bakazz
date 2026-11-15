@@ -14,12 +14,11 @@ const colors = ["#7c3aed", "#db2777", "#0ea5e9", "#f59e0b", "#10b981", "#ef4444"
 ---
 {list.length > 0 && (
   <section class="cp" aria-label={title}>
-    <h3 class="cp-title">{title}</h3>
-    <div class="cp-track" data-cp tabindex="0" role="group" aria-label={title}>
+    <div class:list={["cp-track", { "cp-track--single": list.length === 1 }]} data-cp tabindex="0" role="group" aria-label={title}>
       {list.map((member, index) => {
         const name = member.username.startsWith("@") ? member.username : `@${member.username}`;
         return (
-          <a class="cp-item" href={member.href} aria-label={name}
+          <a class:list={["cp-item", { "cp-item--single": list.length === 1 }]} href={member.href} aria-label={name}
             style={`--w:${sizes[index % sizes.length]}px;--d:${-(index * 0.7).toFixed(1)}s;--t:${(3.6 + (index % 5) * 0.5).toFixed(1)}s`}>
             <span class="cp-av" style={member.avatar ? "" : `background:${member.color ?? colors[index % colors.length]}`}>
               {member.avatar
@@ -36,11 +35,15 @@ const colors = ["#7c3aed", "#db2777", "#0ea5e9", "#f59e0b", "#10b981", "#ef4444"
 
 <style>
   .cp { min-width: 0; color: #f2efe9; padding: 8px 0 24px; }
-  .cp-title { margin: 0 0 4px; padding: 0 16px; font-size: 22px; line-height: 1.25; font-weight: 650; letter-spacing: -.01em; text-transform: none; }
   .cp-track { display: flex; align-items: center; height: 230px; overflow-x: auto; overflow-y: hidden;
     padding-inline: 50%; perspective: 900px; scrollbar-width: none; -webkit-overflow-scrolling: touch;
     overscroll-behavior-x: contain; scroll-behavior: auto; cursor: grab; touch-action: pan-x; }
   .cp-track::-webkit-scrollbar { display: none; }
+  .cp-track--single { height: auto; min-height: 0; justify-content: flex-start; padding: 12px 16px 8px; perspective: none; overflow: visible; }
+  .cp-item--single { width: 64px; margin: 0; transform: none; filter: none; }
+  .cp-item--single .cp-av { width: 64px; animation: none; }
+  .cp-item--single .cp-name { position: static; display: block; margin-top: 8px; transform: none; text-align: center; font-size: 12px; opacity: 1; }
+
   .cp-track.is-drag { cursor: grabbing; }
   .cp-track:focus-visible { outline: 2px solid #f472b6; outline-offset: -2px; }
   .cp-item { position: relative; display: block; flex: 0 0 auto; width: var(--w); margin-inline: 12px; color: inherit; text-decoration: none;
