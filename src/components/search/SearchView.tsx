@@ -28,14 +28,13 @@ function readFilters(params: URLSearchParams): Filters {
 function hasSelectedFilters(filters: Filters) {
   return filters.genres.length > 0 || Boolean(filters.year || filters.status);
 }
-function buildParams(query: string, filters: Filters, page = 1, count = false) {
+function buildParams(query: string, filters: Filters, page = 1) {
   const params = new URLSearchParams();
   if (query.trim().length >= 2) params.set("q", query.trim());
   if (filters.genres.length) params.set("genre", filters.genres.join(","));
   if (filters.year) params.set("year", filters.year);
   if (filters.status) params.set("status", filters.status);
-  if (count) params.set("count", "1");
-  else if (page > 1) params.set("page", String(page));
+  if (page > 1) params.set("page", String(page));
   return params;
 }
 
@@ -88,7 +87,7 @@ export default function SearchView({ lang = "es" }: { lang?: Lang }) {
   }, [query, appliedKey, initialized]);
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => setDebouncedQuery(query.trim()), 250);
+    const timeout = window.setTimeout(() => setDebouncedQuery(query.trim()), 400);
     return () => window.clearTimeout(timeout);
   }, [query]);
 
@@ -147,7 +146,7 @@ export default function SearchView({ lang = "es" }: { lang?: Lang }) {
     setCountError(false);
     setCountLoading(true);
     const timeout = window.setTimeout(() => {
-      const params = buildParams(debouncedQuery || query, draft, 1, true);
+      const params = buildParams(query, draft, 1);
       if (!params.has("q") && !params.has("genre") && !params.has("year") && !params.has("status")) params.set("popular", "1");
       fetch("/api/anime-search?" + params.toString(), { signal: controller.signal })
         .then(async (response) => {
@@ -158,7 +157,7 @@ export default function SearchView({ lang = "es" }: { lang?: Lang }) {
         .then((payload) => setCount(Number(payload.total ?? 0)))
         .catch((reason) => { if (reason?.name !== "AbortError") { setCount(null); setCountError(true); } })
         .finally(() => { if (!controller.signal.aborted) setCountLoading(false); });
-    }, 250);
+    }, 400);
     return () => { window.clearTimeout(timeout); controller.abort(); };
   }, [filtersOpen, draftKey, debouncedQuery, query, countRetry]);
 

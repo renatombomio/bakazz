@@ -132,32 +132,12 @@ async function popularAnime(page:number,perPage:number):Promise<Data> {
   const p=await anilist(query,{page,perPage});
   return {items:p.media,total:p.pageInfo?.total??0,hasNextPage:Boolean(p.pageInfo?.hasNextPage),source:"anilist"};
 }
-async function fetchAniListMeta(query:string) {
-  const response=await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({query}),signal:AbortSignal.timeout(10000)});
-  const body=await response.text();
-  if(!response.ok) {
-    console.error("[anime-search] AniList metadata HTTP error",response.status,body.slice(0,1000));
-    throw new Error("ANILIST_META_HTTP_"+response.status);
-  }
-  const payload=JSON.parse(body);
-  if(payload.errors?.length||!payload.data) {
-    console.error("[anime-search] AniList metadata GraphQL error",JSON.stringify(payload.errors??payload).slice(0,1400));
-    throw new Error("ANILIST_META_INVALID");
-  }
-  return payload.data;
+function loadGenres() {
+  return Array.from(GENRES);
 }
-async function loadGenres() {
-  const data=await fetchAniListMeta("query { GenreCollection }");
-  return Array.isArray(data.GenreCollection)?(data.GenreCollection as string[]).filter(genre=>genre!=="Hentai"&&genre!=="Ecchi"):[];
-}
-async function loadYears() {
+function loadYears() {
   const currentYear=new Date().getFullYear();
-  const candidates=Array.from({length:20},(_,index)=>currentYear-index);
-  const aliases=candidates.map((year)=>`y${year}: Page(page:1,perPage:1) { pageInfo { total } media(type:ANIME,startDate_greater:${year*10000},startDate_lesser:${(year+1)*10000},isAdult:false) { id } }`).join(" ");
-  const data=await fetchAniListMeta("query RecentAnimeYears { "+aliases+" older: Page(page:1,perPage:1) { pageInfo { total } media(type:ANIME,startDate_lesser:20200000,isAdult:false) { id } } }");
-  const recent=candidates.filter((year)=>Number(data["y"+year]?.pageInfo?.total??0)>0).slice(0,7).map(String);
-  if(Number(data.older?.pageInfo?.total??0)>0) recent.push("before2020");
-  return recent;
+  return [...Array.from({length:7},(_,index)=>String(currentYear-index)),"before2020"];
 }
 async function loadCached(key:string,type:"search"|"filters",filters:Record<string,unknown>,ttl:number,load:()=>Promise<Data>):Promise<{data:Data;cache:CacheState}> {
   if(!cacheClient||!cacheToken) return {data:await load(),cache:"BYPASS"};
@@ -168,13 +148,13 @@ async function loadCached(key:string,type:"search"|"filters",filters:Record<stri
   let ownsLock=await claimCacheLock(key,owner);
   if(!ownsLock) {
     // Another server instance is filling this exact query. Wait for its result.
-    for(let attempt=0;attempt<24;attempt++) {
+    for(let attempt=0;attempt<12;attempt++) {
       await new Promise(resolve=>setTimeout(resolve,500));
       const shared=await readCache(key);
       if(shared) return {data:shared,cache:"HIT"};
-      if(attempt===12) ownsLock=await claimCacheLock(key,owner);
-      if(ownsLock) break;
     }
+    // The cache lock is still held. Fail fast instead of creating a thundering herd.
+    throw Object.assign(new Error("CACHE_FILL_IN_PROGRESS"),{status:503,retry:"2"});
   }
 
   try {
@@ -196,8 +176,7 @@ export const GET:APIRoute=async({request})=>{
   const year=params.get("year")||"";
   const status=params.get("status")||"";
   const popular=params.get("popular")==="1";
-  const countOnly=params.get("count")==="1";
-  const perPage=countOnly?50:PAGE_SIZE;
+  const perPage=PAGE_SIZE;
   const now=new Date().getFullYear();
 
   if(params.get("genres")==="1"||params.get("years")==="1") {
@@ -221,7 +200,7 @@ export const GET:APIRoute=async({request})=>{
   const normalizedQuery=q.toLocaleLowerCase("en");
   const isSearch=q.length>=2;
   const isFiltered=genres.length>0||Boolean(year||status);
-  const filterState={query:normalizedQuery,genres,year,status,page,perPage,popular,countOnly};
+  const filterState={query:normalizedQuery,genres,year,status,page,perPage,popular};
   const rawKey=(popular?"popular:":isFiltered?"filters:":"search:")+JSON.stringify(filterState);
   const key=await digest(rawKey);
   const localKey=key;
@@ -239,8 +218,8 @@ export const GET:APIRoute=async({request})=>{
     let result:{data:Data;cache:CacheState};
     try { result=await job; } finally { if(pending.get(localKey)===job) pending.delete(localKey); }
     return Response.json({success:true,...result.data},{headers:{
-      "Cache-Control":"no-store",
-      "Vercel-CDN-Cache-Control":"no-store",
+      "Cache-Control":"public, max-age=0, s-maxage=300, stale-while-revalidate=600",
+      "Vercel-CDN-Cache-Control":"max-age=300, stale-while-revalidate=600",
       "X-Renanime-Search-Source":result.data.source,
       "X-Renanime-Cache":result.cache
     }});
