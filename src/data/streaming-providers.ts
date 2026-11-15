@@ -212,6 +212,62 @@ export const streamingAvailability: Record<string, StreamingAvailability> = {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/tengoku-daimakyou",
     providers: [provider.disney],
   },
+  "personal-019": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/trinity-seven",
+    providers: [provider.crunchyroll],
+  },
+  "personal-020": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/afro-samurai",
+    providers: [provider.crunchyroll],
+  },
+  "personal-023": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/beelzebub",
+    providers: [provider.crunchyroll],
+  },
+  "personal-028": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/sword-art-online",
+    providers: [provider.prime, provider.crunchyroll],
+  },
+  "personal-038": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/assassination-classroom",
+    providers: [provider.netflix],
+  },
+  "personal-041": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/the-seven-deadly-sins",
+    providers: [provider.netflix],
+  },
+  "personal-061": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/megalo-box",
+    providers: [provider.prime],
+  },
+  "personal-064": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/food-wars-shokugeki-no-soma",
+    providers: [provider.crunchyroll],
+  },
+  "personal-066": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/tsurezure-children",
+    providers: [provider.crunchyroll],
+  },
+  "personal-087": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/baki",
+    providers: [provider.netflix],
+  },
+  "personal-093": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/plunderer",
+    providers: [provider.crunchyroll],
+  },
+  "personal-101": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/arifureta-shokugyou-de-sekai-saikyou",
+    providers: [provider.prime],
+  },
+  "personal-102": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/sono-bisque-doll-wa-koi-wo-suru",
+    providers: [provider.netflix, provider.crunchyroll],
+  },
+  "personal-104": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/gleipnir",
+    providers: [provider.crunchyroll],
+  },
   "personal-119": {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/kaiju-no-8",
     providers: [provider.crunchyroll],
