@@ -243,5 +243,8 @@
   "search.newDiscoveries": "New discoveries",
   "search.newDiscoveriesDescription": "Recent releases worth discovering.",
   "search.hiddenGems": "Hidden gems",
-  "search.hiddenGemsDescription": "Highly rated anime with a smaller audience."
+  "search.hiddenGemsDescription": "Highly rated anime with a smaller audience.",
+  "search.awardsTitle": "Anime of the Year winners",
+  "search.awardsDescription": "The series selected as Anime of the Year at the Crunchyroll Anime Awards.",
+  "search.awardLabel": "Crunchyroll Anime Awards"
 }

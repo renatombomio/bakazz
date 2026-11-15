@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { localizedPath, useT, type Lang } from "../../i18n";
-import { CategoryRail, ResultsList, type DisplayMedia } from "./SearchDisplay";
+import { AwardsTimeline, CategoryRail, ResultsList, type DisplayMedia } from "./SearchDisplay";
 
 interface Media {
   id: number;
@@ -54,6 +54,7 @@ export default function SearchView({ lang = "es" }: { lang?: Lang }) {
   const [results, setResults] = useState<Media[]>([]);
   const [discoveryResults, setDiscoveryResults] = useState<Media[]>([]);
   const [gemsResults, setGemsResults] = useState<Media[]>([]);
+  const [awardsResults, setAwardsResults] = useState<Media[]>([]);
   const [total, setTotal] = useState(0);
   const [hasNext, setHasNext] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -112,26 +113,29 @@ export default function SearchView({ lang = "es" }: { lang?: Lang }) {
     if (!initialized || debouncedQuery.length > 0 || hasSelectedFilters(applied)) {
       setDiscoveryResults([]);
       setGemsResults([]);
+      setAwardsResults([]);
       return;
     }
     const controller = new AbortController();
     let cancelled = false;
-    const loadCategory = async (mode: "discovery" | "gems") => {
+    const loadCategory = async (mode: "discovery" | "gems" | "awards") => {
       const response = await fetch(`/api/anime-search?${mode}=1`, { signal: controller.signal });
       const payload = await response.json();
       if (!response.ok || !payload.success) throw new Error(payload.error || `${mode} unavailable`);
       return Array.isArray(payload.items) ? payload.items as Media[] : [];
     };
-    Promise.all([loadCategory("discovery"), loadCategory("gems")])
-      .then(([discovery, gems]) => {
+    Promise.all([loadCategory("discovery"), loadCategory("gems"), loadCategory("awards")])
+      .then(([discovery, gems, awards]) => {
         if (cancelled) return;
         setDiscoveryResults(discovery);
         setGemsResults(gems);
+        setAwardsResults(awards);
       })
       .catch((reason) => {
         if (!cancelled && reason?.name !== "AbortError") {
           setDiscoveryResults([]);
           setGemsResults([]);
+          setAwardsResults([]);
         }
       });
     return () => { cancelled = true; controller.abort(); };
@@ -376,6 +380,17 @@ export default function SearchView({ lang = "es" }: { lang?: Lang }) {
           subtitle={t("search.hiddenGemsDescription")}
           items={gemsItems}
           showScore={true}
+        />
+        <AwardsTimeline
+          title={t("search.awardsTitle")}
+          subtitle={t("search.awardsDescription")}
+          editions={[
+            { year: 2026, label: t("search.awardLabel"), anime: { ...toDisplayItems(awardsResults.filter((item) => item.id === 182896))[0], title: "My Hero Academia FINAL SEASON" } },
+            { year: 2025, label: t("search.awardLabel"), anime: { ...toDisplayItems(awardsResults.filter((item) => item.id === 151807))[0], title: "Solo Leveling" } },
+            { year: 2024, label: t("search.awardLabel"), anime: { ...toDisplayItems(awardsResults.filter((item) => item.id === 145064))[0], title: "JUJUTSU KAISEN Season 2" } },
+            { year: 2023, label: t("search.awardLabel"), anime: { ...toDisplayItems(awardsResults.filter((item) => item.id === 120377))[0], title: "Cyberpunk: Edgerunners" } },
+            { year: 2022, label: t("search.awardLabel"), anime: { ...toDisplayItems(awardsResults.filter((item) => item.id === 110277))[0], title: "Attack on Titan Final Season Part 1" } },
+          ].filter((edition) => edition.anime.id)}
         />
         </>
       )}

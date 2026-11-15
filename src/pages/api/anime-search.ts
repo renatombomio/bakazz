@@ -181,6 +181,14 @@ async function gemsAnime(page:number,perPage:number):Promise<Data> {
   const p=await anilist(query,{page,perPage,after:DISCOVERY_AFTER,before:DISCOVERY_BEFORE});
   return {items:p.media,total:p.pageInfo?.total??0,hasNextPage:Boolean(p.pageInfo?.hasNextPage),source:"anilist"};
 }
+const AWARD_MEDIA_IDS = [182896,151807,145064,120377,110277];
+async function awardAnime():Promise<Data> {
+  const query="query AwardAnime($ids:[Int!]!){Page(page:1,perPage:5){pageInfo{total hasNextPage} media(id_in:$ids,type:ANIME,isAdult:false){"+FIELDS+"}}}";
+  const p=await anilist(query,{ids:AWARD_MEDIA_IDS});
+  const byId=new Map<number,Media>(p.media.map((item:Media)=>[item.id,item]));
+  const items=AWARD_MEDIA_IDS.flatMap((id)=>byId.has(id)?[byId.get(id)!]:[]);
+  return {items,total:items.length,hasNextPage:false,source:"anilist"};
+}
 async function popularAnime(page:number,perPage:number):Promise<Data> {
   const query="query HistoricalPopularAnime($page:Int!,$perPage:Int!,$after:FuzzyDateInt!,$before:FuzzyDateInt!){Page(page:$page,perPage:$perPage){pageInfo{total hasNextPage} media(type:ANIME,sort:POPULARITY_DESC,isAdult:false,startDate_greater:$after,startDate_lesser:$before){"+FIELDS+"}}}";
   const p=await anilist(query,{page,perPage,after:HISTORICAL_POPULAR_AFTER,before:HISTORICAL_POPULAR_BEFORE});
@@ -232,6 +240,7 @@ export const GET:APIRoute=async({request})=>{
   const popular=params.get("popular")==="1";
   const discovery=params.get("discovery")==="1";
   const gems=params.get("gems")==="1";
+  const awards=params.get("awards")==="1";
   const perPage=PAGE_SIZE;
   const now=new Date().getFullYear();
 
@@ -250,7 +259,7 @@ export const GET:APIRoute=async({request})=>{
   if(genres.some(x=>!GENRES.has(x))) return fail("INVALID_GENRE",400);
   if(year&&year!=="before2020"&&(!/^\d{4}$/.test(year)||Number(year)<1900||Number(year)>now)) return fail("INVALID_YEAR",400);
   if(status&&!["FINISHED","RELEASING"].includes(status)) return fail("INVALID_STATUS",400);
-  const categoryModes=[popular,discovery,gems].filter(Boolean).length;
+  const categoryModes=[popular,discovery,gems,awards].filter(Boolean).length;
   if(categoryModes>1) return fail("INVALID_CATEGORY_MODE",400);
   if(categoryModes===1&&(q||genres.length||year||status)) return fail("INVALID_CATEGORY_FILTERS",400);
   if(categoryModes===0&&!q&&!genres.length&&!year&&!status) return fail("MISSING_SEARCH_OR_FILTER",400);
@@ -259,7 +268,7 @@ export const GET:APIRoute=async({request})=>{
   const isSearch=q.length>=2;
   const isFiltered=genres.length>0||Boolean(year||status);
   const filterState={query:normalizedQuery,genres,year,status,page,perPage,popular};
-  const rawKey="v6:"+(discovery?"discovery:":gems?"gems:":popular?"popular:":isFiltered?"filters:":"search:")+JSON.stringify(filterState);
+  const rawKey="v7:"+(discovery?"discovery:":gems?"gems:":popular?"popular:":isFiltered?"filters:":"search:")+JSON.stringify(filterState);
   const key=await digest(rawKey);
   const localKey=key;
 
@@ -269,7 +278,7 @@ export const GET:APIRoute=async({request})=>{
       const useFilters=isFiltered;
       job=loadCached(
         key,useFilters||popular||discovery||gems?"filters":"search",filterState,popular||discovery||gems?FILTER_TTL:useFilters?FILTER_TTL:SEARCH_TTL,
-        ()=>discovery?discoveryAnime(page,perPage):gems?gemsAnime(page,perPage):popular?popularAnime(page,perPage):useFilters?filterAnime(genres,year,status,q,page,perPage):searchAnime(q,page,perPage)
+        ()=>awards?awardAnime():discovery?discoveryAnime(page,perPage):gems?gemsAnime(page,perPage):popular?popularAnime(page,perPage):useFilters?filterAnime(genres,year,status,q,page,perPage):searchAnime(q,page,perPage)
       );
       pending.set(localKey,job);
     }
