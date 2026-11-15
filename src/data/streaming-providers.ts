@@ -152,6 +152,22 @@ export const streamingAvailability: Record<string, StreamingAvailability> = {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/cike-wu-liuqi",
     providers: [provider.netflix],
   },
+  "personal-121": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/bartender-glass-of-god",
+    providers: [provider.crunchyroll],
+  },
+  "personal-128": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/solo-leveling",
+    providers: [provider.crunchyroll],
+  },
+  "personal-131": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/dead-account",
+    providers: [provider.crunchyroll],
+  },
+  "personal-138": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/the-eminence-in-shadow",
+    providers: [provider.netflix],
+  },
   "personal-139": {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/cowboy-bebop",
     providers: [provider.netflix],
