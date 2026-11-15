@@ -230,5 +230,12 @@
   "renCollection.watched": "Also watched",
   "renCollection.view": "View anime",
   "renCollection.seriesWatched": "series watched",
-  "renCollection.recommendedCount": "recommended"
+  "renCollection.recommendedCount": "recommended",
+  "detail.formatTV": "Series",
+  "detail.formatTVShort": "TV Short",
+  "detail.formatMovie": "Movie",
+  "detail.formatOVA": "OVA",
+  "detail.formatONA": "ONA",
+  "detail.formatSpecial": "Special",
+  "detail.formatMusic": "Music"
 }

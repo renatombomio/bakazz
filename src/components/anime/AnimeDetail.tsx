@@ -8,7 +8,7 @@ import { getPersonalFranchiseEntries } from "../../data/franchise";
 import PersonalLibraryActions from "../personal-library/PersonalLibraryActions";
 import { fetchFallbackPoster, selectBestAnimeCandidate } from "../../lib/api/poster-fallback";
 import { fetchFallbackAnime } from "../../lib/api/anime-fallback";
-import { useT, type Lang } from "../../i18n";
+import { useT, type Lang, type TranslationKey } from "../../i18n";
 import AnimeComments from "./AnimeComments";
 import ShareAnime from "./ShareAnime";
 import CharacterCarousel from "./CharacterCarousel";
@@ -343,7 +343,21 @@ function date(value:Media["startDate"],lang:Lang="es"){
   return new Date(value.year,value.month-1,value.day).toLocaleDateString(lang==="en"?"en-GB":"es-ES",{day:"numeric",month:"long",year:"numeric"});
 }
 
-function format(value:string|null|undefined,lang:Lang){if(value==="MOVIE")return lang==="en"?"Movie":"Película";if(value==="TV")return lang==="en"?"Series":"Serie";return value||"Anime";}
+const FORMAT_TRANSLATIONS: Record<string, TranslationKey> = {
+  TV: "detail.formatTV",
+  TV_SHORT: "detail.formatTVShort",
+  MOVIE: "detail.formatMovie",
+  OVA: "detail.formatOVA",
+  ONA: "detail.formatONA",
+  SPECIAL: "detail.formatSpecial",
+  MUSIC: "detail.formatMusic",
+};
+
+function format(value:string|null|undefined,t:(key:TranslationKey)=>string){
+  if(!value) return "Anime";
+  const key=FORMAT_TRANSLATIONS[value];
+  return key ? t(key) : t("detail.unknownFormat");
+}
 
 export default function AnimeDetail({entry,lang="es"}:{entry:LibraryEntry;lang?:Lang}){
  const t=useT(lang);
@@ -423,7 +437,6 @@ export default function AnimeDetail({entry,lang="es"}:{entry:LibraryEntry;lang?:
     .anime-detail-character-image img{display:block;width:100%;height:100%;object-fit:cover}
     .anime-detail-character-name{display:block;margin-top:.45rem;color:var(--color-paper-100);font-size:.7rem;line-height:1.25;font-weight:600}
     .anime-detail-character-role{display:block;margin-top:.2rem;color:var(--color-muted-400);font-size:.55rem;text-transform:uppercase;letter-spacing:.06em}
-    .anime-detail-share-wrap{margin-top:.85rem}
     .anime-detail-recommendations{grid-column:1 / -1;margin-top:2rem;width:100%;min-width:0}
     .anime-detail-recommendations-head{margin-bottom:.8rem}
     .anime-detail-recommendations-track{display:flex;gap:.7rem;min-height:0;overflow-x:auto;padding:.15rem 0 .65rem;scroll-snap-type:x mandatory;scrollbar-width:thin;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
@@ -439,7 +452,7 @@ export default function AnimeDetail({entry,lang="es"}:{entry:LibraryEntry;lang?:
    title={title} bannerImage={banner} poster={poster}
    score={media?.averageScore != null ? media.averageScore/10 : null}
    year={media?.seasonYear ?? media?.startDate?.year ?? null}
-   formatLabel={media?.format ? format(media.format,lang) : null}
+   formatLabel={media?.format ? format(media.format,t) : null}
    episodes={media?.episodes} duration={media?.duration}
    likes={likeCount} liked={liked} likeBusy={likeBusy} likeNotice={likeNotice}
    onLike={toggleLike}

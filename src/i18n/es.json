@@ -230,5 +230,12 @@
   "renCollection.watched": "También los he visto",
   "renCollection.view": "Ver ficha",
   "renCollection.seriesWatched": "series vistas",
-  "renCollection.recommendedCount": "recomendadas"
+  "renCollection.recommendedCount": "recomendadas",
+  "detail.formatTV": "Serie",
+  "detail.formatTVShort": "Serie corta",
+  "detail.formatMovie": "Película",
+  "detail.formatOVA": "OVA",
+  "detail.formatONA": "ONA",
+  "detail.formatSpecial": "Especial",
+  "detail.formatMusic": "Musical"
 }
