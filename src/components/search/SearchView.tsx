@@ -260,6 +260,30 @@ export default function SearchView({ lang = "es" }: { lang?: Lang }) {
     finally { setLoading(false); }
   };
 
+  const toDisplayItems = (items: Media[]): DisplayMedia[] => items.flatMap((item) => {
+    const title = lang === "en" ? item.title?.english || item.title?.romaji : item.title?.romaji || item.title?.english;
+    const image = item.coverImage?.extraLarge || item.coverImage?.large;
+    if (!title || !image) return [];
+    const formatKey: Record<string, string> = {
+      TV: "detail.formatTV", TV_SHORT: "detail.formatTVShort", MOVIE: "detail.formatMovie",
+      OVA: "detail.formatOVA", ONA: "detail.formatONA", SPECIAL: "detail.formatSpecial", MUSIC: "detail.formatMusic",
+    };
+    const formatLabel = item.format && formatKey[item.format] ? t(formatKey[item.format] as Parameters<typeof t>[0]) : null;
+    return [{
+      id: item.id, title, href: localizedPath(lang, `/anime/${item.id}/`), image,
+      year: item.startDate?.year ?? null,
+      score: item.averageScore != null ? item.averageScore / 10 : null,
+      color: item.coverImage?.color ?? null, formatLabel,
+      episodes: item.episodes ?? null, genres: item.genres ?? [],
+    }];
+  });
+  const discoveryItems = toDisplayItems(discoveryResults);
+  const popularItems = toDisplayItems(results);
+  const usedAfterDiscovery = new Set([...discoveryItems, ...popularItems].map((item) => item.id));
+  const gemsItems = toDisplayItems(gemsResults).filter((item) => !usedAfterDiscovery.has(item.id));
+  const discoveryIds = new Set(discoveryItems.map((item) => item.id));
+  const popularUniqueItems = popularItems.filter((item) => !discoveryIds.has(item.id));
+
   const buttonLabel = countError
     ? t("search.error")
     : count === 0
@@ -328,6 +352,7 @@ export default function SearchView({ lang = "es" }: { lang?: Lang }) {
       {loading && <p className="search-state" role="status">{t("search.loading")}</p>}
       {error && <p className="search-state" role="alert">{t("search.error")}</p>}
       {!loading && !error && !query.trim() && !hasFilters && (
+        <>
         <CategoryRail
           title={t("search.newDiscoveries")}
           subtitle={t("search.newDiscoveriesDescription")}
@@ -345,6 +370,7 @@ export default function SearchView({ lang = "es" }: { lang?: Lang }) {
           items={gemsItems}
           showScore={true}
         />
+        </>
       )}
       {!loading && !error && (query.trim() || hasFilters) && (
         <ResultsList
