@@ -292,6 +292,30 @@ export const streamingAvailability: Record<string, StreamingAvailability> = {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/saiki-kusuo-no-sainan",
     providers: [provider.netflix],
   },
+  "personal-071": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/berserk",
+    providers: [provider.crunchyroll],
+  },
+  "personal-084": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/ousama-game-the-animation",
+    providers: [provider.crunchyroll],
+  },
+  "personal-099": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/katsute-kami-datta-kemono-tachi-e",
+    providers: [provider.crunchyroll],
+  },
+  "personal-106": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/sword-gai-the-animation",
+    providers: [provider.netflix],
+  },
+  "personal-125": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/the-elusive-samurai",
+    providers: [provider.crunchyroll],
+  },
+  "personal-126": {
+    region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/sousou-no-frieren",
+    providers: [provider.netflix, provider.crunchyroll],
+  },
   "personal-119": {
     region: "ES", checkedAt: "2026-11-15", sourceUrl: "https://www.justwatch.com/es/serie/kaiju-no-8",
     providers: [provider.crunchyroll],
