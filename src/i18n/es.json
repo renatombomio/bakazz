@@ -222,5 +222,19 @@
   "detail.formatOVA": "OVA",
   "detail.formatONA": "ONA",
   "detail.formatSpecial": "Especial",
-  "detail.formatMusic": "Musical"
+  "detail.formatMusic": "Musical",
+  "search.popular": "Populares",
+  "search.filters": "Filtros",
+  "search.clear": "Limpiar",
+  "search.removeFilters": "Quitar",
+  "search.genre": "Género",
+  "search.year": "Año",
+  "search.status": "Estado",
+  "search.finished": "Finalizado",
+  "search.releasing": "En emisión",
+  "search.before2020": "Antes de 2020",
+  "search.seeLoading": "Ver…",
+  "search.seeCount": "Ver {count} animes",
+  "search.noResults": "Sin resultados",
+  "search.resultsCount": "{count} resultados"
 }

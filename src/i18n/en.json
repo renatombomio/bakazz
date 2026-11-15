@@ -222,5 +222,19 @@
   "detail.formatOVA": "OVA",
   "detail.formatONA": "ONA",
   "detail.formatSpecial": "Special",
-  "detail.formatMusic": "Music"
+  "detail.formatMusic": "Music",
+  "search.popular": "Popular",
+  "search.filters": "Filters",
+  "search.clear": "Clear",
+  "search.removeFilters": "Remove",
+  "search.genre": "Genre",
+  "search.year": "Year",
+  "search.status": "Status",
+  "search.finished": "Finished",
+  "search.releasing": "Releasing",
+  "search.before2020": "Before 2020",
+  "search.seeLoading": "View…",
+  "search.seeCount": "View {count} anime",
+  "search.noResults": "No results",
+  "search.resultsCount": "{count} results"
 }
