@@ -14,7 +14,11 @@
 @media (max-width: 767px) {
   .ad-top[data-mode="banner"] .ad-visual {
     position: relative;
-    aspect-ratio: 16 / 9;
+    display: block;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 16 / 9 !important;
     overflow: hidden;
     padding: 0;
   }
@@ -35,10 +39,13 @@
     transform: translateY(-50%);
     width: 100%;
     height: auto;
+    max-height: 100%;
+    object-fit: contain;
+    object-position: center;
     z-index: 1;
   }
   .ad-top[data-mode="banner"] .ad-actions {
-    top: 14px;
+    top: 6px;
     right: 16px;
     z-index: 2;
   }
