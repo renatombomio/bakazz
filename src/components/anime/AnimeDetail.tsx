@@ -12,6 +12,7 @@ import { useT, type Lang } from "../../i18n";
 import AnimeComments from "./AnimeComments";
 import ShareAnime from "./ShareAnime";
 import CharacterCarousel from "./CharacterCarousel";
+import AnimeTop from "./AnimeTop";
 
 interface Media {
   id: number | string;
@@ -433,86 +434,32 @@ export default function AnimeDetail({entry,lang="es"}:{entry:LibraryEntry;lang?:
     .anime-detail-recommendation-title{display:block;margin-top:.48rem;font-size:.72rem;line-height:1.25;font-weight:500}
     .anime-detail-recommendation-meta{display:block;margin-top:.22rem;font-family:var(--font-meta);font-size:.5rem;letter-spacing:.06em;text-transform:uppercase;opacity:.58}
     @media(max-width:760px){.anime-detail:not(.anime-detail--ghibli) .anime-detail-synopsis-wrap{margin-top:1rem;padding:.85rem .9rem .95rem;border-radius:12px}.anime-detail-recommendations{grid-column:1 / -1;width:100%;margin-top:1.35rem}.anime-detail-recommendations-track{width:100%;max-width:none}.anime-detail-recommendation{flex:0 0 104px}.anime-detail-recommendation-title{font-size:.68rem}}
-    .ad-top{background:#09090b;color:#f2efe9}
-    .ad-visual{position:relative;aspect-ratio:16/10;overflow:hidden;background:#1c1c22}
-    .ad-visual::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;background:linear-gradient(to bottom,rgba(9,9,11,.35) 0,rgba(9,9,11,0) 30%,rgba(9,9,11,.55) 70%,#09090b 100%)}
-    .ad-banner{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 25%}
-    .ad-bg{position:absolute;inset:-30px;width:calc(100% + 60px);height:calc(100% + 60px);object-fit:cover;filter:blur(28px) brightness(.55) saturate(1.2)}
-    .ad-pos{position:absolute;left:50%;top:14px;transform:translateX(-50%);height:calc(100% - 44px);aspect-ratio:2/3;object-fit:cover;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.6)}
-    .ad-actions{position:absolute;top:14px;right:16px;z-index:2;display:flex;align-items:flex-start;gap:10px}
-    .ad-ic{height:40px;min-width:40px;padding:0 12px;border:0;border-radius:999px;color:#f2efe9;background:rgba(9,9,11,.55);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;gap:6px;font:600 14px Inter,system-ui,sans-serif}
-    .ad-ic:focus-visible{outline:2px solid #f472b6;outline-offset:3px}
-    .ad-ic[aria-pressed="true"]{color:#ec4899}
-    .ad-ic svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-    .ad-top[data-mode="poster"] .anime-detail-share-button span{display:none}
-    .ad-body{position:relative;z-index:3;margin-top:-34px;padding:0 16px 8px}
-    .ad-body h1{margin:0;font-size:32px;line-height:1.05;font-weight:800;letter-spacing:-.02em;overflow-wrap:anywhere}
-    .ad-meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px;font-size:14px;color:#c9c5cf}
-    .ad-score{color:#ec4899;font-weight:700}
-    .ad-chip{padding:3px 9px;border-radius:6px;background:#1c1c22;font-size:12.5px;color:#d8d4de}
-    .ad-cta{display:flex;gap:10px;margin-top:20px}
-    .ad-cta .personal-actions{display:flex;flex:1;gap:10px;margin:0;min-width:0}
-    .ad-cta .personal-actions button,.ad-cta .personal-status{flex:1;display:flex;align-items:center;justify-content:center;min-width:0;min-height:52px;padding:12px 8px;border:0;border-radius:999px;background:#1c1c22;color:#f2efe9;font:700 14.5px Inter,system-ui,sans-serif;letter-spacing:0;text-transform:none;text-align:center}
-    .ad-cta .personal-actions button:first-child{background:#ec4899;color:#fff}
-    .ad-cta .personal-actions button:focus-visible{outline:2px solid #f472b6;outline-offset:3px}
-    .ad-avail{display:flex;align-items:center;gap:14px;margin-top:20px;font-size:14px;color:#a6a2ad}
-    .ad-avail .anime-detail-streaming-providers{display:flex;align-items:center;gap:14px}
-    .ad-genres{margin:18px 0 0;font-size:14px;color:#c9c5cf}
-    .ad-genres b{color:#f2efe9}
-    .ad-body h2{margin:22px 0 8px;font-size:20px;font-weight:700}
-    .ad-syn{margin:0;font-size:15.5px;line-height:1.55;color:#d8d4de}
-    .ad-body>.anime-detail-translate{margin-top:12px}
-    .anime-detail-share-wrap{margin:0}
-    .anime-detail-share-button{height:40px;min-height:40px;padding:0 16px;border:0;border-radius:999px;background:rgba(9,9,11,.55);backdrop-filter:blur(8px);color:#f2efe9;font:600 14px Inter,system-ui,sans-serif}
-    .anime-detail-share-button svg{width:18px;height:18px}
-    .anime-detail-share-menu{left:auto;right:0}
-    .anime-detail-like{position:static;min-height:40px}
-    .anime-detail-like-notice{margin:8px 16px 0}
-    @media(min-width:768px){.ad-visual{aspect-ratio:auto;height:min(56svh,520px)}.ad-body{max-width:1100px;margin:-34px auto 0;padding:0 24px 8px}.ad-actions{right:max(24px,calc((100% - 1100px)/2 + 24px))}}
-    @media(max-width:480px){.ad-cta .personal-actions button,.ad-cta .personal-status{font-size:13px}}
-    @media(prefers-reduced-motion:reduce){.ad-ic,.anime-detail-share-button{backdrop-filter:none}}
   `}</style>
-  <section className="ad-top" data-mode={banner ? "banner" : poster ? "poster" : "empty"}>
-   <div className="ad-visual">
-    {banner && <img className="ad-banner" src={banner} alt="" fetchPriority="high" />}
-    {!banner && poster && <>
-     <img className="ad-bg" src={poster} alt="" aria-hidden="true" />
-     <img className="ad-pos" src={poster} alt={title} fetchPriority="high" width={320} height={480} />
-    </>}
-    <div className="ad-actions">
-     {typeof media?.id === "number" && <button type="button" className={"ad-ic anime-detail-like"+(liked?" is-liked":"")} onClick={toggleLike} disabled={likeBusy} aria-pressed={liked} aria-label={lang==="en"?"Like anime":"Me gusta este anime"}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.2-8.8 10-8.8 10s-8.8-4.8-8.8-10a4.6 4.6 0 0 1 8.8-1.9 4.6 4.6 0 0 1 8.8 1.9Z"/></svg><span>{likeCount.toLocaleString(lang==="en"?"en":"es")}</span></button>}
-     {typeof media?.id === "number" && <ShareAnime title={title} animeId={media.id} lang={lang} />}
-    </div>
-   </div>
-   {likeNotice&&<p className="anime-detail-like-notice" role="status">{likeNotice}</p>}
-   <div className="ad-body">
-    <h1>{title}</h1>
-    <div className="ad-meta">
-     {media?.averageScore != null && <span className="ad-score">★ {(media.averageScore/10).toFixed(1)}</span>}
-     {media?.averageScore != null && media?.seasonYear != null && <span>·</span>}
-     {media?.seasonYear != null && <span>{media.seasonYear}</span>}
-     {media?.format && <span className="ad-chip">{format(media.format,lang)}</span>}
-     {media?.episodes != null && <span className="ad-chip">{media.episodes} {t("detail.episodes")}</span>}
-     {media?.duration != null && <span className="ad-chip">{media.duration} min</span>}
-    </div>
-    {media?.id && <div className="ad-cta"><PersonalLibraryActions animeId={entry.animeId} lang={lang} /></div>}
-    {streaming?.providers.length ? <section className="ad-avail" aria-label={t("detail.availableOn")}>
-     <span>{t("detail.availableOn")}</span>
-     <div className="anime-detail-streaming-providers">
-      {streaming.providers.map((provider) => <a key={provider.key} className={`anime-detail-provider provider-${provider.key}`} href={provider.url} target="_blank" rel="noopener noreferrer" aria-label={provider.name} title={provider.name}>
-       {provider.key === "netflix" && <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 2h4l6 15V2h4v20h-4L9 7v15H5z" fill="currentColor"/></svg>}
-       {provider.key === "prime" && <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 16.5c5.2 3.4 12.1 3.3 17.5-.6M17.3 13.7l3.6 2.2-2.4 3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-       {provider.key === "disney" && <span className="anime-detail-disney-wordmark">Disney<span>+</span></span>}
-       {provider.key === "crunchyroll" && <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" strokeWidth="2.5"/><path d="M15.8 7.4a5.4 5.4 0 1 0 1.1 7.7 4.4 4.4 0 1 1-1.1-7.7Z" fill="currentColor"/></svg>}
-      </a>)}
-     </div>
-    </section> : null}
-    {media?.genres?.length ? <p className="ad-genres"><b>{t("detail.genres")}:</b> {media.genres.join(", ")}</p> : null}
-    <h2>{t("detail.synopsis")}</h2>
-    <p className="ad-syn">{loading?t("detail.loading"):(lang==="es"&&translatedSynopsis)||cleanSynopsis||t("detail.noSynopsis")}</p>
+  <AnimeTop
+   title={title} bannerImage={banner} poster={poster}
+   score={media?.averageScore != null ? media.averageScore/10 : null}
+   year={media?.seasonYear ?? media?.startDate?.year ?? null}
+   formatLabel={media?.format ? format(media.format,lang) : null}
+   episodes={media?.episodes} duration={media?.duration}
+   likes={likeCount} liked={liked} likeBusy={likeBusy} likeNotice={likeNotice}
+   onLike={toggleLike}
+   share={typeof media?.id === "number" ? <ShareAnime title={title} animeId={media.id} lang={lang} /> : null}
+   libraryActions={media?.id ? <PersonalLibraryActions animeId={entry.animeId} lang={lang} /> : null}
+   availability={streaming?.providers.length ? <div className="anime-detail-streaming-providers">
+    {streaming.providers.map((provider) => <a key={provider.key} className={`anime-detail-provider provider-${provider.key}`} href={provider.url} target="_blank" rel="noopener noreferrer" aria-label={provider.name} title={provider.name}>
+     {provider.key === "netflix" && <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 2h4l6 15V2h4v20h-4L9 7v15H5z" fill="currentColor"/></svg>}
+     {provider.key === "prime" && <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 16.5c5.2 3.4 12.1 3.3 17.5-.6M17.3 13.7l3.6 2.2-2.4 3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+     {provider.key === "disney" && <span className="anime-detail-disney-wordmark">Disney<span>+</span></span>}
+     {provider.key === "crunchyroll" && <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" strokeWidth="2.5"/><path d="M15.8 7.4a5.4 5.4 0 1 0 1.1 7.7 4.4 4.4 0 1 1-1.1-7.7Z" fill="currentColor"/></svg>}
+    </a>)}
+   </div> : null}
+   genres={media?.genres ?? []}
+   synopsis={<>
+    <p className="anime-detail-synopsis">{loading?t("detail.loading"):(lang==="es"&&translatedSynopsis)||cleanSynopsis||t("detail.noSynopsis")}</p>
     {lang==="es"&&hasSynopsis&&media?.description&&<button type="button" className="anime-detail-translate" onClick={translateSynopsis} disabled={translating}>{translating?t("detail.translating"):translatedSynopsis?t("detail.translated"):t("detail.translate")}</button>}
-   </div>
-  </section>
+   </>}
+   labels={{like:lang==="en"?"Like anime":"Me gusta este anime",availableOn:t("detail.availableOn"),genres:t("detail.genres"),synopsis:t("detail.synopsis"),episodes:t("detail.episodes")}}
+  />
          {media?.trailer?.id&&media.trailer.site==="youtube"&&<section className="anime-detail-trailer">
         <span className="anime-detail-label">{t("detail.trailer")}</span>
         <div className="anime-detail-video"><iframe src={"https://www.youtube.com/embed/"+media.trailer.id+"?rel=0"} title={(lang==="en"?"Trailer for ":"Tráiler de ")+title} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen /></div>
