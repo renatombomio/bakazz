@@ -431,6 +431,20 @@ export default function AnimeDetail({entry,lang="es"}:{entry:LibraryEntry;lang?:
     .anime-detail-like:disabled{opacity:.55;cursor:wait}
     .anime-detail-like-notice{margin:.45rem 0 0;color:#f3a3bd;font-size:.72rem}
     .anime-detail-characters{grid-column:1/-1;width:100%;min-width:0;margin-top:1.45rem}
+    /* Shared content rail: keep trailer, characters and comments aligned. */
+    .anime-detail > .anime-detail-trailer,
+    .anime-detail > .anime-detail-characters,
+    .anime-detail > .anime-comments {
+      box-sizing: border-box;
+      width: min(calc(100% - 2rem), 58rem);
+      max-width: 58rem;
+      min-width: 0;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .anime-detail > .anime-detail-trailer { margin-top: 1.5rem; }
+    .anime-detail > .anime-detail-characters { margin-top: 1.45rem; }
+    .anime-detail > .anime-comments { margin-top: 2rem; }
     .anime-detail-characters-track{display:flex;gap:.7rem;overflow-x:auto;padding:.2rem 0 .7rem;scroll-snap-type:x mandatory;scrollbar-width:thin;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
     .anime-detail-character{flex:0 0 104px;min-width:0;scroll-snap-align:start}
     .anime-detail-character-image{aspect-ratio:3/4;overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:9px;background:#171717}
