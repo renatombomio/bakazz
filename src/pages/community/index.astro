@@ -2,6 +2,7 @@
 export const prerender = false;
 import Layout from "../../layouts/Layout.astro";
 import Navbar from "../../components/layout/Navbar.astro";
+import CommunityPeople from "../../components/community/CommunityPeople.astro";
 import "../../styles/community-social.css";
 import { createSupabaseSsrClient } from "../../lib/supabase-ssr";
 const en=Astro.locals.lang==="en", base=en?"/en":"";
@@ -92,11 +93,18 @@ const cats:Record<string,string>=en?{anime:"Anime",characters:"Characters",theor
 <main id="main-content" class="community-feed">
  <header class="community-top"><h1>{en?"Community":"Comunidad"}</h1></header>
  <label class="srch"><span class="sr-only">{en?"Search users or debates":"Buscar usuarios o debates"}</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><input id="community-search" type="search" placeholder={en?"Search users or debates":"Buscar usuarios o debates"} autocomplete="off"/></label>
- <section class="members-section"><div class="sec"><h2>{en?"Members":"Miembros"} <small>{members.length}</small></h2></div>
- {members.length?<div class="members-grid">{members.map((m:any)=><a class="member community-searchable" data-search={["@"+m.aka,m.headline,m.bio,...(m.interests??[])].filter(Boolean).join(" ").toLowerCase()} href={base+"/u/"+encodeURIComponent(m.aka)+"/"}><img class="av" src={m.avatar_url||"/images/profile-avatar-placeholder.svg"} alt="" loading="lazy"/><span>@{m.aka}</span></a>)}</div>:<p class="community-note">{membersError?(en?"Could not load members.":"No se han podido cargar los miembros."):(en?"No public members found.":"No hay miembros públicos disponibles.")}</p>}
+ <section class="community-duel-section" aria-labelledby="community-duel-title">
+  <div class="sec community-duel-heading"><div><h2 id="community-duel-title">{en?"Duel of the week":"Duelo de la semana"}</h2><p>{en?"Which one do you choose?":"¿Cuál te quedas?"}</p></div></div>
+  <p class="community-note">{en?"The weekly duel is being prepared.":"El duelo semanal se está preparando."}</p>
  </section>
  <section class="community-trending-section"><div class="sec"><h2>{en?"Trending debate":"Debate en tendencia"}</h2><a href={base+"/community/debates/"}>{en?"View all":"Ver todos"}</a></div>
  {debatesError||debateLikesError?<p class="community-note">{en?"Debates are temporarily unavailable.":"Los debates no están disponibles temporalmente."}</p>:trendingDebate?(()=>{const d:any=trendingDebate;const p=Array.isArray(d.profiles)?d.profiles[0]:d.profiles;return <article class="post community-searchable" data-search={[d.title,d.body,d.category,p?.aka].join(" ").toLowerCase()}><div class="hd"><a class="author" href={base+"/u/"+encodeURIComponent(p?.aka||"")+"/"}><img class="av" src={p?.avatar_url||"/images/profile-avatar-placeholder.svg"} alt="" loading="lazy"/><span>@{p?.aka}</span></a><time>{age(d.created_at)}</time></div><div class="post-content"><a class="post-main" href={base+"/community/debates/"+d.id+"/"}><h3>{d.title}</h3>{d.body&&<p class="tx">{d.body}</p>}</a>{d.image_path&&d.image_status==="approved"&&<a class="community-debate-image" href={supabase.storage.from("debate-images").getPublicUrl(d.image_path).data.publicUrl} target="_blank" rel="noreferrer"><img src={supabase.storage.from("debate-images").getPublicUrl(d.image_path).data.publicUrl} alt={d.title} loading="lazy"/></a>}<div class="tags"><span class="tag">{cats[d.category]||"General"}</span></div></div><div class="acts"><a class="act" href={base+"/community/debates/"+d.id+"/"} aria-label={en?"Likes":"Me gusta"}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.2-8.8 11-8.8 11S3.2 14 3.2 8.8a4.5 4.5 0 0 1 8.8-1.1 4.5 4.5 0 0 1 8.8 1.1Z"/></svg><span>{trendingDebateStats.likes}</span></a><a class="act" href={base+"/community/debates/"+d.id+"/"} aria-label={en?"Comments":"Comentarios"}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l-1-4.5A7.5 7.5 0 1 1 20 11.5Z"/></svg><span>{trendingDebateCommentsCount??0}</span></a><button class="act share" type="button" data-share-url={base+"/community/debates/"+d.id+"/"} aria-label={en?"Share debate":"Compartir debate"}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M4 14v6h16v-6"/></svg></button></div></article>})():<p class="community-note">{en?"No liked debates yet.":"Todavía no hay debates con me gusta."}</p>}
+ </section>
+ <section class="members-section">
+  <div class="sec"><h2>{en?"People on Renanime":"Gente en Renanime"}</h2></div>
+  {members.length?<div class="community-searchable" data-search={members.map((m:any)=>["@"+m.aka,m.headline,m.bio,...(m.interests??[])].filter(Boolean).join(" ")).join(" ").toLowerCase()}>
+   <CommunityPeople title={en?"People on Renanime":"Gente en Renanime"} members={members.map((m:any)=>({id:m.id,username:m.aka,avatar:m.avatar_url,href:base+"/u/"+encodeURIComponent(m.aka)+"/"}))} max={9}/>
+  </div>:<p class="community-note">{membersError?(en?"Could not load members.":"No se han podido cargar los miembros."):(en?"No public members found.":"No hay miembros públicos disponibles.")}</p>}
  </section>
  <section class="community-top-anime-section"><div class="sec"><h2>{en?"Most loved anime":"Animes más queridos"}</h2></div>
  {animeLikesError?<p class="community-note">{en?"Anime ranking is temporarily unavailable.":"El ranking de anime no está disponible temporalmente."}</p>:topAnime.length?<div class="top-anime-layout">
@@ -163,6 +171,14 @@ const cats:Record<string,string>=en?{anime:"Anime",characters:"Characters",theor
 .top-anime-row-likes svg{width:13px;height:13px}
 @media(max-width:520px){.top-anime-layout{grid-template-columns:minmax(0,1fr) minmax(0,.95fr);gap:9px;padding-left:12px;padding-right:12px}.top-anime-feature{min-height:260px;padding:12px}.top-anime-feature-title{font-size:19px}.top-anime-row{grid-template-columns:19px 36px minmax(0,1fr);gap:3px 6px}.top-anime-row img{width:36px;height:50px}.top-anime-name{font-size:10.5px}.top-anime-row-likes{font-size:10px}}
 @media(max-width:360px){.top-anime-layout{grid-template-columns:1fr}.top-anime-feature{min-height:300px}.top-anime-list{grid-template-rows:none}.top-anime-row{min-height:62px}}
+
+.community-duel-section{padding-bottom:8px}
+.community-duel-heading{align-items:flex-start}
+.community-duel-heading p{margin:3px 0 0;color:#96919d;font-size:14px}
+.community-duel-section .community-note{padding-top:4px;padding-bottom:16px}
+.members-section{min-width:0;overflow:hidden}
+.members-section .sec{padding-bottom:0}
+.members-section .cp{padding-top:0}
 </style>
 </Layout>
 <script>
