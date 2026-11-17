@@ -7,6 +7,53 @@ let library: PersonalAnimeEntry[] = [];
 let hydrated = false;
 let hydrating: Promise<void> | null = null;
 
+const resolvedAnimeIds = new Map<string, Promise<string>>();
+
+/**
+ * The library database stores AniList IDs. Jikan fallback detail pages expose
+ * MAL IDs (mal-123), so resolve those to the canonical AniList ID before save.
+ * Renanime's curated local IDs are resolved through the identity catalogue.
+ */
+export async function resolvePersonalLibraryAnimeId(animeId: string): Promise<string> {
+  const value = String(animeId).trim();
+  if (/^\\d+$/.test(value) && Number.isSafeInteger(Number(value)) && Number(value) > 0) return value;
+
+  const curatedId = (await import("../lib/api/ren-anime-identities")).getRenAniListId(value);
+  if (curatedId && Number.isSafeInteger(curatedId) && curatedId > 0) return String(curatedId);
+
+  const malMatch = /^mal-(\\d+)$/i.exec(value);
+  if (!malMatch) throw new Error("Anime ID cannot be saved to the personal library");
+
+  const cached = resolvedAnimeIds.get(value);
+  if (cached) return cached;
+
+  const task = (async () => {
+    const response = await fetch("https://graphql.anilist.co", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({
+        query: "query ResolveMalId($idMal: Int!) { Media(idMal: $idMal, type: ANIME) { id } }",
+        variables: { idMal: Number(malMatch[1]) },
+      }),
+    });
+    if (!response.ok) throw new Error("Could not resolve this anime on AniList");
+    const payload = await response.json();
+    const canonicalId = Number(payload?.data?.Media?.id);
+    if (!Number.isSafeInteger(canonicalId) || canonicalId <= 0) {
+      throw new Error("This anime has no AniList ID and cannot be saved yet");
+    }
+    return String(canonicalId);
+  })();
+
+  resolvedAnimeIds.set(value, task);
+  try {
+    return await task;
+  } catch (error) {
+    resolvedAnimeIds.delete(value);
+    throw error;
+  }
+}
+
 function isBrowser() { return typeof window !== "undefined"; }
 
 function readLegacy(): PersonalAnimeEntry[] {
