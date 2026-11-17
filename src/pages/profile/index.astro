@@ -709,7 +709,8 @@ if (debateIds.length) {
       if (!animeResponse.ok) throw new Error("anime_fetch_failed");
       const payload = await animeResponse.json();
       const likePayload = likeResponse.ok ? await likeResponse.json() : { likes:{} };
-      const commentPayload = commentResponse.ok ? await commentResponse.json() : { counts:{} };\n      const favoriteTotals = JSON.parse(document.querySelector<HTMLElement>("#profile-favorites-grid")?.dataset.likeTotals || "{}") as Record<string, number>;
+      const commentPayload = commentResponse.ok ? await commentResponse.json() : { counts:{} };
+      const favoriteTotals = JSON.parse(document.querySelector<HTMLElement>("#profile-favorites-grid")?.dataset.likeTotals || "{}") as Record<string, number>;
       const media = new Map(ids.map((id,index) => [id,payload.data?.["a"+index]]));
       grids.forEach(grid => {
         const gridIds = JSON.parse(grid.dataset.ids || "[]") as string[];
