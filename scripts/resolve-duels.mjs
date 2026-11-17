@@ -16,8 +16,19 @@ const query = `
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+function retryDelay(response, attempt) {
+  const header = response.headers.get("retry-after");
+  if (header) {
+    const seconds = Number(header);
+    if (Number.isFinite(seconds)) return Math.max(1, seconds) * 1000;
+    const date = Date.parse(header);
+    if (Number.isFinite(date)) return Math.max(1000, date - Date.now());
+  }
+  return Math.min(60_000, 2_000 * 2 ** attempt);
+}
+
 async function searchAnime(search, attempt = 0) {
-  const response = await fetch(endpoint, {
+  const response = await fetch(endpoint, {\n    signal: AbortSignal.timeout(20_000),
     method: "POST",
     headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify({ query, variables: { search } }),
@@ -60,7 +71,7 @@ for (let index = 0; index < uniqueTitles.length; index += 1) {
     })),
   });
 
-  console.log(`[${index + 1}/${uniqueTitles.length}] ${search}: ${candidates.length} candidates`);
+  console.error(`[${index + 1}/${uniqueTitles.length}] ${search}: ${candidates.length} candidates`);
   if (index < uniqueTitles.length - 1) await sleep(900);
 }
 
