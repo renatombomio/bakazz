@@ -700,7 +700,22 @@ if (debateIds.length) {
       .map(selector => document.querySelector<HTMLElement>(selector)).filter(Boolean) as HTMLElement[];
     const ids = [...new Set(grids.flatMap(grid => JSON.parse(grid.dataset.ids || "[]") as string[]))].filter(id => /^\d+$/.test(id));
     if (!ids.length) {
-      grids.forEach(grid => { grid.innerHTML = '<span class="profile-anime-empty">' + copy("Todavía no hay animes aquí.", "No anime here yet.") + '</span>'; });
+      grids.forEach(grid => {
+        if (grid.id === "profile-favorites-grid") {
+          const slots = Array.from({length:5}, () => {
+            const placeholder = document.createElement("a");
+            placeholder.className = "po po-placeholder";
+            placeholder.href = grid.dataset.searchHref || "/search/";
+            placeholder.setAttribute("aria-label",copy("Buscar anime para añadir a favoritos","Search anime to add to favorites"));
+            placeholder.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+            return placeholder;
+          });
+          slots[0].classList.add("big");
+          grid.replaceChildren(...slots);
+        } else {
+          grid.innerHTML = '<span class="profile-anime-empty">' + copy("Todavía no hay animes aquí.", "No anime here yet.") + '</span>';
+        }
+      });
       return;
     }
     const variables: Record<string, number> = {};
@@ -736,7 +751,7 @@ if (debateIds.length) {
           meta.append(likeMeta); cardCopy.append(titleNode); card.append(img,cardCopy,meta);
           if (isFavoriteWall) {
             const pill = document.createElement("span"); pill.className = "lk" + (counts.liked ? " is-liked" : "");
-            pill.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.2-8.8 10-8.8-10a4.6 4.6 0 0 1 8.8-1.9 4.6 4.6 0 0 1 8.8 1.9Z"/></svg><span></span>';
+            pill.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.2-8.8 10-8.8 10s-8.8-4.8-8.8-10a4.6 4.6 0 0 1 8.8-1.9 4.6 4.6 0 0 1 8.8 1.9Z"/></svg><span></span>';
             pill.querySelector("span")!.textContent = new Intl.NumberFormat(isEnglish ? "en" : "es", {notation:"compact",maximumFractionDigits:1}).format(Number(counts.count ?? 0));
             card.append(pill);
           }
