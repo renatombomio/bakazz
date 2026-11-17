@@ -13,7 +13,7 @@ function json(body: unknown, status = 200) {
 function parseIds(value: string | null): number[] {
   if (!value) return [];
   const ids = [...new Set(value.split(",").map((part) => Number(part.trim())))];
-  if (ids.length > 24 || ids.some((id) => !Number.isInteger(id) || id <= 0)) return [];
+  if (ids.length > 40 || ids.some((id) => !Number.isInteger(id) || id <= 0)) return [];
   return ids;
 }
 
@@ -23,16 +23,22 @@ export const GET: APIRoute = async ({ request, cookies }) => {
   try {
     const supabase = createSupabaseSsrClient(request, cookies);
     const { data: authData } = await supabase.auth.getUser();
-    const { data, error } = await supabase.from("anime_likes").select("anime_id,user_id").in("anime_id", ids);
-    if (error) {
-      console.warn("Anime likes read failed:", error.code);
+    const viewerId = authData.user?.id ?? "00000000-0000-0000-0000-000000000000";
+    const [{ data: totals, error: totalsError }, { data: viewerLikes, error: viewerLikesError }] = await Promise.all([
+      supabase.from("anime_like_totals").select("anime_id, like_count").in("anime_id", ids),
+      supabase.from("anime_likes").select("anime_id").eq("user_id", viewerId).in("anime_id", ids),
+    ]);
+    if (totalsError || viewerLikesError) {
+      console.warn("Anime likes grouped read failed:", totalsError?.code ?? viewerLikesError?.code);
       return json({ ok: false, error: "LIKES_UNAVAILABLE" }, 503);
     }
     const likes: Record<number, {count:number;liked:boolean}> = {};
     ids.forEach((id) => { likes[id] = { count: 0, liked: false }; });
-    (data ?? []).forEach((row) => {
-      likes[row.anime_id].count += 1;
-      if (authData.user && row.user_id === authData.user.id) likes[row.anime_id].liked = true;
+    (totals ?? []).forEach((row) => {
+      likes[row.anime_id].count = Number(row.like_count ?? 0);
+    });
+    (viewerLikes ?? []).forEach((row) => {
+      likes[row.anime_id].liked = true;
     });
     return json({ ok: true, likes });
   } catch (error) {
