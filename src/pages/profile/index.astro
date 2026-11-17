@@ -210,7 +210,7 @@ if (debateIds.length) {
 
         <div class="profile-library-heading" id="profile-character-favorites"><h2>{isEnglish ? "Favourite characters" : "Personajes favoritos"}</h2><a href={localizedPath(Astro.locals.lang, "/profile/characters/")}>{isEnglish ? "See all" : "Ver todos"}</a></div>
         {characterFavorites.length ? <div class="profile-character-row">
-          {characterFavorites.map((character: any) => <a class="profile-character-card" href={localizedPath(Astro.locals.lang, "/profile/characters/")} data-character-id={character.id} data-like-count={favoriteCharacterLikeTotals[character.id] ?? 0}>
+          {characterFavorites.map((character: any) => <a class="profile-character-card" href={character.anime_id ? localizedPath(Astro.locals.lang, "/anime/" + character.anime_id + "/") : "#profile-character-favorites"} data-character-id={character.id} data-like-count={favoriteCharacterLikeTotals[character.id] ?? 0}>
             <span class="profile-character-image">
               {character.image_url && <img src={character.image_url} alt="" loading="eager" decoding="async" />}
               <small class="profile-character-likes" aria-label={isEnglish ? "Likes" : "Me gusta"}>
