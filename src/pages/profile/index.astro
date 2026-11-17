@@ -68,35 +68,6 @@ if (favoriteCharacterIds.length) {
   if (error) console.error("Renanime favorite character like totals error:", error.message);
   else favoriteCharacterLikeTotals = Object.fromEntries((totals ?? []).map((row: any) => [row.character_id, Number(row.like_count ?? 0)]));
 }
-const characterAnimeIds = [...new Set(characterFavorites.map((item: any) => item.anime_id).filter((id: any) => Number.isInteger(id)))];
-let characterAnimeTitles: Record<number, string> = {};
-if (characterAnimeIds.length) {
-  const variables: Record<string, number> = {};
-  const fields = characterAnimeIds.map((id, index) => {
-    variables["id" + index] = id;
-    return "a" + index + ": Media(id: $id" + index + ", type: ANIME) { id title { romaji english } }";
-  }).join("\n");
-  const definitions = characterAnimeIds.map((_, index) => "$id" + index + ": Int!").join(", ");
-  try {
-    const response = await fetch("https://graphql.anilist.co", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Accept": "application/json" },
-      body: JSON.stringify({ query: "query CharacterAnimeTitles(" + definitions + ") { " + fields + " }", variables }),
-    });
-    if (response.ok) {
-      const payload = await response.json();
-      characterAnimeTitles = Object.fromEntries(characterAnimeIds.map((id, index) => {
-        const anime = payload.data?.["a" + index];
-        return [id, anime?.title?.english || anime?.title?.romaji || ""];
-      }).filter((entry: any) => entry[1]));
-    }
-  } catch (error) {
-    console.error("Renanime character anime titles error:", error);
-  }
-}
-for (const character of characterFavorites) {
-  character.anime_title = character.anime_id ? characterAnimeTitles[character.anime_id] ?? "" : "";
-}
 const { count: characterFavoritesCount } = await supabase
   .from("character_likes")
   .select("character_id", { count: "exact", head: true })
@@ -239,9 +210,15 @@ if (debateIds.length) {
 
         <div class="profile-library-heading" id="profile-character-favorites"><h2>{isEnglish ? "Favourite characters" : "Personajes favoritos"}</h2><a href={localizedPath(Astro.locals.lang, "/profile/characters/")}>{isEnglish ? "See all" : "Ver todos"}</a></div>
         {characterFavorites.length ? <div class="profile-character-row">
-          {characterFavorites.map((character: any) => <a class="profile-character-card" href={character.anime_id ? localizedPath(Astro.locals.lang, "/anime/" + character.anime_id + "/") : "#profile-character-favorites"} data-character-id={character.id} data-like-count={favoriteCharacterLikeTotals[character.id] ?? 0}>
-            {character.image_url && <img src={character.image_url} alt="" loading="lazy" />}
-            <strong>{character.name}</strong><span>{character.anime_title || (isEnglish ? "Anime unavailable" : "Anime no disponible")}</span><small class="profile-character-likes">♥ {(favoriteCharacterLikeTotals[character.id] ?? 0).toLocaleString(isEnglish ? "en" : "es", { notation: "compact", maximumFractionDigits: 1 })}</small>
+          {characterFavorites.map((character: any) => <a class="profile-character-card" href={localizedPath(Astro.locals.lang, "/profile/characters/")} data-character-id={character.id} data-like-count={favoriteCharacterLikeTotals[character.id] ?? 0}>
+            <span class="profile-character-image">
+              {character.image_url && <img src={character.image_url} alt="" loading="eager" decoding="async" />}
+              <small class="profile-character-likes" aria-label={isEnglish ? "Likes" : "Me gusta"}>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.2-8.8 10-8.8 10s-8.8-4.8-8.8-10a4.6 4.6 0 0 1 8.8-1.9 4.6 4.6 0 0 1 8.8 1.9Z"/></svg>
+                <span>{(favoriteCharacterLikeTotals[character.id] ?? 0).toLocaleString(isEnglish ? "en" : "es", { notation: "compact", maximumFractionDigits: 1 })}</span>
+              </small>
+            </span>
+            <strong>{character.name}</strong>
           </a>)}
         </div> : <p class="profile-character-empty">{isEnglish ? "You haven't liked any characters yet." : "Todavía no has marcado personajes como favoritos."}</p>}
 
@@ -603,13 +580,14 @@ if (debateIds.length) {
   .profile-favorites-wall .profile-anime-card{position:relative}
   .profile-favorites-wall .profile-favorite-like{position:absolute;left:6px;bottom:6px;display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:999px;background:rgba(9,9,11,.78);color:#f2efe9;font-size:11px;font-weight:700}
   .profile-favorites-wall .profile-favorite-like svg{width:12px;height:12px;fill:none;stroke:#f2efe9}.profile-favorites-wall .profile-favorite-like.is-liked svg{fill:#ec4899;stroke:#ec4899}
-  .profile-character-row{display:flex;gap:16px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none}
-  .profile-character-row::-webkit-scrollbar{display:none}
-  .profile-character-card{flex:0 0 76px;display:flex;flex-direction:column;align-items:center;gap:5px;padding:0;border:0;background:none;text-align:center;text-decoration:none;color:#f2efe9}
-  .profile-character-card img{width:76px;height:76px;border-radius:50%;object-fit:cover}
-  .profile-character-card strong{width:100%;font-size:.72rem;line-height:1.2;min-height:2.4em}
-  .profile-character-card span{font-size:.62rem;color:#85818b;line-height:1.2}
-  .profile-character-likes{display:flex;align-items:center;gap:4px;margin-top:2px;color:#ec4899;font-size:.68rem;font-weight:650}
+  .profile-character-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;align-items:start;padding:2px 0 12px}
+  .profile-character-card{display:flex;min-width:0;flex-direction:column;align-items:center;gap:8px;padding:0;border:0;background:none;text-align:center;text-decoration:none;color:#f2efe9}
+  .profile-character-image{position:relative;display:block;width:100%;aspect-ratio:1;min-width:0}
+  .profile-character-image img{display:block;width:100%;height:100%;border-radius:50%;object-fit:cover}
+  .profile-character-likes{position:absolute;left:50%;bottom:-7px;display:flex;align-items:center;gap:4px;max-width:calc(100% - 4px);padding:4px 8px;border:2px solid #09090b;border-radius:999px;background:rgba(9,9,11,.92);color:#f2efe9;font-size:.68rem;font-weight:700;line-height:1;white-space:nowrap;transform:translateX(-50%)}
+  .profile-character-likes svg{width:14px;height:14px;flex:none;fill:#ec4899;stroke:#ec4899;stroke-width:1.8}
+  .profile-character-card strong{display:-webkit-box;width:100%;min-width:0;min-height:2.4em;margin-top:2px;overflow:hidden;font-size:.76rem;font-weight:650;line-height:1.2;text-overflow:ellipsis;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+  .profile-character-card:focus-visible{outline:2px solid #ec4899;outline-offset:4px;border-radius:12px}
   .profile-character-empty,.profile-debate-empty{color:#85818b;font-size:.78rem}
   .profile-tabs{display:flex;gap:22px;border-bottom:1px solid rgba(255,255,255,.1);margin:0 0 12px}
   .profile-tabs button{padding:9px 0 11px;border:0;border-bottom:2px solid transparent;background:none;color:#85818b;font:inherit;font-size:.83rem;cursor:pointer}
@@ -630,8 +608,6 @@ if (debateIds.length) {
   @media(max-width:520px){
     .profile-favorites-wall{grid-template-rows:repeat(2,minmax(84px,1fr));gap:6px}
     .profile-favorites-wall .profile-anime-card,.profile-favorites-wall .profile-anime-card img{min-height:84px}
-    .profile-character-card{flex-basis:68px}
-    .profile-character-card img{width:68px;height:68px}
     .profile-debates{padding:0 1.25rem 1.5rem}
     .profile-stats{padding-left:1.25rem;padding-right:1.25rem}
     .profile-rank-progress{margin-left:1.25rem;margin-right:1.25rem;padding:0}
