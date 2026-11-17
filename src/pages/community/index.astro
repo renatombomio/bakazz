@@ -142,7 +142,12 @@ const cats:Record<string,string>=en?{anime:"Anime",characters:"Characters",theor
  </section>
  <section class="activity-section"><div class="sec"><h2>{en?"Recent activity":"Actividad reciente"}</h2></div>
  {activity.length?<div class="activity-feed">{activity.map(x=><article class="actv"><a href={base+"/u/"+encodeURIComponent(x.aka)+"/"} aria-label={"@"+x.aka}><img class="av" src={x.avatar||"/images/profile-avatar-placeholder.svg"} alt="" loading="lazy"/></a><div class="t"><a href={base+"/u/"+encodeURIComponent(x.aka)+"/"}><b>@{x.aka}</b></a> {x.kind==="like"?(en?"liked":"le ha gustado"):x.kind==="joined"?(en?"joined Renanime":"se ha unido a Renanime"):(en?"commented on":"ha comentado en")} {x.animeId!==null&&<a href={base+"/anime/"+x.animeId+"/"}><q>{x.animeTitle}</q></a>}{x.kind==="comment"&&x.content&&<span class="activity-quote"> “{x.content}”</span>}</div><em>{age(x.created)}</em></article>)}</div>:<p class="community-note">{en?"No recent activity yet.":"Todavía no hay actividad reciente."}</p>}
- </section><p id="community-no-results" class="community-note" hidden>{en?"No results match your search.":"No hay resultados para esa búsqueda."}</p>
+ </section><section id="community-search-results" class="community-search-results" aria-live="polite" hidden>
+  <div class="search-result-group"><h2>{en ? 'Users' : 'Usuarios'}</h2><div id="community-search-users" class="search-result-list"></div></div>
+  <div class="search-result-group"><h2>{en ? 'Debates' : 'Debates'}</h2><div id="community-search-debates" class="search-result-list"></div></div>
+  <p id="community-search-empty" class="community-note" hidden>{en ? 'No users or debates match your search.' : 'No hay usuarios ni debates que coincidan.'}</p>
+</section>
+<p id="community-no-results" class="community-note" hidden>{en?"No results match your search.":"No hay resultados para esa búsqueda."}</p>
 </main>
 <style>
 /* Keep the trending debate card aligned with the full Debates feed. */
@@ -188,10 +193,55 @@ const cats:Record<string,string>=en?{anime:"Anime",characters:"Characters",theor
 .members-section{min-width:0;overflow:hidden}
 .members-section .sec{padding-bottom:0}
 .members-section .cp{padding-top:0}
+.community-search-results{padding:8px 16px 24px}.search-result-group{margin:0 0 18px}.search-result-group h2{margin:0 0 9px;font-size:13px;font-weight:800;color:#a39fa9}.search-result-list{display:grid;gap:7px}.community-search-user,.community-search-debate{display:flex;align-items:center;gap:11px;min-width:0;padding:9px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:#111114;color:#f2efe9;text-decoration:none}.community-search-user>img,.community-search-debate>img{width:42px;height:42px;flex:0 0 42px;border-radius:50%;object-fit:cover}.search-user-meta{display:flex;align-items:center;gap:9px;font-size:13px}.search-presence{width:9px;height:9px;border-radius:50%;background:#777}.search-presence.is-online{background:#22c55e}.search-debate-content{display:grid;gap:4px;min-width:0}.search-debate-content strong{font-size:13px;line-height:1.3}.search-debate-content small{overflow:hidden;color:#96919d;font-size:11px;text-overflow:ellipsis;white-space:nowrap}
 </style>
 </Layout>
 <script>
-const input=document.querySelector<HTMLInputElement>("#community-search");const items=[...document.querySelectorAll<HTMLElement>(".community-searchable")];const empty=document.querySelector<HTMLElement>("#community-no-results");
-input?.addEventListener("input",()=>{const q=input.value.trim().toLowerCase();let n=0;items.forEach(el=>{const ok=!q||(el.dataset.search||"").includes(q);el.hidden=!ok;if(ok)n++;});if(empty)empty.hidden=n>0;});
+const input=document.querySelector<HTMLInputElement>("#community-search");
+const results=document.querySelector<HTMLElement>("#community-search-results");
+const usersBox=document.querySelector<HTMLElement>("#community-search-users");
+const debatesBox=document.querySelector<HTMLElement>("#community-search-debates");
+const empty=document.querySelector<HTMLElement>("#community-search-empty");
+const searchable=[...document.querySelectorAll<HTMLElement>(".community-searchable")];
+let timer=0;
+let controller:AbortController|null=null;
+const locale=document.documentElement.lang.toLowerCase().startsWith("en")?"en":"es";
+const make=(tag:string,className:string,text:string)=>{const node=document.createElement(tag);node.className=className;node.textContent=text;return node;};
+const clear=(node:HTMLElement|null)=>{if(node)node.replaceChildren();};
+function renderUsers(rows:any[]){
+ if(!usersBox)return;clear(usersBox);
+ for(const user of rows){const a=document.createElement("a");a.className="community-search-user";a.href=(locale==="en"?"/en":"")+"/u/"+encodeURIComponent(user.aka)+"/";
+ const img=document.createElement("img");img.src=user.avatar_url||"/images/profile-avatar-placeholder.svg";img.alt="";img.loading="lazy";
+ const meta=make("span","search-user-meta","");meta.append(make("strong","", "@"+user.aka));
+ const presence=make("i","search-presence "+(user.isOnline?"is-online":"is-offline"),"");presence.title=user.isOnline?(locale==="en"?"Online":"En línea"):(locale==="en"?"Offline":"Desconectado");meta.append(presence);
+ a.append(img,meta);usersBox.append(a);}
+}
+function renderDebates(rows:any[]){
+ if(!debatesBox)return;clear(debatesBox);
+ for(const debate of rows){const a=document.createElement("a");a.className="community-search-debate";a.href=(locale==="en"?"/en":"")+"/community/debates/"+encodeURIComponent(debate.id)+"/";
+ const avatar=document.createElement("img");avatar.src=debate.avatar_url||"/images/profile-avatar-placeholder.svg";avatar.alt="";avatar.loading="lazy";
+ const content=make("span","search-debate-content","");content.append(make("strong","",debate.title),make("small","", "@"+debate.aka+(debate.body?" · "+debate.body.slice(0,100):"")));
+ a.append(avatar,content);debatesBox.append(a);}
+}
+function setSearching(q:string){
+ searchable.forEach(el=>el.hidden=Boolean(q));
+ if(results)results.hidden=!q;
+}
+input?.addEventListener("input",()=>{
+ const q=input.value.trim();window.clearTimeout(timer);controller?.abort();
+ setSearching(q);
+ if(!q){clear(usersBox);clear(debatesBox);if(empty)empty.hidden=true;return;}
+ if(q.replace(/^@/,"").length<2){clear(usersBox);clear(debatesBox);if(empty)empty.hidden=true;return;}
+ timer=window.setTimeout(async()=>{
+  controller=new AbortController();
+  try{
+   const response=await fetch((locale==="en"?"/en":"")+"/api/community/search/?q="+encodeURIComponent(q),{signal:controller.signal,credentials:"same-origin",headers:{"Accept":"application/json"}});
+   if(!response.ok)throw new Error("SEARCH_FAILED");
+   const data=await response.json();
+   renderUsers(data.users||[]);renderDebates(data.debates||[]);
+   if(empty)empty.hidden=Boolean((data.users||[]).length||(data.debates||[]).length);
+  }catch(error){if(error instanceof DOMException&&error.name==="AbortError")return;clear(usersBox);clear(debatesBox);if(empty){empty.hidden=false;empty.textContent=locale==="en"?"Search is temporarily unavailable.":"La búsqueda no está disponible temporalmente.";}}
+ },220);
+});
 document.querySelectorAll<HTMLButtonElement>(".share").forEach(button=>button.addEventListener("click",async()=>{const url=new URL(button.dataset.shareUrl||"",window.location.origin).toString();try{if(navigator.share)await navigator.share({url});else if(navigator.clipboard)await navigator.clipboard.writeText(url);}catch{}}));
 </script>
