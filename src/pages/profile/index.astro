@@ -229,17 +229,16 @@ if (debateIds.length) {
       </section>
 
       <section class="profile-rank-progress" aria-label={isEnglish ? "Community rank progress" : "Progreso de rango de comunidad"}>
-        <div class="profile-rank-progress-heading">
-          <div class="profile-rank-progress-title">
-            {currentRank ? <UserRankBadge rank={currentRank.key} size="regular" /> : <span class="profile-rank-unranked-mark" aria-hidden="true">✦</span>}
-            <div><strong>{currentRank?.label || (isEnglish ? "No rank yet" : "Sin rango todavía")}</strong><span>{seenAnimeCount.toLocaleString(isEnglish ? "en" : "es")} {isEnglish ? "anime watched" : "animes vistos"}</span></div>
-          </div>
-          {nextRank ? <span class="profile-rank-next">{rankRemaining.toLocaleString(isEnglish ? "en" : "es")} {isEnglish ? "to" : "para"} {nextRank.label}</span> : <span class="profile-rank-next">{isEnglish ? "Maximum rank reached" : "Rango máximo alcanzado"}</span>}
-        </div>
+        <p class="profile-rank-summary">
+          <strong>{currentRank?.label || (isEnglish ? "Unranked" : "Sin rango")}</strong>
+          <span aria-hidden="true">·</span>
+          {nextRank
+            ? <span>{seenAnimeCount.toLocaleString(isEnglish ? "en" : "es")} {isEnglish ? "of" : "de"} {nextRank.minSeen.toLocaleString(isEnglish ? "en" : "es")} {isEnglish ? "for" : "para"} {nextRank.label}</span>
+            : <span>{isEnglish ? "Maximum rank reached" : "Rango máximo alcanzado"}</span>}
+        </p>
         <div class="profile-rank-track" role="progressbar" aria-label={isEnglish ? "Progress to next rank" : "Progreso hacia el siguiente rango"} aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(rankProgress)}>
           <span style={`width:${rankProgress}%`}></span>
         </div>
-        {nextRank && <p>{seenAnimeCount.toLocaleString(isEnglish ? "en" : "es")} / {nextRank.minSeen.toLocaleString(isEnglish ? "en" : "es")} {isEnglish ? "anime for the next rank" : "animes para el siguiente rango"}</p>}
       </section>
 
       <section class="profile-library-links">
@@ -591,17 +590,12 @@ if (debateIds.length) {
   /* Profile 2.0 — editorial hierarchy, poster-first layout. */
   .profile-member-line{margin:.55rem 0 0!important;color:#85818b!important;font-size:.76rem!important}
   .profile-rank-identity{display:inline-flex;align-items:center;gap:6px;margin-top:5px;color:#c8c2d0;font-size:.72rem;font-weight:650}
-  .profile-rank-progress{margin:10px 1.5rem 8px;padding:14px 15px;border:1px solid rgba(255,255,255,.08);border-radius:13px;background:linear-gradient(120deg,rgba(236,72,153,.075),rgba(255,255,255,.018) 55%)}
-  .profile-rank-progress-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
-  .profile-rank-progress-title{display:flex;align-items:center;gap:9px;min-width:0}
-  .profile-rank-progress-title>div{display:grid;gap:3px;min-width:0}
-  .profile-rank-progress-title strong{font-size:.82rem;line-height:1.2}
-  .profile-rank-progress-title span{color:#8d8793;font-size:.67rem}
-  .profile-rank-next{color:#c6a4b7;font-size:.67rem;text-align:right}
-  .profile-rank-unranked-mark{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#27232b;color:#d9b7cb;font-size:1rem}
-  .profile-rank-track{height:5px;margin-top:12px;overflow:hidden;border-radius:999px;background:#29252d}
-  .profile-rank-track span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#a83d77,#f472b6);transition:width .25s ease}
-  .profile-rank-progress>p{margin:7px 0 0;color:#77717e;font-size:.64rem}
+  .profile-rank-progress{margin:10px 1.5rem 8px;padding:0}
+  .profile-rank-summary{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin:0;color:#a7a3ad;font-size:.72rem;line-height:1.4}
+  .profile-rank-summary strong{color:#f2efe9;font-size:.74rem;font-weight:700}
+  .profile-rank-summary>span[aria-hidden="true"]{color:#77717e}
+  .profile-rank-track{height:4px;margin-top:8px;overflow:hidden;border-radius:999px;background:#1c1c22}
+  .profile-rank-track span{display:block;height:100%;border-radius:inherit;background:#f5f2ec;transition:width .25s ease}
   .profile-social-links{padding-top:12px}
   .profile-social-button{width:38px;height:38px}
   .genre-tags span{border:0;background:#1c1c22;padding:7px 12px;color:#d8d4de}
