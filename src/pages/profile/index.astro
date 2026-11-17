@@ -39,7 +39,6 @@ const rankProgressTarget = nextRank?.minSeen ?? currentRank?.minSeen ?? 0;
 const rankProgress = nextRank && rankProgressTarget > rankProgressStart
   ? Math.min(100, Math.max(0, ((seenAnimeCount - rankProgressStart) / (rankProgressTarget - rankProgressStart)) * 100))
   : 100;
-const rankRemaining = nextRank ? Math.max(0, nextRank.minSeen - seenAnimeCount) : 0;
 const { data: favoriteData, error: favoriteError } = await supabase
   .from("anime_likes")
   .select("anime_id, created_at", { count: "exact" })
@@ -643,7 +642,7 @@ if (debateIds.length) {
     .profile-character-card img{width:68px;height:68px}
     .profile-debates{padding:0 1.25rem 1.5rem}
     .profile-stats{padding-left:1.25rem;padding-right:1.25rem}
-    .profile-rank-progress{margin-left:1.25rem;margin-right:1.25rem;padding:12px}
+    .profile-rank-progress{margin-left:1.25rem;margin-right:1.25rem;padding:0}
   }
 </style>
 
