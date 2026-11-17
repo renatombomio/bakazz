@@ -156,6 +156,10 @@ const profileCommentsCount = commentsCountError ? 0 : commentsCount ?? 0;
             <p id="profile-feedback" role="status" aria-live="polite"></p>
           </div>
           <p class="upload-note">{isEnglish ? "JPG, PNG, WebP or AVIF · Max. 5 MB per image." : "JPG, PNG, WebP o AVIF · Máximo 5 MB por imagen."}</p>
+          <div class="account-danger-zone">
+            <button class="delete-account-button" id="delete-account-button" type="button">{isEnglish ? "Delete account" : "Eliminar cuenta"}</button>
+            <p>{isEnglish ? "Permanently delete your account and its associated data." : "Elimina permanentemente tu cuenta y los datos asociados."}</p>
+          </div>
         </div>
       </section>
 
@@ -206,9 +210,6 @@ const profileCommentsCount = commentsCountError ? 0 : commentsCount ?? 0;
           </div>
         </div>
       </section>
-      <div class="profile-actions">
-        <button class="delete-account-button" id="delete-account-button" type="button">{isEnglish ? "Delete account" : "Eliminar cuenta"}</button>
-      </div>
     </section>
   </main>
 </Layout>
@@ -447,6 +448,10 @@ const profileCommentsCount = commentsCountError ? 0 : commentsCount ?? 0;
 
   .profile-actions button:disabled { cursor: wait; opacity: 0.55; }
   .profile-actions .delete-account-button { border-color: rgba(239,68,68,.35); color:#fca5a5; }
+  .account-danger-zone{margin-top:1.5rem;padding-top:1rem;border-top:1px solid rgba(239,68,68,.16)}
+  .account-danger-zone p{margin:.45rem 0 0;color:#777;font-size:.68rem;line-height:1.45}
+  .account-danger-zone .delete-account-button{padding:0;border:0;background:none;color:#e87979;font-size:.75rem;text-decoration:underline;text-underline-offset:3px}
+  .account-danger-zone .delete-account-button:hover{background:none;color:#fca5a5}
 
   @media (max-width: 520px) {
     .profile-page { padding: 68px 0 1.5rem; }
@@ -521,6 +526,26 @@ const profileCommentsCount = commentsCountError ? 0 : commentsCount ?? 0;
       editor?.classList.toggle("is-editing", opening);
       toggle.setAttribute("aria-expanded", String(opening));
       if (opening) fields.querySelector<HTMLInputElement>("input")?.focus();
+      return;
+    }
+
+    const deleteButton = target.closest<HTMLButtonElement>("#delete-account-button");
+    if (deleteButton) {
+      const confirmation = window.prompt(copy("Esta acción es irreversible. Escribe ELIMINAR para borrar tu cuenta y los datos asociados.", "This action is permanent. Type DELETE to remove your account and associated data."));
+      if (confirmation !== (isEnglish ? "DELETE" : "ELIMINAR")) return;
+      deleteButton.disabled = true;
+      deleteButton.textContent = copy("Eliminando cuenta…", "Deleting account…");
+      try {
+        const response = await fetch("/api/auth/account/delete", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ confirmation }) });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok || !result.ok) throw new Error(result.error || "DELETE_FAILED");
+        window.location.assign(isEnglish ? "/en/" : "/");
+      } catch (error) {
+        deleteButton.disabled = false;
+        deleteButton.textContent = copy("Eliminar cuenta", "Delete account");
+        window.alert(copy("No se pudo eliminar la cuenta. No se han confirmado cambios.", "The account could not be deleted. No changes were confirmed."));
+        console.error("Account deletion failed:", error);
+      }
       return;
     }
 
