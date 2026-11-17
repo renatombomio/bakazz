@@ -6,6 +6,7 @@ import { createSupabaseSsrClient } from "../../lib/supabase-ssr";
 import { localizedPath } from "../../i18n";
 import UserRankBadge from "../../components/gamification/UserRankBadge.astro";
 import { getNextAnimeRank, resolveAnimeRank } from "../../lib/gamification/ranks";
+import ProfileSectionsIsland from "../../components/profile/ProfileSectionsIsland";
 
 const lang = Astro.locals.lang;
 const isEnglish = lang === "en";
@@ -90,6 +91,103 @@ if (debateIds.length) {
   if (repliesError) console.error("Renanime profile debate replies error:", repliesError.message);
   else debateReplyCounts = (replies ?? []).reduce((acc: Record<string, number>, row: any) => { acc[row.debate_id] = (acc[row.debate_id] ?? 0) + 1; return acc; }, {});
 }
+
+const favoriteAnimeIds = favorites.map((entry: any) => Number(entry.anime_id)).filter((id: number) => Number.isInteger(id) && id > 0);
+const profileAnimeIds = [...new Set([
+  ...favoriteAnimeIds,
+  ...watched.slice(0, 6).map((entry: any) => Number(entry.anime_id)),
+  ...pending.slice(0, 6).map((entry: any) => Number(entry.anime_id)),
+])].filter((id: number) => Number.isInteger(id) && id > 0);
+
+const animeById = new Map<number, any>();
+if (profileAnimeIds.length) {
+  const variables: Record<string, number> = {};
+  const fields = profileAnimeIds.map((id, index) => {
+    variables["id" + index] = id;
+    return `a${index}: Media(id: $id${index}, type: ANIME) { id title { romaji english } coverImage { large } }`;
+  }).join("\n");
+  const definitions = profileAnimeIds.map((_, index) => `$id${index}: Int!`).join(", ");
+  try {
+    const response = await fetch("https://graphql.anilist.co", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({ query: `query ProfileSectionsAnime(${definitions}) { ${fields} }`, variables }),
+    });
+    if (!response.ok) throw new Error(`AniList returned ${response.status}`);
+    const payload = await response.json();
+    profileAnimeIds.forEach((id, index) => {
+      const media = payload.data?.["a" + index];
+      if (media?.id) animeById.set(id, media);
+    });
+  } catch (error) {
+    console.error("Renanime profile sections AniList error:", error);
+  }
+}
+
+const { data: favoriteAnimeTotals, error: favoriteAnimeTotalsError } = favoriteAnimeIds.length
+  ? await supabase.from("anime_like_totals").select("anime_id, like_count").in("anime_id", favoriteAnimeIds)
+  : { data: [], error: null };
+if (favoriteAnimeTotalsError) console.error("Renanime profile anime like totals error:", favoriteAnimeTotalsError.message);
+const favoriteAnimeLikeCounts = Object.fromEntries((favoriteAnimeTotals ?? []).map((row: any) => [Number(row.anime_id), Number(row.like_count ?? 0)]));
+
+const profileSectionFavorites = favorites.slice(0, 5).flatMap((entry: any) => {
+  const id = Number(entry.anime_id);
+  const anime = animeById.get(id);
+  if (!anime) return [];
+  return [{
+    id,
+    title: isEnglish ? anime.title?.english || anime.title?.romaji || "Anime" : anime.title?.romaji || anime.title?.english || "Anime",
+    image: anime.coverImage?.large || "",
+    href: localizedPath(lang, `/anime/${id}/`),
+    likes: favoriteAnimeLikeCounts[id] ?? 0,
+    liked: true,
+  }];
+});
+
+const profileSectionCharacters = characterFavorites.map((character: any) => ({
+  id: Number(character.id),
+  name: character.name,
+  image: character.image_url || "",
+  href: character.anime_id ? localizedPath(lang, `/anime/${character.anime_id}/`) : localizedPath(lang, "/profile/characters/"),
+  likes: favoriteCharacterLikeTotals[character.id] ?? 0,
+  liked: true,
+}));
+
+const toLibraryItems = (entries: any[]) => entries.slice(0, 6).flatMap((entry: any) => {
+  const id = Number(entry.anime_id);
+  const anime = animeById.get(id);
+  if (!anime) return [];
+  return [{
+    id,
+    title: isEnglish ? anime.title?.english || anime.title?.romaji || "Anime" : anime.title?.romaji || anime.title?.english || "Anime",
+    cover: anime.coverImage?.large || "",
+    href: localizedPath(lang, `/anime/${id}/`),
+  }];
+});
+const profileSectionCollection = toLibraryItems(watched);
+const profileSectionWatchlist = toLibraryItems(pending);
+
+const formatDebateAge = (createdAt: string) => {
+  const elapsed = Math.max(0, Date.now() - new Date(createdAt).getTime());
+  const units = [
+    { ms: 365 * 86400000, es: "a", en: "y" },
+    { ms: 30 * 86400000, es: "mes", en: "mo" },
+    { ms: 7 * 86400000, es: "sem", en: "w" },
+    { ms: 86400000, es: "d", en: "d" },
+    { ms: 3600000, es: "h", en: "h" },
+    { ms: 60000, es: "min", en: "m" },
+  ];
+  const unit = units.find((candidate) => elapsed >= candidate.ms) ?? units[units.length - 1];
+  const amount = Math.max(1, Math.floor(elapsed / unit.ms));
+  return isEnglish ? `${amount}${unit.en} ago` : `hace ${amount} ${unit.es}`;
+};
+const profileSectionDebates = debates.slice(0, 3).map((debate: any) => ({
+  id: Number(debate.id),
+  title: debate.title,
+  meta: `${(debateReplyCounts[debate.id] ?? 0).toLocaleString(isEnglish ? "en" : "es")} ${isEnglish ? "replies" : "respuestas"} · ${formatDebateAge(debate.created_at)}`,
+  href: localizedPath(lang, `/community/debates/${debate.id}/`),
+}));
+
 ---
 
 <Layout
@@ -204,45 +302,29 @@ if (debateIds.length) {
         </div>
       </section>
 
-      <section class="profile-library-links">
-        <div class="profile-library-heading"><h2>{isEnglish ? "Favorite anime" : "Animes favoritos"}</h2><a href={localizedPath(Astro.locals.lang, "/profile/anime-favorites/")}>{isEnglish ? "See all" : "Ver todos"}</a></div>
-        <div class="fw" id="profile-favorites-grid" data-count={favorites.length} data-ids={JSON.stringify(favorites.map((entry: any) => String(entry.anime_id)))} data-search-href={localizedPath(Astro.locals.lang, "/search/")}></div>
-
-        <div class="profile-library-heading" id="profile-character-favorites"><h2>{isEnglish ? "Favourite characters" : "Personajes favoritos"}</h2><a href={localizedPath(Astro.locals.lang, "/profile/characters/")}>{isEnglish ? "See all" : "Ver todos"}</a></div>
-        {characterFavorites.length ? <div class="profile-character-row">
-          {characterFavorites.map((character: any) => <a class="profile-character-card" href={character.anime_id ? localizedPath(Astro.locals.lang, "/anime/" + character.anime_id + "/") : "#profile-character-favorites"} data-character-id={character.id} data-like-count={favoriteCharacterLikeTotals[character.id] ?? 0}>
-            <span class="profile-character-image">
-              {character.image_url && <img src={character.image_url} alt="" loading="eager" decoding="async" />}
-              <small class="profile-character-likes" aria-label={isEnglish ? "Likes" : "Me gusta"}>
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.2-8.8 10-8.8 10s-8.8-4.8-8.8-10a4.6 4.6 0 0 1 8.8-1.9 4.6 4.6 0 0 1 8.8 1.9Z"/></svg>
-                <span>{(favoriteCharacterLikeTotals[character.id] ?? 0).toLocaleString(isEnglish ? "en" : "es", { notation: "compact", maximumFractionDigits: 1 })}</span>
-              </small>
-            </span>
-            <strong>{character.name}</strong>
-          </a>)}
-        </div> : <p class="profile-character-empty">{isEnglish ? "You haven't liked any characters yet." : "Todavía no has marcado personajes como favoritos."}</p>}
-
-        <div class="profile-library-heading profile-library-tabs-heading"><h2>{isEnglish ? "My library" : "Mi biblioteca"}</h2></div>
-        <div class="profile-tabs" role="tablist" aria-label={isEnglish ? "My anime lists" : "Mis listas de anime"}>
-          <button type="button" role="tab" id="tab-watched" aria-selected="true" aria-controls="panel-watched">{isEnglish ? "Collection" : "Colección"}</button>
-          <button type="button" role="tab" id="tab-pending" aria-selected="false" aria-controls="panel-pending">{isEnglish ? "My list" : "Mi lista"}</button>
-        </div>
-        <div id="panel-watched" role="tabpanel" aria-labelledby="tab-watched">
-          <div class="profile-anime-grid" id="profile-watched-grid" data-ids={JSON.stringify(watched.slice(0, 12).map((entry: any) => String(entry.anime_id)))}></div>
-          <a class="profile-see-all" href={localizedPath(Astro.locals.lang, "/collection/")}>{isEnglish ? "View collection" : "Ver colección"}</a>
-        </div>
-        <div id="panel-pending" role="tabpanel" aria-labelledby="tab-pending" hidden>
-          <div class="profile-anime-grid" id="profile-pending-grid" data-ids={JSON.stringify(pending.slice(0, 12).map((entry: any) => String(entry.anime_id)))}></div>
-          <a class="profile-see-all" href={localizedPath(Astro.locals.lang, "/pending/")}>{isEnglish ? "View list" : "Ver lista"}</a>
-        </div>
-      </section>
-
-      <section class="profile-debates">
-        <div class="profile-library-heading"><h2>{isEnglish ? "My debates" : "Mis debates"}</h2><a href={localizedPath(Astro.locals.lang, "/community/debates/")}>{isEnglish ? "Community" : "Comunidad"}</a></div>
-        {debates.length ? <div class="profile-debate-list">{debates.map((debate: any) => <a class="profile-debate" href={localizedPath(Astro.locals.lang, "/community/debates/" + debate.id + "/")}>
-          <strong>{debate.title}</strong><span>{(debateReplyCounts[debate.id] ?? 0).toLocaleString(isEnglish ? "en" : "es")} {isEnglish ? "replies" : "respuestas"} · {new Date(debate.created_at).toLocaleDateString(isEnglish ? "en" : "es", { day: "numeric", month: "short", year: "numeric" })}</span>
-        </a>)}</div> : <p class="profile-debate-empty">{isEnglish ? "You haven't started any debates yet." : "Todavía no has iniciado ningún debate."}</p>}
-      </section>
+      <ProfileSectionsIsland
+        client:load
+        lang={lang}
+        owner={true}
+        favorites={profileSectionFavorites}
+        favoritesTotal={favoritesCount}
+        favoritesHref={localizedPath(lang, "/profile/anime-favorites/")}
+        characters={profileSectionCharacters}
+        charactersTotal={characterFavoritesCount ?? characterFavorites.length}
+        charactersHref={localizedPath(lang, "/profile/characters/")}
+        collection={profileSectionCollection}
+        collectionTotal={watched.length}
+        collectionHref={localizedPath(lang, "/collection/")}
+        watchlist={profileSectionWatchlist}
+        watchlistTotal={pending.length}
+        watchlistHref={localizedPath(lang, "/pending/")}
+        debates={profileSectionDebates}
+        debatesTotal={debates.length}
+        debatesHref={localizedPath(lang, "/community/debates/")}
+        newDebateHref={localizedPath(lang, "/community/debates/")}
+        addFavoriteHref={localizedPath(lang, "/search/")}
+        searchHref={localizedPath(lang, "/search/")}
+      />
 
       <section class="image-cropper" id="image-cropper" hidden aria-modal="true" role="dialog" aria-labelledby="cropper-title">
         <div class="cropper-panel">
@@ -555,7 +637,7 @@ if (debateIds.length) {
     }
   }
 
-  /* Profile 2.0 — editorial hierarchy, poster-first layout. */
+  /* Profile 2.0 — editorial hierarchy and rank progress. */
   .profile-member-line{margin:.55rem 0 0!important;color:#85818b!important;font-size:.76rem!important}
   .profile-rank-identity{display:inline-flex;align-items:center;gap:6px;margin-top:5px;color:#c8c2d0;font-size:.72rem;font-weight:650}
   .profile-rank-progress{margin:10px 1.5rem 8px;padding:0}
@@ -570,52 +652,7 @@ if (debateIds.length) {
   .profile-stats{grid-template-columns:repeat(4,minmax(0,1fr));justify-content:space-between;padding:22px 1.5rem 12px}
   .profile-stat strong{font-family:Anton,Impact,sans-serif;font-size:clamp(2rem,5vw,2.5rem);font-weight:400;line-height:1;color:#f2efe9}
   .profile-stat span{font-size:.66rem}
-  .profile-library-links{padding-top:.35rem}
-  .profile-library-heading{margin-top:1.65rem;margin-bottom:.85rem}
-  /* FavoritesWall: one large poster plus four fixed slots; no titles below posters. */
-  .fw{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:8px;aspect-ratio:2/1;margin-top:.8rem;min-width:0}
-  .fw .po{position:relative;display:block;min-width:0;min-height:0;overflow:hidden;border-radius:10px;background:#17171b;color:#f2efe9;text-decoration:none}
-  .fw .po.big{grid-column:span 2;grid-row:span 2}
-  .fw .po img{display:block;width:100%;height:100%;min-height:0;object-fit:cover;border-radius:inherit}
-  .fw .po .profile-anime-card-copy,.fw .po .profile-anime-card-meta{display:none}
-  .fw .po .lk{position:absolute;left:7px;bottom:7px;z-index:1;display:inline-flex;align-items:center;gap:5px;max-width:calc(100% - 14px);padding:5px 9px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(9,9,11,.84);color:#f2efe9;font-size:.72rem;font-weight:700;line-height:1;white-space:nowrap}
-  .fw .po .lk svg{width:14px;height:14px;flex:0 0 14px;fill:none;stroke:currentColor;stroke-width:1.8}
-  .fw .po .lk.is-liked svg{fill:#ec4899;stroke:#ec4899}
-  .fw .po-placeholder{display:grid;place-items:center;background:#111114;color:#777}
-  .fw .po-placeholder svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.5}
-  .fw .po-placeholder .lk{display:none}
-  .fw .po:focus-visible{outline:2px solid #ec4899;outline-offset:3px}
-  .fw .po img{transition:transform .2s ease}
-  .fw .po:not(.po-placeholder):hover img{transform:scale(1.025)}
-  .profile-character-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;align-items:start;padding:2px 0 12px}
-  .profile-character-card{display:flex;min-width:0;flex-direction:column;align-items:center;gap:8px;padding:0;border:0;background:none;text-align:center;text-decoration:none;color:#f2efe9}
-  .profile-character-image{position:relative;display:block;width:100%;aspect-ratio:1;min-width:0}
-  .profile-character-image img{display:block;width:100%;height:100%;border-radius:50%;object-fit:cover}
-  .profile-character-likes{position:absolute;left:50%;bottom:-7px;display:flex;align-items:center;gap:4px;max-width:calc(100% - 4px);padding:4px 8px;border:2px solid #09090b;border-radius:999px;background:rgba(9,9,11,.92);color:#f2efe9;font-size:.68rem;font-weight:700;line-height:1;white-space:nowrap;transform:translateX(-50%)}
-  .profile-character-likes svg{width:14px;height:14px;flex:none;fill:#ec4899;stroke:#ec4899;stroke-width:1.8}
-  .profile-character-card strong{display:-webkit-box;width:100%;min-width:0;min-height:2.4em;margin-top:2px;overflow:hidden;font-size:.76rem;font-weight:650;line-height:1.2;text-overflow:ellipsis;-webkit-box-orient:vertical;-webkit-line-clamp:2}
-  .profile-character-card:focus-visible{outline:2px solid #ec4899;outline-offset:4px;border-radius:12px}
-  .profile-character-empty,.profile-debate-empty{color:#85818b;font-size:.78rem}
-  .profile-tabs{display:flex;gap:22px;border-bottom:1px solid rgba(255,255,255,.1);margin:0 0 12px}
-  .profile-tabs button{padding:9px 0 11px;border:0;border-bottom:2px solid transparent;background:none;color:#85818b;font:inherit;font-size:.83rem;cursor:pointer}
-  .profile-tabs button[aria-selected=true]{border-color:#ec4899;color:#f2efe9}
-  #panel-watched[hidden],#panel-pending[hidden]{display:none}
-  .profile-anime-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:0}
-  :global(.profile-anime-card){display:block;position:relative;min-width:0;overflow:hidden}
-  :global(.profile-anime-card img){width:100%;height:auto;aspect-ratio:2/3;object-fit:cover;border-radius:8px}
-  :global(.profile-anime-card-copy){display:block;padding:6px 1px 0}
-  :global(.profile-anime-card-title){font-size:.72rem;-webkit-line-clamp:2}
-  :global(.profile-anime-card-meta){display:none}
-  .profile-see-all{display:inline-flex;margin-top:12px;color:#ec4899;font-size:.72rem;text-decoration:none}
-  .profile-debates{padding:0 1.5rem 2rem}
-  .profile-debate-list{display:grid;gap:0}
-  .profile-debate{display:grid;gap:5px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.08);text-decoration:none;color:#f2efe9}
-  .profile-debate strong{font-size:.85rem;line-height:1.35}
-  .profile-debate span{font-size:.68rem;color:#85818b}
   @media(max-width:520px){
-    .fw{gap:6px}
-    .fw .po .lk{left:5px;bottom:5px;padding:4px 7px;font-size:.65rem}
-    .profile-debates{padding:0 1.25rem 1.5rem}
     .profile-stats{padding-left:1.25rem;padding-right:1.25rem}
     .profile-rank-progress{margin-left:1.25rem;margin-right:1.25rem;padding:0}
   }
@@ -628,24 +665,6 @@ if (debateIds.length) {
 
 
 
-  document.addEventListener("click", (event) => {
-    const target = event.target;
-    if (!(target instanceof Element)) return;
-    const tab = target.closest<HTMLButtonElement>('[role="tab"][aria-controls]');
-    if (!tab) return;
-    const tabs = document.querySelectorAll<HTMLButtonElement>('.profile-tabs [role="tab"]');
-    tabs.forEach((item) => { const active = item === tab; item.setAttribute("aria-selected", String(active)); item.tabIndex = active ? 0 : -1; const panel = document.getElementById(item.getAttribute("aria-controls") || ""); if (panel) panel.hidden = !active; });
-  });
-
-  document.addEventListener("keydown", (event) => {
-    const tab = event.target instanceof Element ? event.target.closest<HTMLButtonElement>('.profile-tabs [role="tab"]') : null;
-    if (!tab || !["ArrowLeft","ArrowRight","Home","End"].includes(event.key)) return;
-    event.preventDefault();
-    const tabs = [...document.querySelectorAll<HTMLButtonElement>('.profile-tabs [role="tab"]')];
-    const current = tabs.indexOf(tab);
-    const next = event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1 : (current + (event.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length;
-    tabs[next]?.focus(); tabs[next]?.click();
-  });
   // ClientRouter keeps the document alive between routes: delegate clicks to the
   // persistent document so controls work on every visit to /profile/.
   document.addEventListener("click", async (event) => {
@@ -696,90 +715,7 @@ if (debateIds.length) {
   const feedback = document.querySelector<HTMLElement>("#profile-feedback");
   const copy = (es: string, en: string) => isEnglish ? en : es;
 
-  async function loadProfileAnime() {
-    const grids = ["#profile-watched-grid", "#profile-pending-grid", "#profile-favorites-grid"]
-      .map(selector => document.querySelector<HTMLElement>(selector)).filter(Boolean) as HTMLElement[];
-    const ids = [...new Set(grids.flatMap(grid => JSON.parse(grid.dataset.ids || "[]") as string[]))].filter(id => /^\d+$/.test(id));
-    if (!ids.length) {
-      grids.forEach(grid => {
-        if (grid.id === "profile-favorites-grid") {
-          const slots = Array.from({length:5}, () => {
-            const placeholder = document.createElement("a");
-            placeholder.className = "po po-placeholder";
-            placeholder.href = grid.dataset.searchHref || "/search/";
-            placeholder.setAttribute("aria-label",copy("Buscar anime para añadir a favoritos","Search anime to add to favorites"));
-            placeholder.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
-            return placeholder;
-          });
-          slots[0].classList.add("big");
-          grid.replaceChildren(...slots);
-        } else {
-          grid.innerHTML = '<span class="profile-anime-empty">' + copy("Todavía no hay animes aquí.", "No anime here yet.") + '</span>';
-        }
-      });
-      return;
-    }
-    const variables: Record<string, number> = {};
-    const fields = ids.map((id, index) => { variables["id" + index] = Number(id); return `a${index}: Media(id: $id${index}, type: ANIME) { id title { romaji english } coverImage { large } }`; }).join("\n");
-    const definitions = ids.map((_, index) => `$id${index}: Int!`).join(", ");
-    try {
-      const [animeResponse, likeResponse] = await Promise.all([
-        fetch("https://graphql.anilist.co", { method:"POST", headers:{"Content-Type":"application/json","Accept":"application/json"}, body:JSON.stringify({query:`query ProfileAnime(${definitions}) { ${fields} }`,variables}) }),
-        fetch("/api/anime/likes?ids="+ids.join(","), {credentials:"same-origin",cache:"no-store"})
-      ]);
-      if (!animeResponse.ok) throw new Error("anime_fetch_failed");
-      const payload = await animeResponse.json();
-      const likePayload = likeResponse.ok ? await likeResponse.json() : { likes:{} };
-      const media = new Map(ids.map((id,index) => [id,payload.data?.["a"+index]]));
-      grids.forEach(grid => {
-        const gridIds = JSON.parse(grid.dataset.ids || "[]") as string[];
-        const cards: HTMLElement[] = gridIds.map(id => {
-          const anime = media.get(id);
-          if (!anime) return null;
-          const title = anime.title?.english || anime.title?.romaji || "Anime";
-          const counts = likePayload.likes?.[id] || {count:0,liked:false};
-          const isFavoriteWall = grid.id === "profile-favorites-grid";
-          const card = document.createElement("a");
-          card.className = isFavoriteWall ? "po" : "profile-anime-card";
-          if (isFavoriteWall && grid.children.length === 0) card.classList.add("big");
-          card.href = (document.querySelector<HTMLElement>(".profile-page")?.dataset.animeBase || "/anime/") + id + "/";
-          card.setAttribute("aria-label",title);
-          const img = document.createElement("img"); img.src = anime.coverImage?.large || ""; img.alt = ""; img.loading = isFavoriteWall ? "eager" : "lazy"; img.decoding = "async";
-          const cardCopy = document.createElement("span"); cardCopy.className = "profile-anime-card-copy";
-          const titleNode = document.createElement("span"); titleNode.className = "profile-anime-card-title"; titleNode.textContent = title;
-          const meta = document.createElement("span"); meta.className = "profile-anime-card-meta";
-          const likeMeta = document.createElement("span"); likeMeta.className = "like-count" + (counts.liked ? " is-liked" : ""); likeMeta.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.2-8.8 10-8.8 10s-8.8-4.8-8.8-10a4.6 4.6 0 0 1 8.8-1.9 4.6 4.6 0 0 1 8.8 1.9Z"/></svg><span></span>'; likeMeta.querySelector("span")!.textContent = Number(counts.count||0).toLocaleString(isEnglish?"en":"es");
-          meta.append(likeMeta); cardCopy.append(titleNode); card.append(img,cardCopy,meta);
-          if (isFavoriteWall) {
-            const pill = document.createElement("span"); pill.className = "lk" + (counts.liked ? " is-liked" : "");
-            pill.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.2-8.8 10-8.8 10s-8.8-4.8-8.8-10a4.6 4.6 0 0 1 8.8-1.9 4.6 4.6 0 0 1 8.8 1.9Z"/></svg><span></span>';
-            pill.querySelector("span")!.textContent = new Intl.NumberFormat(isEnglish ? "en" : "es", {notation:"compact",maximumFractionDigits:1}).format(Number(counts.count ?? 0));
-            card.append(pill);
-          }
-          return card;
-        }).filter((card): card is HTMLAnchorElement => card instanceof HTMLAnchorElement);
-        if (grid.id === "profile-favorites-grid") {
-          const slots = cards.slice(0,5);
-          while (slots.length < 5) {
-            const placeholder = document.createElement("a");
-            placeholder.className = "po po-placeholder";
-            placeholder.href = grid.dataset.searchHref || "/search/";
-            placeholder.setAttribute("aria-label",copy("Buscar anime para añadir a favoritos","Search anime to add to favorites"));
-            placeholder.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
-            slots.push(placeholder);
-          }
-          if (slots[0]) slots[0].classList.add("big");
-          slots.slice(1).forEach(card => card.classList.remove("big"));
-          grid.replaceChildren(...slots);
-        } else {
-          grid.replaceChildren(...(cards.length ? cards : [Object.assign(document.createElement("span"),{className:"profile-anime-empty",textContent:copy("Todavía no hay animes aquí.","No anime here yet.")})]));
-        }
-      });
-    } catch {
-      grids.forEach(grid => { grid.innerHTML = '<span class="profile-anime-empty">' + copy("No se pudieron cargar los animes.", "Could not load anime.") + '</span>'; });
-    }
-  }
-  void loadProfileAnime();
+
 
   async function uploadImage(kind: "avatar" | "cover", file: File) {
     if (file.size > 5 * 1024 * 1024) throw new Error(copy("La imagen supera el límite de 5 MB.", "Image exceeds the 5 MB limit."));
