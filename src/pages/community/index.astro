@@ -38,7 +38,7 @@ if(auth.user){
   }
  }
 }
-const {data:memberCandidates,error:membersError}=await supabase.from("profiles").select("id,aka,avatar_url,headline,bio,interests").eq("is_private",false).not("aka","is",null).limit(100);
+const {data:memberCandidates,error:membersError}=await supabase.from("profiles").select("id,aka,avatar_url,last_seen_at,headline,bio,interests").eq("is_private",false).not("aka","is",null).limit(100);
 const shuffledMembers=[...(memberCandidates??[])];
 for(let i=shuffledMembers.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffledMembers[i],shuffledMembers[j]]=[shuffledMembers[j],shuffledMembers[i]];}
 const members=shuffledMembers.slice(0,9);
@@ -116,7 +116,7 @@ const cats:Record<string,string>=en?{anime:"Anime",characters:"Characters",theor
  <section class="members-section">
   <div class="sec"><h2>{en?"People on Renanime":"Gente en Renanime"}</h2></div>
   {members.length?<div class="community-searchable" data-search={members.map((m:any)=>["@"+m.aka,m.headline,m.bio,...(m.interests??[])].filter(Boolean).join(" ")).join(" ").toLowerCase()}>
-   <CommunityPeople title={en?"People on Renanime":"Gente en Renanime"} members={members.map((m:any)=>({id:m.id,username:m.aka,avatar:m.avatar_url,href:base+"/u/"+encodeURIComponent(m.aka)+"/"}))} max={9}/>
+   <CommunityPeople title={en?"People on Renanime":"Gente en Renanime"} members={members.map((m:any)=>({id:m.id,username:m.aka,avatar:m.avatar_url,isOnline:Boolean(m.last_seen_at&&Date.now()-new Date(m.last_seen_at).getTime()<=120_000),href:base+"/u/"+encodeURIComponent(m.aka)+"/"}))} max={9}/>
   </div>:<p class="community-note">{membersError?(en?"Could not load members.":"No se han podido cargar los miembros."):(en?"No public members found.":"No hay miembros públicos disponibles.")}</p>}
  </section>
  <section class="community-top-anime-section"><div class="sec"><h2>{en?"Most loved anime":"Animes más queridos"}</h2></div>

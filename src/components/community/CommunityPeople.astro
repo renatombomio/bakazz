@@ -1,5 +1,5 @@
 ---
-interface Member { id: string; username: string; avatar?: string | null; color?: string; href: string }
+interface Member { id: string; username: string; avatar?: string | null; color?: string; href: string; isOnline?: boolean }
 interface Props { title: string; members: Member[]; max?: number }
 const { title, members, max = 24 } = Astro.props;
 const seen = new Set<string>();
@@ -24,6 +24,7 @@ const colors = ["#7c3aed", "#db2777", "#0ea5e9", "#f59e0b", "#10b981", "#ef4444"
               {member.avatar
                 ? <img src={member.avatar} alt="" width="132" height="132" loading="lazy" decoding="async" draggable="false" />
                 : <b aria-hidden="true">{name.replace("@", "").charAt(0).toUpperCase()}</b>}
+              <i class:list={["cp-presence", member.isOnline ? "is-online" : "is-offline"]} aria-label={member.isOnline ? "En línea" : "Desconectado"} title={member.isOnline ? "En línea" : "Desconectado"} />
             </span>
             <span class="cp-name">{name}</span>
           </a>
@@ -35,34 +36,36 @@ const colors = ["#7c3aed", "#db2777", "#0ea5e9", "#f59e0b", "#10b981", "#ef4444"
 
 <style>
   .cp { min-width: 0; color: #f2efe9; padding: 8px 0 24px; }
-  .cp-track { display: flex; align-items: center; height: 230px; overflow-x: auto; overflow-y: hidden;
+  .cp-track { display: flex; align-items: center; height: 250px; overflow-x: auto; overflow-y: hidden;
     padding-inline: 50%; perspective: 900px; scrollbar-width: none; -webkit-overflow-scrolling: touch;
     overscroll-behavior-x: contain; scroll-behavior: auto; cursor: grab; touch-action: pan-x; }
   .cp-track::-webkit-scrollbar { display: none; }
   .cp-track--single { height: auto; min-height: 0; justify-content: flex-start; padding: 12px 16px 8px; perspective: none; overflow: visible; }
-  .cp-item--single { width: 64px; margin: 0; transform: none; filter: none; }
-  .cp-item--single .cp-av { width: 64px; animation: cp-float var(--t) ease-in-out var(--d) infinite alternate; }
-  .cp-item--single .cp-name { position: static; display: block; margin-top: 8px; transform: none; text-align: center; font-size: 12px; opacity: 1; }
+  .cp-item--single { width: 104px; margin: 0; transform: none; filter: none; }
+  .cp-item--single .cp-av { width: 88px; animation: cp-float var(--t) ease-in-out var(--d) infinite alternate; }
+  .cp-item--single .cp-name { position: static; display: block; margin-top: 0; transform: none; text-align: center; font-size: 12px; opacity: 1; }
 
   .cp-track.is-drag { cursor: grabbing; }
   .cp-track:focus-visible { outline: 2px solid #f472b6; outline-offset: -2px; }
-  .cp-item { position: relative; display: block; flex: 0 0 auto; width: var(--w); margin-inline: 12px; color: inherit; text-decoration: none;
+  .cp-item { position: relative; display: flex; flex: 0 0 auto; width: 104px; flex-direction:column; align-items:center; justify-content:center; gap:10px; margin-inline: 12px; color: inherit; text-decoration: none;
     transform: translateY(var(--y, 0px)) rotateY(var(--r, 0deg)) scale(var(--s, 1)); filter: brightness(var(--o, 1));
     transform-origin: center center; will-change: transform, filter; user-select: none; -webkit-user-drag: none; }
-  .cp-av { display: block; width: 100%; aspect-ratio: 1; border-radius: 50%; overflow: hidden;
+  .cp-av { position:relative; display: block; width: 88px; flex:0 0 88px; aspect-ratio: 1; border-radius: 50%; overflow: hidden;
     border: 1px solid rgba(255,255,255,.14); box-shadow: 0 14px 28px -10px rgba(0,0,0,.7);
     animation: cp-float var(--t) ease-in-out var(--d) infinite alternate; }
   .cp-av img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
   .cp-av b { display: flex; align-items: center; justify-content: center; height: 100%; font-size: 30px; color: #fff; }
-  .cp-name { position: absolute; left: 50%; top: calc(100% + 10px); transform: translateX(-50%); white-space: nowrap;
-    font-size: 13px; font-weight: 600; color: #f2efe9; opacity: 0; transition: opacity .2s; pointer-events: none; }
+  .cp-name { position:static; display:block; max-width:110px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:13px; font-weight:650; color:#f2efe9; opacity:1; transition:opacity .2s; pointer-events:none; text-align:center; }
   .cp-item.is-center .cp-name { opacity: 1; }
+  .cp-presence{position:absolute;right:1px;bottom:1px;width:16px;height:16px;border:3px solid #09090b;border-radius:50%;background:#777;box-shadow:0 2px 8px #0008}
+  .cp-presence.is-online{background:#22c55e;box-shadow:0 0 0 2px #22c55e33,0 0 12px #22c55e88}
+  .cp-presence.is-offline{background:#777}
   .cp-item:focus-visible { outline: 2px solid #f472b6; outline-offset: 7px; border-radius: 50%; }
   @keyframes cp-float {
     from { transform: translateY(-7px) rotate(-1.5deg); }
     to { transform: translateY(7px) rotate(1.5deg); }
   }
-  @media (min-width: 768px) { .cp-track { height: 300px; } .cp-item { margin-inline: 18px; } }
+  @media (min-width: 768px) { .cp-track { height: 320px; } .cp-item { margin-inline: 18px; } .cp-av{width:104px;flex-basis:104px} }
   @media (prefers-reduced-motion: reduce) {
     .cp-av { animation: none; }
     .cp-item { transform: none !important; filter: none !important; }

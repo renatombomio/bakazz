@@ -1,6 +1,6 @@
 ---
 import CommunityPeople from "../community/CommunityPeople.astro";
-interface CommunityMember { id: string; aka: string; avatar_url: string | null; href: string; }
+interface CommunityMember { id: string; aka: string; avatar_url: string | null; last_seen_at?: string | null; href: string; }
 interface Props { members: CommunityMember[]; labels: { title: string; members: string; emptyMembers: string; }; }
 const { members, labels } = Astro.props;
 ---
@@ -12,6 +12,7 @@ const { members, labels } = Astro.props;
           id: member.id,
           username: member.aka,
           avatar: member.avatar_url,
+          isOnline: Boolean(member.last_seen_at && Date.now() - new Date(member.last_seen_at).getTime() <= 120_000),
           href: member.href,
         }))} />
       : <p class="community-empty">{labels.emptyMembers}</p>}
