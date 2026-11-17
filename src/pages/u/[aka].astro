@@ -18,28 +18,26 @@ const { data: profile, error: profileError } = await supabase
 if (profileError) console.error("Public profile lookup error:", profileError.message);
 if (!profile) return new Response(en ? "Profile not found" : "Perfil no encontrado", { status: 404 });
 
-const { data: libraryData, error: libraryError } = await supabase
-  .from("user_anime")
-  .select("anime_id, status, updated_at")
-  .eq("user_id", profile.id)
-  .order("updated_at", { ascending: false });
-if (libraryError) console.error("Public profile library error:", libraryError.message);
-const library = Array.isArray(libraryData) ? libraryData : [];
+const viewer = Astro.locals.renanimeUser;
+const canViewLibrary = !profile.is_private || viewer?.id === profile.id;
+const libraryResult = canViewLibrary
+  ? await supabase.from("user_anime").select("anime_id, status, updated_at").eq("user_id", profile.id).order("updated_at", { ascending: false })
+  : { data: [], error: null };
+if (libraryResult.error) console.error("Public profile library error:", libraryResult.error.message);
+const library = Array.isArray(libraryResult.data) ? libraryResult.data : [];
 const watched = library.filter((entry: any) => entry.status === "seen");
 const pending = library.filter((entry: any) => entry.status === "pending");
-const { data: favoriteData, count: favoritesCount, error: favoriteError } = await supabase
-  .from("anime_likes")
-  .select("anime_id, created_at", { count: "exact" })
-  .eq("user_id", profile.id)
-  .order("created_at", { ascending: false })
-  .limit(4);
-if (favoriteError) console.error("Public profile favorites error:", favoriteError.message);
-const favorites = Array.isArray(favoriteData) ? favoriteData : [];
-const { count: commentsCount, error: commentsError } = await supabase
-  .from("anime_comments")
-  .select("id", { count: "exact", head: true })
-  .eq("user_id", profile.id);
-if (commentsError) console.error("Public profile comments error:", commentsError.message);
+const favoritesResult = canViewLibrary
+  ? await supabase.from("anime_likes").select("anime_id, created_at", { count: "exact" }).eq("user_id", profile.id).order("created_at", { ascending: false }).limit(4)
+  : { data: [], count: 0, error: null };
+if (favoritesResult.error) console.error("Public profile favorites error:", favoritesResult.error.message);
+const favorites = Array.isArray(favoritesResult.data) ? favoritesResult.data : [];
+const favoritesCount = favoritesResult.count ?? 0;
+const commentsResult = canViewLibrary
+  ? await supabase.from("anime_comments").select("id", { count: "exact", head: true }).eq("user_id", profile.id)
+  : { count: 0, error: null };
+if (commentsResult.error) console.error("Public profile comments error:", commentsResult.error.message);
+const commentsCount = commentsResult.count ?? 0;
 const online = profile.last_seen_at && new Date(profile.last_seen_at).getTime() >= Date.now() - 5 * 60 * 1000;
 const displayTitle = profile.name || `@${profile.aka}`;
 const pageTitle = `@${profile.aka} — Renanime`;
@@ -65,26 +63,28 @@ const pageTitle = `@${profile.aka} — Renanime`;
         {profile.bio && <p>{profile.bio}</p>}
         {profile.location && <span class="public-location">{profile.location}</span>}
         {profile.interests?.length > 0 && <div class="public-interests">{profile.interests.map((interest: string) => <span>#{interest}</span>)}</div>}
-        {profile.is_private && <p class="private-note">{en ? "This is your private profile. Other members cannot see your library." : "Este es tu perfil privado. Los demás usuarios no pueden ver tu biblioteca."}</p>}
+        {profile.is_private && !canViewLibrary && <p class="private-note">{en ? "This profile is private. Its library is only visible to its owner." : "Este perfil es privado. Su biblioteca solo es visible para su propietario."}</p>}
       </section>
 
-      <section class="public-stats" aria-label={en ? "Anime activity" : "Actividad anime"}>
-        <div><strong>{watched.length}</strong><span>{en ? "Watched" : "Vistos"}</span></div>
-        <div><strong>{pending.length}</strong><span>{en ? "Watchlist" : "Pendientes"}</span></div>
-        <div><strong>{favoritesCount ?? 0}</strong><span>{en ? "Favorites" : "Favoritos"}</span></div>
-        <div><strong>{commentsCount ?? 0}</strong><span>{en ? "Comments" : "Comentarios"}</span></div>
-      </section>
+      {canViewLibrary && <>
+        <section class="public-stats" aria-label={en ? "Anime activity" : "Actividad anime"}>
+          <div><strong>{watched.length}</strong><span>{en ? "Watched" : "Vistos"}</span></div>
+          <div><strong>{pending.length}</strong><span>{en ? "Watchlist" : "Pendientes"}</span></div>
+          <div><strong>{favoritesCount}</strong><span>{en ? "Favorites" : "Favoritos"}</span></div>
+          <div><strong>{commentsCount}</strong><span>{en ? "Comments" : "Comentarios"}</span></div>
+        </section>
 
-      <section class="public-library">
-        <div class="public-library-heading"><h2>{en ? "Collection" : "Colección"}</h2><span>{watched.length}</span></div>
-        <div class="public-anime-grid" data-ids={JSON.stringify(watched.slice(0, 8).map((entry: any) => String(entry.anime_id)))}></div>
+        <section class="public-library">
+          <div class="public-library-heading"><h2>{en ? "Collection" : "Colección"}</h2><span>{watched.length}</span></div>
+          <div class="public-anime-grid" data-ids={JSON.stringify(watched.slice(0, 8).map((entry: any) => String(entry.anime_id)))}></div>
 
-        <div class="public-library-heading"><h2>{en ? "Watchlist" : "Lista"}</h2><span>{pending.length}</span></div>
-        <div class="public-anime-grid" data-ids={JSON.stringify(pending.slice(0, 8).map((entry: any) => String(entry.anime_id)))}></div>
+          <div class="public-library-heading"><h2>{en ? "Watchlist" : "Lista"}</h2><span>{pending.length}</span></div>
+          <div class="public-anime-grid" data-ids={JSON.stringify(pending.slice(0, 8).map((entry: any) => String(entry.anime_id)))}></div>
 
-        <div class="public-library-heading"><h2>{en ? "Favorite anime" : "Animes favoritos"}</h2><span>{favoritesCount ?? 0}</span></div>
-        <div class="public-anime-grid" data-ids={JSON.stringify(favorites.map((entry: any) => String(entry.anime_id)))}></div>
-      </section>
+          <div class="public-library-heading"><h2>{en ? "Favorite anime" : "Animes favoritos"}</h2><span>{favoritesCount}</span></div>
+          <div class="public-anime-grid" data-ids={JSON.stringify(favorites.map((entry: any) => String(entry.anime_id)))}></div>
+        </section>
+      </>}
     </article>
   </main>
 </Layout>
@@ -141,15 +141,13 @@ const pageTitle = `@${profile.aka} — Renanime`;
     const fields = ids.map((id,index) => { variables["id"+index] = Number(id); return `a${index}: Media(id: $id${index}, type: ANIME) { id title { romaji english } coverImage { large } }`; }).join("\n");
     const definitions = ids.map((_,index) => `$id${index}: Int!`).join(", ");
     try {
-      const [animeResponse,likesResponse,commentsResponse] = await Promise.all([
+      const [animeResponse,likesResponse] = await Promise.all([
         fetch("https://graphql.anilist.co",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({query:`query PublicProfileAnime(${definitions}) { ${fields} }`,variables})}),
-        fetch("/api/anime/likes?ids="+ids.join(","),{credentials:"same-origin",cache:"no-store"}),
-        fetch("/api/anime/comments?ids="+ids.join(","),{credentials:"same-origin",cache:"no-store"})
+        fetch("/api/anime/likes?ids="+ids.join(","),{credentials:"same-origin",cache:"no-store"})
       ]);
       if (!animeResponse.ok) throw new Error("anime_fetch_failed");
       const payload = await animeResponse.json();
       const likes = likesResponse.ok ? await likesResponse.json() : {likes:{}};
-      const comments = commentsResponse.ok ? await commentsResponse.json() : {counts:{}};
       const media = new Map(ids.map((id,index)=>[id,payload.data?.["a"+index]]));
       grids.forEach(grid => {
         const gridIds = JSON.parse(grid.dataset.ids || "[]") as string[];
@@ -168,7 +166,7 @@ const pageTitle = `@${profile.aka} — Renanime`;
           title.textContent = en ? anime.title?.english || anime.title?.romaji || "Anime" : anime.title?.romaji || anime.title?.english || "Anime";
           const meta = document.createElement("span");
           meta.className = "public-anime-meta";
-          meta.textContent = "♥ " + Number(likes.likes?.[id]?.count || 0).toLocaleString(en?"en":"es") + " · " + Number(comments.counts?.[id] || 0).toLocaleString(en?"en":"es") + " comments";
+          meta.textContent = "♥ " + Number(likes.likes?.[id]?.count || 0).toLocaleString(en?"en":"es");
           card.append(image,title,meta);
           return card;
         }).filter((card): card is HTMLAnchorElement => card instanceof HTMLAnchorElement);
