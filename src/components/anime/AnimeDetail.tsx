@@ -208,15 +208,24 @@ async function findAnime(entry: LibraryEntry): Promise<Media|null> {
       }`;
 
   try{
-    const response=await fetch(ENDPOINT,{
-      method:"POST",
-      headers:{"Content-Type":"application/json",Accept:"application/json"},
-      body:JSON.stringify(
-        mediaId
-          ? {query,variables:{id:mediaId}}
-          : {query,variables:{search:entry.title}}
-      ),
-    });
+    // A stalled AniList request must not leave the detail loading forever.
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 6500);
+    let response: Response;
+    try {
+      response = await fetch(ENDPOINT,{
+        method:"POST",
+        headers:{"Content-Type":"application/json",Accept:"application/json"},
+        body:JSON.stringify(
+          mediaId
+            ? {query,variables:{id:mediaId}}
+            : {query,variables:{search:entry.title}}
+        ),
+        signal: controller.signal,
+      });
+    } finally {
+      window.clearTimeout(timeout);
+    }
     if(!response.ok) throw new Error("AniList detail lookup failed");
     const payload=await response.json();
     const candidate = mediaId
@@ -371,20 +380,32 @@ export default function AnimeDetail({entry,lang="es"}:{entry:LibraryEntry;lang?:
  const franchiseEntries=getPersonalFranchiseEntries(entry,getLibrary());
  useEffect(()=>{
   let cancelled=false;
+  setLoading(true);
+  setMedia(null);
+  setTranslatedSynopsis("");
+  setFranchiseMedia({});
   findAnime(entry).then(value=>{
     if(cancelled)return;
     setMedia(value);
+  }).catch(()=>{
+    if(!cancelled)setMedia(null);
   }).finally(()=>{if(!cancelled)setLoading(false)});
+
+  // Franchise data is supplementary: defer it so it cannot compete with
+  // the main detail request, comments, and character data on first paint.
   const franchiseCandidates=franchiseEntries.filter(candidate=>candidate.animeId!==entry.animeId);
+  let franchiseTimer: number | undefined;
   if(franchiseCandidates.length){
-   findAnimeBatch(franchiseCandidates).then(results=>{
-    if(cancelled)return;
-    setFranchiseMedia(results);
-   });
-  }else{
-   setFranchiseMedia({});
+   franchiseTimer=window.setTimeout(()=>{
+    findAnimeBatch(franchiseCandidates).then(results=>{
+     if(!cancelled)setFranchiseMedia(results);
+    });
+   },1200);
   }
-  return()=>{cancelled=true};
+  return()=>{
+   cancelled=true;
+   if(franchiseTimer!==undefined)window.clearTimeout(franchiseTimer);
+  };
  },[entry.animeId]);
  useEffect(()=>{
   if(typeof media?.id !== "number") return;
