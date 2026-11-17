@@ -235,7 +235,7 @@ input?.addEventListener("input",()=>{
  timer=window.setTimeout(async()=>{
   controller=new AbortController();
   try{
-   const response=await fetch((locale==="en"?"/en":"")+"/api/community/search/?q="+encodeURIComponent(q),{signal:controller.signal,credentials:"same-origin",headers:{"Accept":"application/json"}});
+   const response=await fetch("/api/community/search/?q="+encodeURIComponent(q),{signal:controller.signal,credentials:"same-origin",headers:{"Accept":"application/json"}});
    if(!response.ok)throw new Error("SEARCH_FAILED");
    const data=await response.json();
    renderUsers(data.users||[]);renderDebates(data.debates||[]);
