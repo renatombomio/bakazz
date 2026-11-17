@@ -16,8 +16,8 @@ const RANK_THRESHOLDS: ReadonlyArray<{ key: AnimeRankKey; minSeen: number; es: s
   { key: "beginner", minSeen: 20, es: "Beginner", en: "Beginner" },
   { key: "anime-fan", minSeen: 50, es: "Anime Fan", en: "Anime Fan" },
   { key: "anime-master", minSeen: 100, es: "Anime Master", en: "Anime Master" },
-  { key: "anime-pro", minSeen: 200, es: "Anime Pro", en: "Anime Pro" },
-  { key: "anime-legend", minSeen: 500, es: "Anime Legend", en: "Anime Legend" },
+  { key: "anime-pro", minSeen: 150, es: "Anime Pro", en: "Anime Pro" },
+  { key: "anime-legend", minSeen: 200, es: "Anime Legend", en: "Anime Legend" },
 ];
 
 export function normalizeSeenAnimeCount(value: number): number {
