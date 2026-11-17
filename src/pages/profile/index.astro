@@ -334,7 +334,9 @@ if (debateIds.length) {
   .editor-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 1rem; }
   .save-profile { border: 0; border-radius: 999px; padding: .8rem 1.2rem; background: #ec4899; color: white; font: inherit; font-size: .82rem; font-weight: 650; cursor: pointer; }
   .save-profile:disabled { opacity: .55; cursor: wait; }
-  #profile-feedback { margin: 0; color: #9ed9b0; font-size: .8rem; }\n  :global(#profile-saved-toast){position:fixed;left:50%;bottom:28px;z-index:1200;transform:translate(-50%,12px);padding:11px 18px;border-radius:999px;background:#24242a;color:#f2efe9;font-size:.82rem;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}\n  :global(#profile-saved-toast.visible){opacity:1;transform:translate(-50%,0)}
+  #profile-feedback { margin: 0; color: #9ed9b0; font-size: .8rem; }
+  :global(#profile-saved-toast){position:fixed;left:50%;bottom:28px;z-index:1200;transform:translate(-50%,12px);padding:11px 18px;border-radius:999px;background:#24242a;color:#f2efe9;font-size:.82rem;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+  :global(#profile-saved-toast.visible){opacity:1;transform:translate(-50%,0)}
   .upload-note { margin: 0; color: #777; font-size: .72rem; }
   :global(html:has(.profile-page)) { background: #000 !important; }
   :global(body.texture-grain:has(.profile-page)) {
@@ -574,13 +576,17 @@ if (debateIds.length) {
   .profile-favorites-wall .profile-anime-card{position:relative;display:block;min-height:120px;overflow:hidden;border-radius:10px}
   .profile-favorites-wall .profile-anime-card:first-child{grid-column:span 2;grid-row:span 2}
   .profile-favorites-wall .profile-anime-card img{width:100%;height:100%;min-height:120px;object-fit:cover;border-radius:10px}
-  .profile-favorites-wall .profile-anime-card-copy,.profile-favorites-wall .profile-anime-card-meta{display:none}\n  .profile-favorites-wall .profile-anime-card{position:relative}\n  .profile-favorites-wall .profile-favorite-like{position:absolute;left:6px;bottom:6px;display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:999px;background:rgba(9,9,11,.78);color:#f2efe9;font-size:11px;font-weight:700}\n  .profile-favorites-wall .profile-favorite-like svg{width:12px;height:12px;fill:#ec4899;stroke:#ec4899}
+  .profile-favorites-wall .profile-anime-card-copy,.profile-favorites-wall .profile-anime-card-meta{display:none}
+  .profile-favorites-wall .profile-anime-card{position:relative}
+  .profile-favorites-wall .profile-favorite-like{position:absolute;left:6px;bottom:6px;display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:999px;background:rgba(9,9,11,.78);color:#f2efe9;font-size:11px;font-weight:700}
+  .profile-favorites-wall .profile-favorite-like svg{width:12px;height:12px;fill:#ec4899;stroke:#ec4899}
   .profile-character-row{display:flex;gap:16px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none}
   .profile-character-row::-webkit-scrollbar{display:none}
   .profile-character-card{flex:0 0 76px;display:flex;flex-direction:column;align-items:center;gap:5px;padding:0;border:0;background:none;text-align:center;text-decoration:none;color:#f2efe9}
   .profile-character-card img{width:76px;height:76px;border-radius:50%;object-fit:cover}
   .profile-character-card strong{width:100%;font-size:.72rem;line-height:1.2;min-height:2.4em}
-  .profile-character-card span{font-size:.62rem;color:#85818b;line-height:1.2}\n  .profile-character-likes{display:flex;align-items:center;gap:4px;margin-top:2px;color:#ec4899;font-size:.68rem;font-weight:650}
+  .profile-character-card span{font-size:.62rem;color:#85818b;line-height:1.2}
+  .profile-character-likes{display:flex;align-items:center;gap:4px;margin-top:2px;color:#ec4899;font-size:.68rem;font-weight:650}
   .profile-character-empty,.profile-debate-empty{color:#85818b;font-size:.78rem}
   .profile-tabs{display:flex;gap:22px;border-bottom:1px solid rgba(255,255,255,.1);margin:0 0 12px}
   .profile-tabs button{padding:9px 0 11px;border:0;border-bottom:2px solid transparent;background:none;color:#85818b;font:inherit;font-size:.83rem;cursor:pointer}
