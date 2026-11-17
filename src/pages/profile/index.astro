@@ -302,7 +302,8 @@ const profileSectionDebates = debates.slice(0, 3).map((debate: any) => ({
         </div>
       </section>
 
-      <ProfileSectionsIsland
+      <div id="profile-favorites-grid">
+        <ProfileSectionsIsland
         client:load
         lang={lang}
         owner={true}
@@ -325,6 +326,7 @@ const profileSectionDebates = debates.slice(0, 3).map((debate: any) => ({
         addFavoriteHref={localizedPath(lang, "/search/")}
         searchHref={localizedPath(lang, "/search/")}
       />
+      </div>
 
       <section class="image-cropper" id="image-cropper" hidden aria-modal="true" role="dialog" aria-labelledby="cropper-title">
         <div class="cropper-panel">
