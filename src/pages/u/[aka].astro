@@ -45,7 +45,7 @@ const pageTitle = `@${profile.aka} — Renanime`;
 
 <Layout title={pageTitle} description={profile.headline || profile.bio || (en ? "Anime fan on Renanime." : "Fan del anime en Renanime.")}>
   <Navbar />
-  <main class="public-profile-page">
+  <main class="public-profile-page" data-anime-base={localizedPath(Astro.locals.lang, "/anime/")}>
     <article class="public-profile">
       <div class="public-cover" style={profile.cover_url ? `background-image: linear-gradient(0deg,rgba(0,0,0,.94),rgba(0,0,0,.08)),url("${profile.cover_url}")` : undefined}>
         {online && <span class="public-online"><i></i>{en ? "Online" : "En línea"}</span>}
@@ -156,7 +156,7 @@ const pageTitle = `@${profile.aka} — Renanime`;
           if (!anime) return null;
           const card = document.createElement("a");
           card.className = "public-anime-card";
-          card.href = (en ? "/en" : "") + "/anime/" + id;
+          card.href = (document.querySelector<HTMLElement>(".public-profile-page")?.dataset.animeBase || "/anime/") + id + "/";
           const image = document.createElement("img");
           image.src = anime.coverImage?.large || "";
           image.alt = "";
