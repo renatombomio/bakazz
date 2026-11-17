@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/anime-of-the-month",
       "schedule": "15 0 1 * *"
+    },
+    {
+      "path": "/api/cron/weekly-popular-episodes",
+      "schedule": "15 0 * * 1"
     }
   ]
 }
