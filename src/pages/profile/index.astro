@@ -127,7 +127,7 @@ if (debateIds.length) {
 >
   <Navbar />
 
-  <main class="profile-page">
+  <main class="profile-page" data-anime-base={localizedPath(Astro.locals.lang, "/anime/")}>
     <section class="profile-card">
       <section class="profile-editor" aria-labelledby="profile-editor-title">
         <div class="cover-preview" id="cover-preview" style={profile.cover_url ? `background-image: linear-gradient(0deg, rgba(5,5,5,.94), rgba(5,5,5,.08)), url("${profile.cover_url}")` : undefined}>
@@ -740,7 +740,7 @@ if (debateIds.length) {
           if (!anime) return null;
           const title = anime.title?.english || anime.title?.romaji || "Anime";
           const counts = likePayload.likes?.[id] || {count:0,liked:false};
-          const card = document.createElement("a"); card.className = "profile-anime-card"; card.href = (isEnglish ? "/en" : "") + "/anime/" + id; card.setAttribute("aria-label",title);
+          const card = document.createElement("a"); card.className = "profile-anime-card"; card.href = (document.querySelector<HTMLElement>(".profile-page")?.dataset.animeBase || "/anime/") + id + "/"; card.setAttribute("aria-label",title);
           const img = document.createElement("img"); img.src = anime.coverImage?.large || ""; img.alt = ""; img.loading = "lazy";
           const cardCopy = document.createElement("span"); cardCopy.className = "profile-anime-card-copy";
           const titleNode = document.createElement("span"); titleNode.className = "profile-anime-card-title"; titleNode.textContent = title;
