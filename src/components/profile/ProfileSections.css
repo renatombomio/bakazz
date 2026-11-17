@@ -1,5 +1,5 @@
 /* Sistema de espacios: 40px entre secciones, 14px bajo cada título, 16px de margen lateral (lo pone la página) */
-.ps { font-family: inherit; color: #f2efe9; padding: 0 16px 32px; }
+.ps { font-family: inherit; color: #f2efe9; padding: 0 0 32px; }
 .ps section { margin-top: 40px; }
 .ps-h { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; min-height: 34px; }
 .ps-h h2 { margin: 0; font-size: 20px; line-height: 1.15; font-weight: 700; letter-spacing: -.01em; }
