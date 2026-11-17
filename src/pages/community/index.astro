@@ -21,10 +21,8 @@ const duelText = {
  title: en ? "Duel of the week" : "Duelo de la semana",
  subtitle: en ? "Which one do you pick?" : "¿Cuál te quedas?",
  voted: en ? "Thanks for voting" : "Gracias por votar",
- votes: (n: number) => en ? (n === 1 ? "1 vote" : `${n.toLocaleString("en")} votes`) : (n === 1 ? "1 voto" : `${n.toLocaleString("es")} votos`),
  locale: en ? "en" : "es",
  next: en ? "A new duel on Monday" : "El lunes, un duelo nuevo",
- voteFor: (name: string) => en ? `Vote for ${name}` : `Votar por ${name}`,
  error: en ? "Your vote couldn't be saved" : "No se pudo guardar tu voto",
 };
 const supabase=createSupabaseSsrClient(Astro.request,Astro.cookies);
