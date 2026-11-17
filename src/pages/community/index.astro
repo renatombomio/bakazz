@@ -29,6 +29,17 @@ const duelText = {
 };
 const supabase=createSupabaseSsrClient(Astro.request,Astro.cookies);
 const {data:auth}=await supabase.auth.getUser();
+if(auth.user){
+ const {data:myDuelVote}=await supabase.from("duel_votes").select("anime_id").eq("week",duelWeek).eq("user_id",auth.user.id).maybeSingle();
+ if(myDuelVote){
+  const {data:duelCounts,error:duelCountsError}=await supabase.rpc("duel_counts",{p_week:duelWeek,p_a:duelInitial.a.id,p_b:duelInitial.b.id});
+  const counts=Array.isArray(duelCounts)?duelCounts[0]:duelCounts;
+  if(!duelCountsError&&counts&&(myDuelVote.anime_id===duelInitial.a.id||myDuelVote.anime_id===duelInitial.b.id)){
+   duelInitial.myVote=myDuelVote.anime_id===duelInitial.a.id?"a":"b";
+   duelInitial.counts={a:Number(counts.a)||0,b:Number(counts.b)||0};
+  }
+ }
+}
 const {data:memberCandidates,error:membersError}=await supabase.from("profiles").select("id,aka,avatar_url,headline,bio,interests").eq("is_private",false).not("aka","is",null).limit(100);
 const shuffledMembers=[...(memberCandidates??[])];
 for(let i=shuffledMembers.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffledMembers[i],shuffledMembers[j]]=[shuffledMembers[j],shuffledMembers[i]];}
