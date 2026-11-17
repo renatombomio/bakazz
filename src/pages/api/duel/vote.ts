@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
-import { createSupabaseSsrClient } from "../../../../lib/supabase-ssr";
-import { weekKey } from "../../../../components/community/duel";
+import { createSupabaseSsrClient } from "../../../lib/supabase-ssr";
+import { weekKey } from "../../../components/community/duel";
 
 export const prerender = false;
 
