@@ -7,6 +7,7 @@ import {
   removeFromPersonalLibrary,
   subscribeToPersonalLibrary,
   hydratePersonalLibrary,
+  resolvePersonalLibraryAnimeId,
 } from "../../data/personal-library";
 
 interface Props {
@@ -17,13 +18,15 @@ interface Props {
 export default function PersonalLibraryActions({ animeId, lang = "es" }: Props) {
   const t = useT(lang);
   const id = String(animeId);
+  const [libraryId, setLibraryId] = useState(id);
   const [status, setStatus] = useState(() => getPersonalEntry(id)?.state.status ?? "NOT_IN_COLLECTION");
   const [ready, setReady] = useState(false);
+  const [canSave, setCanSave] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
   const run = async (action: () => Promise<unknown>) => {
-    if (busy) return;
+    if (busy || !canSave) return;
     setBusy(true);
     setError("");
     try { await action(); }
@@ -33,27 +36,50 @@ export default function PersonalLibraryActions({ animeId, lang = "es" }: Props) 
 
   useEffect(() => {
     let active = true;
-    const sync = () => setStatus(getPersonalEntry(id)?.state.status ?? "NOT_IN_COLLECTION");
+    let unsubscribe = () => undefined;
+    let resolvedId = id;
 
-    void hydratePersonalLibrary().then(() => {
-      if (!active) return;
-      sync();
-      setReady(true);
-    });
+    const initialize = async () => {
+      try {
+        resolvedId = await resolvePersonalLibraryAnimeId(id);
+        await hydratePersonalLibrary();
+        if (!active) return;
 
-    const unsubscribe = subscribeToPersonalLibrary(sync);
+        setLibraryId(resolvedId);
+        const sync = () => setStatus(getPersonalEntry(resolvedId)?.state.status ?? "NOT_IN_COLLECTION");
+        sync();
+        unsubscribe = subscribeToPersonalLibrary(sync);
+        setReady(true);
+      } catch {
+        if (!active) return;
+        setCanSave(false);
+        setError(lang === "en"
+          ? "This anime could not be matched to an AniList entry, so it cannot be saved."
+          : "No se ha podido identificar este anime en AniList y no se puede guardar.");
+        setReady(true);
+      }
+    };
+
+    void initialize();
     return () => {
       active = false;
       unsubscribe();
     };
-  }, [id]);
+  }, [id, lang]);
 
   if (!ready) {
     return (
       <div className="personal-actions">
         <span className="personal-status" role="status" aria-live="polite">{t("actions.loading")}</span>
-        {error && <span className="personal-error" role="alert">{error}</span>}
-        {error && <span className="personal-error" role="alert">{error}</span>}
+        <style>{styles}</style>
+      </div>
+    );
+  }
+
+  if (!canSave) {
+    return (
+      <div className="personal-actions">
+        <span className="personal-error" role="alert">{error}</span>
         <style>{styles}</style>
       </div>
     );
@@ -63,9 +89,10 @@ export default function PersonalLibraryActions({ animeId, lang = "es" }: Props) 
     return (
       <div className="personal-actions">
         <span className="personal-status">{t("actions.watched")}</span>
-        <button type="button" disabled={busy} onClick={() => void run(() => removeFromPersonalLibrary(id))}>
+        <button type="button" disabled={busy} onClick={() => void run(() => removeFromPersonalLibrary(libraryId))}>
           {t("actions.remove")}
         </button>
+        {error && <span className="personal-error" role="alert">{error}</span>}
         <style>{styles}</style>
       </div>
     );
@@ -74,12 +101,13 @@ export default function PersonalLibraryActions({ animeId, lang = "es" }: Props) 
   if (status === "PENDING") {
     return (
       <div className="personal-actions">
-        <button type="button" className="is-active" disabled={busy} onClick={() => void run(() => markPersonalWatched(id))}>
+        <button type="button" className="is-active" disabled={busy} onClick={() => void run(() => markPersonalWatched(libraryId))}>
           {t("actions.markWatched")}
         </button>
-        <button type="button" disabled={busy} onClick={() => void run(() => removeFromPersonalLibrary(id))}>
+        <button type="button" disabled={busy} onClick={() => void run(() => removeFromPersonalLibrary(libraryId))}>
           {t("actions.removeFromList")}
         </button>
+        {error && <span className="personal-error" role="alert">{error}</span>}
         <style>{styles}</style>
       </div>
     );
@@ -87,12 +115,13 @@ export default function PersonalLibraryActions({ animeId, lang = "es" }: Props) 
 
   return (
     <div className="personal-actions">
-      <button type="button" disabled={busy} onClick={() => void run(() => addToPersonalList(id))}>
+      <button type="button" disabled={busy} onClick={() => void run(() => addToPersonalList(libraryId))}>
         {t("actions.add")}
       </button>
-      <button type="button" disabled={busy} onClick={() => void run(() => markPersonalWatched(id))}>
+      <button type="button" disabled={busy} onClick={() => void run(() => markPersonalWatched(libraryId))}>
         ✓ {lang === "en" ? "I have watched it" : "Ya lo he visto"}
       </button>
+      {error && <span className="personal-error" role="alert">{error}</span>}
       <style>{styles}</style>
     </div>
   );
