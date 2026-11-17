@@ -1,0 +1,100 @@
+---
+import type { AnimeRankKey, RankLocale } from "../../lib/gamification/ranks";
+
+type BadgeSize = "compact" | "regular" | "profile";
+
+interface Props {
+  rank: AnimeRankKey;
+  size?: BadgeSize;
+  locale?: RankLocale;
+  showLabel?: boolean;
+  class?: string;
+}
+
+const {
+  rank,
+  size = "regular",
+  locale = "es",
+  showLabel = false,
+  class: className,
+} = Astro.props;
+
+const labels: Record<AnimeRankKey, string> = {
+  beginner: "Beginner",
+  "anime-fan": "Anime Fan",
+  "anime-master": "Anime Master",
+  "anime-pro": "Anime Pro",
+  "anime-legend": "Anime Legend",
+};
+
+const label = labels[rank];
+const accessibleLabel = locale === "en" ? `${label} rank` : `Rango ${label}`;
+---
+
+<span
+  class:list={["user-rank-badge", `user-rank-badge--${rank}`, `user-rank-badge--${size}`, className]}
+  role="img"
+  aria-label={accessibleLabel}
+  title={label}
+  data-rank={rank}
+>
+  <svg viewBox="0 0 48 48" fill="none" aria-hidden="true" focusable="false">
+    {rank === "beginner" && (
+      <g class="rank-art">
+        <path d="m24 3.8 5.55 11.25 12.42 1.8-8.98 8.76 2.12 12.37L24 32.14l-11.11 5.84 2.12-12.37-8.98-8.76 12.42-1.8L24 3.8Z" fill="#F6C95D" stroke="#FFF0B5" stroke-width="1.7" stroke-linejoin="round"/>
+        <path d="m24 11.2 3.5 7.1 7.83 1.14-5.66 5.52 1.34 7.8L24 29.08l-7.01 3.68 1.34-7.8-5.66-5.52 7.83-1.14 3.5-7.1Z" fill="#FFE9A0" opacity=".58"/>
+        <path d="m8.3 8.4 1.2 2.4 2.6.4-1.9 1.8.45 2.6-2.35-1.2-2.35 1.2.45-2.6-1.9-1.8 2.6-.4 1.2-2.4Z" fill="#FFF0B5"/>
+      </g>
+    )}
+    {rank === "anime-fan" && (
+      <g class="rank-art">
+        <path d="M25.3 3.7c1.6 7.1 10.2 9.7 10.2 19.3 0 9.1-5.2 17-13.4 17-7.3 0-12.4-5.2-12.4-12.3 0-6.5 4.1-10.6 8.3-15.3-.2 5.1 1.4 7.2 3.2 8.5C24.8 15.1 26.2 10.1 25.3 3.7Z" fill="#F06A42" stroke="#FFC08C" stroke-width="1.7" stroke-linejoin="round"/>
+        <path d="M25.1 20.1c.6 3.1 4.3 5.1 4.3 9.3 0 4.1-2.7 7-6.4 7-3.3 0-5.7-2.4-5.7-5.7 0-2.8 1.7-4.7 3.7-6.9.1 2.1.8 3.1 1.6 3.7 1.7-2.2 2.6-4.4 2.5-7.4Z" fill="#FFE39B"/>
+        <path d="M8 28.5c-1.1 2.2-1.3 4.4-.5 6.2M38.7 17.5c1.3 1.7 1.8 3.5 1.6 5.5" stroke="#FFB77C" stroke-width="1.7" stroke-linecap="round"/>
+      </g>
+    )}
+    {rank === "anime-master" && (
+      <g class="rank-art">
+        <path d="m24 3.5 15.2 8.8v17.5L24 38.5 8.8 29.8V12.3L24 3.5Z" fill="#6754A5" stroke="#C8B9FF" stroke-width="1.7" stroke-linejoin="round"/>
+        <path d="m24 8.5 10.8 6.2v12.5L24 33.5l-10.8-6.3V14.7L24 8.5Z" fill="#9277DB" stroke="#E4DCFF" stroke-width="1.2" stroke-linejoin="round"/>
+        <path d="m24 12.4 7.4 7.2-7.4 11-7.4-11 7.4-7.2Z" fill="#F3D98A" stroke="#FFF1BE" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="m24 12.4 0 18.2 7.4-11-7.4-7.2Z" fill="#FFE9A8" opacity=".7"/>
+        <path d="m8 8 2.1 1.1L12 8l-.4 2.2 1.6 1.5-2.2.3-1 2-1-2-2.2-.3 1.6-1.5L8 8Z" fill="#E4DCFF"/>
+      </g>
+    )}
+    {rank === "anime-pro" && (
+      <g class="rank-art">
+        <path d="M24 3.8 40.1 9v12.2c0 10.2-6.3 17.2-16.1 22.1C14.2 38.4 7.9 31.4 7.9 21.2V9L24 3.8Z" fill="#277D88" stroke="#A4E8E7" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M24 9.1 34.7 12.5v8.3c0 7.1-3.9 12.3-10.7 16.2-6.8-3.9-10.7-9.1-10.7-16.2v-8.3L24 9.1Z" fill="#45A7A3" stroke="#C7F5E8" stroke-width="1.2" stroke-linejoin="round"/>
+        <path d="m24 14.3 7.2 7.1-7.2 9.2-7.2-9.2 7.2-7.1Z" fill="#D8F2D2" stroke="#F5FFE7" stroke-width="1.4" stroke-linejoin="round"/>
+        <path d="m24 14.3 0 16.3 7.2-9.2-7.2-7.1Z" fill="#A8D8C0"/>
+      </g>
+    )}
+    {rank === "anime-legend" && (
+      <g class="rank-art">
+        <path d="m5.2 13.2 10.1 7.2L24 7.1l8.7 13.3 10.1-7.2-3.5 24H8.7l-3.5-24Z" fill="#D99A36" stroke="#FFE3A0" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M9.1 31.2h29.8l-1.1 6H10.2l-1.1-6Z" fill="#A96727" stroke="#FFE3A0" stroke-width="1.2" stroke-linejoin="round"/>
+        <path d="m24 12.1 3.2 5.1-3.2 5.1-3.2-5.1 3.2-5.1Z" fill="#FFF1BD" stroke="#FFF8DC" stroke-width="1.1"/>
+        <circle cx="8.2" cy="11.1" r="2.5" fill="#F5D77D" stroke="#FFF0B5" stroke-width="1.2"/>
+        <circle cx="39.8" cy="11.1" r="2.5" fill="#F5D77D" stroke="#FFF0B5" stroke-width="1.2"/>
+        <path d="M14 26.5h20" stroke="#FFE3A0" stroke-width="1.5" stroke-linecap="round"/>
+      </g>
+    )}
+  </svg>
+  {showLabel && <span class="user-rank-badge__label">{label}</span>}
+</span>
+
+<style>
+  .user-rank-badge{display:inline-flex;flex:0 0 auto;align-items:center;justify-content:center;gap:.42em;vertical-align:middle;line-height:1}
+  .user-rank-badge svg{display:block;width:100%;height:100%;overflow:visible}
+  .user-rank-badge--compact{width:19px;height:19px}
+  .user-rank-badge--regular{width:28px;height:28px}
+  .user-rank-badge--profile{width:46px;height:46px}
+  .user-rank-badge__label{color:#e8e4ed;font-size:.82em;font-weight:700;letter-spacing:-.02em;white-space:nowrap}
+  .user-rank-badge--beginner .rank-art{filter:drop-shadow(0 1px 2px #f6c95d35)}
+  .user-rank-badge--anime-fan .rank-art{filter:drop-shadow(0 1px 3px #f06a4245)}
+  .user-rank-badge--anime-master .rank-art{filter:drop-shadow(0 1px 3px #9277db45)}
+  .user-rank-badge--anime-pro .rank-art{filter:drop-shadow(0 1px 3px #45a7a345)}
+  .user-rank-badge--anime-legend .rank-art{filter:drop-shadow(0 1px 4px #d99a3645)}
+  @media(prefers-reduced-motion:no-preference){.user-rank-badge{transition:transform .18s ease}.user-rank-badge:hover{transform:translateY(-1px)}}
+</style>
