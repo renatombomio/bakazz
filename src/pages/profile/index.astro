@@ -206,7 +206,7 @@ if (debateIds.length) {
 
       <section class="profile-library-links">
         <div class="profile-library-heading"><h2>{isEnglish ? "Favorite anime" : "Animes favoritos"}</h2><a href={localizedPath(Astro.locals.lang, "/profile/anime-favorites/")}>{isEnglish ? "See all" : "Ver todos"}</a></div>
-        <div class="profile-favorites-wall" id="profile-favorites-grid" data-ids={JSON.stringify(favorites.map((entry: any) => String(entry.anime_id)))}></div>
+        <div class="fw" id="profile-favorites-grid" data-count={favorites.length} data-ids={JSON.stringify(favorites.map((entry: any) => String(entry.anime_id)))} data-search-href={localizedPath(Astro.locals.lang, "/search/")}></div>
 
         <div class="profile-library-heading" id="profile-character-favorites"><h2>{isEnglish ? "Favourite characters" : "Personajes favoritos"}</h2><a href={localizedPath(Astro.locals.lang, "/profile/characters/")}>{isEnglish ? "See all" : "Ver todos"}</a></div>
         {characterFavorites.length ? <div class="profile-character-row">
@@ -572,14 +572,20 @@ if (debateIds.length) {
   .profile-stat span{font-size:.66rem}
   .profile-library-links{padding-top:.35rem}
   .profile-library-heading{margin-top:1.65rem;margin-bottom:.85rem}
-  .profile-favorites-wall{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(100px,1fr));gap:8px;margin-top:.8rem}
-  .profile-favorites-wall .profile-anime-card{position:relative;display:block;min-height:120px;overflow:hidden;border-radius:10px}
-  .profile-favorites-wall .profile-anime-card:first-child{grid-column:span 2;grid-row:span 2}
-  .profile-favorites-wall .profile-anime-card img{width:100%;height:100%;min-height:120px;object-fit:cover;border-radius:10px}
-  .profile-favorites-wall .profile-anime-card-copy,.profile-favorites-wall .profile-anime-card-meta{display:none}
-  .profile-favorites-wall .profile-anime-card{position:relative}
-  .profile-favorites-wall .profile-favorite-like{position:absolute;left:6px;bottom:6px;display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:999px;background:rgba(9,9,11,.78);color:#f2efe9;font-size:11px;font-weight:700}
-  .profile-favorites-wall .profile-favorite-like svg{width:12px;height:12px;fill:none;stroke:#f2efe9}.profile-favorites-wall .profile-favorite-like.is-liked svg{fill:#ec4899;stroke:#ec4899}
+  /* FavoritesWall: one large poster plus four fixed slots; no titles below posters. */
+  .fw{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:8px;aspect-ratio:2/1;margin-top:.8rem;min-width:0}
+  .fw .po{position:relative;display:block;min-width:0;min-height:0;overflow:hidden;border-radius:10px;background:#17171b;color:#f2efe9;text-decoration:none}
+  .fw .po.big{grid-column:span 2;grid-row:span 2}
+  .fw .po img{display:block;width:100%;height:100%;min-height:0;object-fit:cover;border-radius:inherit}
+  .fw .po .lk{position:absolute;left:7px;bottom:7px;z-index:1;display:inline-flex;align-items:center;gap:5px;max-width:calc(100% - 14px);padding:5px 9px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(9,9,11,.84);color:#f2efe9;font-size:.72rem;font-weight:700;line-height:1;white-space:nowrap}
+  .fw .po .lk svg{width:14px;height:14px;flex:0 0 14px;fill:none;stroke:currentColor;stroke-width:1.8}
+  .fw .po .lk.is-liked svg{fill:#ec4899;stroke:#ec4899}
+  .fw .po-placeholder{display:grid;place-items:center;background:#111114;color:#777}
+  .fw .po-placeholder svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.5}
+  .fw .po-placeholder .lk{display:none}
+  .fw .po:focus-visible{outline:2px solid #ec4899;outline-offset:3px}
+  .fw .po img{transition:transform .2s ease}
+  .fw .po:not(.po-placeholder):hover img{transform:scale(1.025)}
   .profile-character-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;align-items:start;padding:2px 0 12px}
   .profile-character-card{display:flex;min-width:0;flex-direction:column;align-items:center;gap:8px;padding:0;border:0;background:none;text-align:center;text-decoration:none;color:#f2efe9}
   .profile-character-image{position:relative;display:block;width:100%;aspect-ratio:1;min-width:0}
@@ -716,22 +722,42 @@ if (debateIds.length) {
           if (!anime) return null;
           const title = anime.title?.english || anime.title?.romaji || "Anime";
           const counts = likePayload.likes?.[id] || {count:0,liked:false};
-          const card = document.createElement("a"); card.className = "profile-anime-card"; card.href = (document.querySelector<HTMLElement>(".profile-page")?.dataset.animeBase || "/anime/") + id + "/"; card.setAttribute("aria-label",title);
-          const img = document.createElement("img"); img.src = anime.coverImage?.large || ""; img.alt = ""; img.loading = "lazy";
+          const isFavoriteWall = grid.id === "profile-favorites-grid";
+          const card = document.createElement("a");
+          card.className = isFavoriteWall ? "po" : "profile-anime-card";
+          if (isFavoriteWall && grid.children.length === 0) card.classList.add("big");
+          card.href = (document.querySelector<HTMLElement>(".profile-page")?.dataset.animeBase || "/anime/") + id + "/";
+          card.setAttribute("aria-label",title);
+          const img = document.createElement("img"); img.src = anime.coverImage?.large || ""; img.alt = ""; img.loading = isFavoriteWall ? "eager" : "lazy"; img.decoding = "async";
           const cardCopy = document.createElement("span"); cardCopy.className = "profile-anime-card-copy";
           const titleNode = document.createElement("span"); titleNode.className = "profile-anime-card-title"; titleNode.textContent = title;
           const meta = document.createElement("span"); meta.className = "profile-anime-card-meta";
           const likeMeta = document.createElement("span"); likeMeta.className = "like-count" + (counts.liked ? " is-liked" : ""); likeMeta.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.2-8.8 10-8.8 10s-8.8-4.8-8.8-10a4.6 4.6 0 0 1 8.8-1.9 4.6 4.6 0 0 1 8.8 1.9Z"/></svg><span></span>'; likeMeta.querySelector("span")!.textContent = Number(counts.count||0).toLocaleString(isEnglish?"en":"es");
           meta.append(likeMeta); cardCopy.append(titleNode); card.append(img,cardCopy,meta);
-          if (grid.id === "profile-favorites-grid") {
-            const pill = document.createElement("span"); pill.className = "profile-favorite-like" + (counts.liked ? " is-liked" : "");
-            pill.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg><span></span>';
+          if (isFavoriteWall) {
+            const pill = document.createElement("span"); pill.className = "lk" + (counts.liked ? " is-liked" : "");
+            pill.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.2-8.8 10-8.8-10a4.6 4.6 0 0 1 8.8-1.9 4.6 4.6 0 0 1 8.8 1.9Z"/></svg><span></span>';
             pill.querySelector("span")!.textContent = new Intl.NumberFormat(isEnglish ? "en" : "es", {notation:"compact",maximumFractionDigits:1}).format(Number(counts.count ?? 0));
             card.append(pill);
           }
           return card;
         }).filter((card): card is HTMLAnchorElement => card instanceof HTMLAnchorElement);
-        grid.replaceChildren(...(cards.length ? cards : [Object.assign(document.createElement("span"),{className:"profile-anime-empty",textContent:copy("Todavía no hay animes aquí.","No anime here yet.")})]));
+        if (grid.id === "profile-favorites-grid") {
+          const slots = cards.slice(0,5);
+          while (slots.length < 5) {
+            const placeholder = document.createElement("a");
+            placeholder.className = "po po-placeholder";
+            placeholder.href = grid.dataset.searchHref || "/search/";
+            placeholder.setAttribute("aria-label",copy("Buscar anime para añadir a favoritos","Search anime to add to favorites"));
+            placeholder.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+            slots.push(placeholder);
+          }
+          if (slots[0]) slots[0].classList.add("big");
+          slots.slice(1).forEach(card => card.classList.remove("big"));
+          grid.replaceChildren(...slots);
+        } else {
+          grid.replaceChildren(...(cards.length ? cards : [Object.assign(document.createElement("span"),{className:"profile-anime-empty",textContent:copy("Todavía no hay animes aquí.","No anime here yet.")})]));
+        }
       });
     } catch {
       grids.forEach(grid => { grid.innerHTML = '<span class="profile-anime-empty">' + copy("No se pudieron cargar los animes.", "Could not load anime.") + '</span>'; });
