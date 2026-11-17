@@ -20,7 +20,9 @@ type Props = {
     title: string;
     subtitle: string;
     voted: string;
-    votes: (n: number) => string;
+    votesSuffix: string;
+    locale: "es" | "en";
+    voteForPrefix: string;
     next: string;
     voteFor: (name: string) => string;
     error: string;
@@ -66,7 +68,7 @@ export default function WeeklyDuel({ initial, loggedIn, loginHref, voteUrl, t }:
       className="dd-side"
       data-win={done && s.myVote === k}
       data-lose={done && s.myVote !== k}
-      aria-label={t.voteFor(a.title)}
+      aria-label={t.voteForPrefix + a.title}
       aria-pressed={s.myVote === k}
       disabled={done || busy}
       onClick={() => vote(k)}
@@ -88,7 +90,7 @@ export default function WeeklyDuel({ initial, loggedIn, loginHref, voteUrl, t }:
         {!done && <span className="dd-vs" aria-hidden="true">VS</span>}
         {side("b", s.b, pb)}
       </div>
-      {done && <p className="dd-meta">{t.votes(total)} · {t.next}</p>}
+      {done && <p className="dd-meta">{total.toLocaleString(t.locale)} {t.votesSuffix} · {t.next}</p>}
       {err && <p className="dd-err" role="alert">{t.error}</p>}
     </section>
   );
