@@ -803,10 +803,10 @@ const profileCommentsCount = commentsCountError ? 0 : commentsCount ?? 0;
     const reserved = new Set(["p","reel","reels","explore","stories","tv","accounts","direct","video","tag","discover"]);
     let value = input.trim();
     if (!value) return {ok:true,value:null};
-    if (/[/.]/.test(value) && /^(https?:\\/\\/)?[^\\s/]+\\.[^\\s/]+\\//i.test(value + "/")) {
+    if (/[/.]/.test(value) && /^(https?:\/\/)?[^\\s/]+\.[^\\s/]+\//i.test(value + "/")) {
       try {
-        const url = new URL(/^https?:\\/\\//i.test(value) ? value : "https://" + value);
-        const host = url.hostname.replace(/^(www|m)\\./,"").toLowerCase();
+        const url = new URL(/^https?:\/\//i.test(value) ? value : "https://" + value);
+        const host = url.hostname.replace(/^(www|m)\./,"").toLowerCase();
         if (!rules[kind].hosts.includes(host)) return {ok:false};
         value = url.pathname.split("/").filter(Boolean)[0] || "";
         if (reserved.has(value.toLowerCase()) || (kind === "tiktok" && !value.startsWith("@"))) return {ok:false};
