@@ -81,11 +81,14 @@ export default function WeeklyDuel({ initial, loggedIn, loginHref, voteUrl, t }:
       setGo(false);
       return;
     }
+    let second = 0;
     const frame = window.requestAnimationFrame(() => {
-      const second = window.requestAnimationFrame(() => setGo(true));
-      return () => window.cancelAnimationFrame(second);
+      second = window.requestAnimationFrame(() => setGo(true));
     });
-    return () => window.cancelAnimationFrame(frame);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.cancelAnimationFrame(second);
+    };
   }, [done]);
 
   async function vote(choice: "a" | "b") {
