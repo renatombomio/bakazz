@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "@fontsource/anton";
 import { percents, type DuelSide } from "./duel";
 import "./WeeklyDuel.css";
 
