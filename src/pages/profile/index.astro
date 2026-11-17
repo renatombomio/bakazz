@@ -22,7 +22,7 @@ if (libraryError) {
 
 const { data: profileData } = await supabase
   .from("profiles")
-  .select("id, name, aka, headline, bio, location, avatar_url, cover_url, interests, created_at, last_seen_at")
+  .select("id, name, aka, headline, bio, location, avatar_url, cover_url, interests, created_at, last_seen_at, instagram, tiktok")
   .eq("id", user.id)
   .maybeSingle();
 const profile = { ...user, ...profileData };
@@ -147,6 +147,16 @@ const profileCommentsCount = commentsCountError ? 0 : commentsCount ?? 0;
           <label>{isEnglish ? "Location (optional)" : "Ubicación (opcional)"}
             <input id="profile-location" maxlength="80" value={profile.location || ""} placeholder={isEnglish ? "City, country" : "Ciudad, país"} />
           </label>
+          <div class="social-edit-fields">
+            <label>Instagram
+              <input id="profile-instagram" maxlength="120" value={profile.instagram || ""} placeholder="@usuario o instagram.com/usuario" autocomplete="off" autocapitalize="none" spellcheck="false" />
+              <span class="social-field-error" id="instagram-error" hidden>{isEnglish ? "Invalid Instagram username or profile link." : "Usuario o enlace de Instagram no válido."}</span>
+            </label>
+            <label>TikTok
+              <input id="profile-tiktok" maxlength="120" value={profile.tiktok || ""} placeholder="@usuario o tiktok.com/@usuario" autocomplete="off" autocapitalize="none" spellcheck="false" />
+              <span class="social-field-error" id="tiktok-error" hidden>{isEnglish ? "Invalid TikTok username or profile link." : "Usuario o enlace de TikTok no válido."}</span>
+            </label>
+          </div>
           <label class="privacy-setting">
             <input id="profile-private" type="checkbox" checked={Boolean(profile.is_private)} />
             <span><strong>{isEnglish ? "Private profile" : "Perfil privado"}</strong><small>{isEnglish ? "Only you can see your anime collection and watchlist. Your profile will not appear in the community directory." : "Solo tú podrás ver tu colección y lista de anime. Tu perfil no aparecerá en el directorio de la comunidad."}</small></span>
@@ -167,6 +177,10 @@ const profileCommentsCount = commentsCountError ? 0 : commentsCount ?? 0;
         {profile.headline && <h1 id="profile-headline-view">{profile.headline}</h1>}
         {profile.bio && <p id="profile-bio-view">{profile.bio}</p>}
         {profile.location && <p class="profile-location-view">{profile.location}</p>}
+        {(profile.instagram || profile.tiktok) && <div class="profile-social-links">
+          {profile.instagram && <a class="profile-social-button" href={`https://www.instagram.com/${profile.instagram}/`} target="_blank" rel="noopener noreferrer nofollow ugc" aria-label={`Instagram de ${profile.name}`}><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.2" fill="currentColor" stroke="none"/></svg></a>}
+          {profile.tiktok && <a class="profile-social-button" href={`https://www.tiktok.com/@${profile.tiktok}`} target="_blank" rel="noopener noreferrer nofollow ugc" aria-label={`TikTok de ${profile.name}`}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 2v12.1a4 4 0 1 1-3.5-4"/></svg></a>}
+        </div>}
         <div class="genre-tags" id="profile-genre-tags">
           {(profile.interests || []).map((genre: string) => <span>#{genre}</span>)}
         </div>
@@ -272,10 +286,19 @@ const profileCommentsCount = commentsCountError ? 0 : commentsCount ?? 0;
   .editor-fields label { display: grid; gap: .45rem; color: #aaa; font-size: .78rem; }
   .editor-fields textarea,.editor-fields input { width: 100%; border: 1px solid rgba(255,255,255,.13); border-radius: 12px; padding: .85rem 1rem; background: rgba(255,255,255,.04); color: white; font: inherit; font-size: .9rem; }
   .editor-fields textarea { min-height: 96px; resize: vertical; }
+  .social-edit-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .social-field-error{color:#f0a0b0;font-size:.68rem}
+  .social-field-error[hidden]{display:none}
+  .profile-social-links{display:flex;gap:10px;padding-top:14px}
+  .profile-social-button{width:40px;height:40px;border-radius:50%;background:#1c1c22;color:#f2efe9;display:grid;place-items:center}
+  .profile-social-button svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8}
+  .profile-social-button:focus-visible{outline:2px solid #f472b6;outline-offset:3px}
+  @media(max-width:520px){.social-edit-fields{grid-template-columns:1fr}}
+
   .editor-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 1rem; }
   .save-profile { border: 0; border-radius: 999px; padding: .8rem 1.2rem; background: #ec4899; color: white; font: inherit; font-size: .82rem; font-weight: 650; cursor: pointer; }
   .save-profile:disabled { opacity: .55; cursor: wait; }
-  #profile-feedback { margin: 0; color: #9ed9b0; font-size: .8rem; }
+  #profile-feedback { margin: 0; color: #9ed9b0; font-size: .8rem; }\n  :global(#profile-saved-toast){position:fixed;left:50%;bottom:28px;z-index:1200;transform:translate(-50%,12px);padding:11px 18px;border-radius:999px;background:#24242a;color:#f2efe9;font-size:.82rem;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}\n  :global(#profile-saved-toast.visible){opacity:1;transform:translate(-50%,0)}
   .upload-note { margin: 0; color: #777; font-size: .72rem; }
   :global(html:has(.profile-page)) { background: #000 !important; }
   :global(body.texture-grain:has(.profile-page)) {
@@ -772,15 +795,67 @@ const profileCommentsCount = commentsCountError ? 0 : commentsCount ?? 0;
   });
 
 
-  document.querySelector<HTMLButtonElement>("#save-profile")?.addEventListener("click", async (event) => {
+  const normalizeSocial = (kind: "instagram" | "tiktok", input: string): {ok:true;value:string|null}|{ok:false} => {
+    const rules = {
+      instagram: { re: /^[a-z0-9._]{1,30}$/, hosts: ["instagram.com","instagr.am"] },
+      tiktok: { re: /^[a-z0-9._]{2,24}$/, hosts: ["tiktok.com"] }
+    };
+    const reserved = new Set(["p","reel","reels","explore","stories","tv","accounts","direct","video","tag","discover"]);
+    let value = input.trim();
+    if (!value) return {ok:true,value:null};
+    if (/[/.]/.test(value) && /^(https?:\\/\\/)?[^\\s/]+\\.[^\\s/]+\\//i.test(value + "/")) {
+      try {
+        const url = new URL(/^https?:\\/\\//i.test(value) ? value : "https://" + value);
+        const host = url.hostname.replace(/^(www|m)\\./,"").toLowerCase();
+        if (!rules[kind].hosts.includes(host)) return {ok:false};
+        value = url.pathname.split("/").filter(Boolean)[0] || "";
+        if (reserved.has(value.toLowerCase()) || (kind === "tiktok" && !value.startsWith("@"))) return {ok:false};
+      } catch { return {ok:false}; }
+    }
+    value = value.replace(/^@+/,"").toLowerCase();
+    if (!rules[kind].re.test(value) || value.endsWith(".")) return {ok:false};
+    return {ok:true,value};
+  };
+  const socialInputs = {
+    instagram: document.querySelector<HTMLInputElement>("#profile-instagram"),
+    tiktok: document.querySelector<HTMLInputElement>("#profile-tiktok")
+  };
+  const saveButton = document.querySelector<HTMLButtonElement>("#save-profile");
+  function validateSocialFields() {
+    let valid = true;
+    for (const kind of ["instagram","tiktok"] as const) {
+      const input = socialInputs[kind];
+      const result = normalizeSocial(kind,input?.value || "");
+      const error = document.querySelector<HTMLElement>(kind === "instagram" ? "#instagram-error" : "#tiktok-error");
+      if (error) error.hidden = result.ok;
+      input?.setAttribute("aria-invalid",String(!result.ok));
+      if (!result.ok) valid = false;
+    }
+    if (saveButton) saveButton.disabled = !valid;
+    return valid;
+  }
+  for (const kind of ["instagram","tiktok"] as const) {
+    const input = socialInputs[kind];
+    input?.addEventListener("input",validateSocialFields);
+    input?.addEventListener("blur",() => {
+      const result = normalizeSocial(kind,input.value);
+      if (result.ok) input.value = result.value || "";
+      validateSocialFields();
+    });
+  }
+  validateSocialFields();
+
+  saveButton?.addEventListener("click", async (event) => {
     const button = event.currentTarget as HTMLButtonElement;
+    if (!validateSocialFields()) return;
     button.disabled = true;
     if (feedback) feedback.textContent = copy("Guardando…", "Saving…");
     try {
+      const socialInstagram = normalizeSocial("instagram",socialInputs.instagram?.value || "");
+      const socialTiktok = normalizeSocial("tiktok",socialInputs.tiktok?.value || "");
+      if (!socialInstagram.ok || !socialTiktok.ok) throw new Error(copy("Revisa los usuarios de redes sociales.","Check the social usernames."));
       const response = await fetch("/api/auth/profile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "same-origin",
+        method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin",
         body: JSON.stringify({
           name: (document.querySelector<HTMLInputElement>("#profile-name")?.value || "").trim(),
           aka: (document.querySelector<HTMLInputElement>("#profile-aka")?.value || "").trim(),
@@ -788,39 +863,64 @@ const profileCommentsCount = commentsCountError ? 0 : commentsCount ?? 0;
           location: (document.querySelector<HTMLInputElement>("#profile-location")?.value || "").trim(),
           headline: (document.querySelector<HTMLInputElement>("#profile-headline")?.value || "").trim(),
           interests: (document.querySelector<HTMLInputElement>("#profile-interests")?.value || "").split(",").map(value => value.trim()).filter(Boolean),
+          instagram: socialInstagram.value, tiktok: socialTiktok.value,
           isPrivate: Boolean(document.querySelector<HTMLInputElement>("#profile-private")?.checked)
         })
       });
       const result = await response.json();
-      if (!response.ok || !result.ok) throw new Error(copy("No se pudieron guardar los cambios.", "Could not save changes."));
-      const savedName = result.profile?.name || (document.querySelector<HTMLInputElement>("#profile-name")?.value || "").trim();
-      const savedAka = result.profile?.aka || (document.querySelector<HTMLInputElement>("#profile-aka")?.value || "").trim();
+      if (!response.ok || !result.ok) throw new Error(result.error || copy("No se pudieron guardar los cambios.", "Could not save changes."));
+      const profile = result.profile || {};
+      const name = profile.name || (document.querySelector<HTMLInputElement>("#profile-name")?.value || "").trim();
+      const aka = profile.aka || (document.querySelector<HTMLInputElement>("#profile-aka")?.value || "").trim();
       const nameNode = document.querySelector<HTMLElement>("#identity-name");
       const akaNode = document.querySelector<HTMLElement>("#identity-aka");
-      if (nameNode) nameNode.textContent = savedName;
-      if (akaNode) akaNode.textContent = "@" + savedAka;
-      const headline = (document.querySelector<HTMLInputElement>("#profile-headline")?.value || "").trim();
-      const bio = (document.querySelector<HTMLTextAreaElement>("#profile-bio")?.value || "").trim();
-      const interests = (document.querySelector<HTMLInputElement>("#profile-interests")?.value || "").split(",").map(value => value.trim()).filter(Boolean);
-      const headlineView = document.querySelector<HTMLElement>("#profile-headline-view");
-      if (headline && headlineView) headlineView.textContent = headline;
-      else if (headline) {
-        const node = document.createElement("h1"); node.id = "profile-headline-view"; node.textContent = headline;
-        document.querySelector(".profile-about")?.prepend(node);
-      } else headlineView?.remove();
-      const bioView = document.querySelector<HTMLElement>("#profile-bio-view");
-      if (bio && bioView) bioView.textContent = bio;
-      else if (bio) {
-        const node = document.createElement("p"); node.id = "profile-bio-view"; node.textContent = bio;
-        document.querySelector(".profile-about")?.append(node);
-      } else bioView?.remove();
+      if (nameNode) nameNode.textContent = name;
+      if (akaNode) akaNode.textContent = "@" + aka;
+      for (const [selector,value,tag,id] of [
+        ["#profile-headline-view",(document.querySelector<HTMLInputElement>("#profile-headline")?.value || "").trim(),"h1","profile-headline-view"],
+        ["#profile-bio-view",(document.querySelector<HTMLTextAreaElement>("#profile-bio")?.value || "").trim(),"p","profile-bio-view"]
+      ] as const) {
+        let node = document.querySelector<HTMLElement>(selector);
+        if (!value) node?.remove();
+        else if (node) node.textContent = value;
+        else { node = document.createElement(tag); node.id = id; node.textContent = value; document.querySelector(".profile-about")?.prepend(node); }
+      }
+      const interests = (document.querySelector<HTMLInputElement>("#profile-interests")?.value || "").split(",").map(v=>v.trim()).filter(Boolean);
       const tags = document.querySelector<HTMLElement>("#profile-genre-tags");
-      if (tags) tags.replaceChildren(...interests.map(genre => { const tag = document.createElement("span"); tag.textContent = "#" + genre; return tag; }));
-      if (feedback) feedback.textContent = copy("Perfil actualizado.", "Profile updated.");
+      if (tags) tags.replaceChildren(...interests.map(genre=>{const span=document.createElement("span");span.textContent="#"+genre;return span;}));
+      let links = document.querySelector<HTMLElement>(".profile-social-links");
+      if (socialInstagram.value || socialTiktok.value) {
+        if (!links) { links=document.createElement("div"); links.className="profile-social-links"; document.querySelector(".profile-about")?.append(links); }
+        links.replaceChildren();
+        for (const [kind,handle] of [["instagram",socialInstagram.value],["tiktok",socialTiktok.value]] as const) {
+          if (!handle) continue;
+          const link=document.createElement("a"); link.className="profile-social-button"; link.target="_blank"; link.rel="noopener noreferrer nofollow ugc";
+          link.href=kind==="instagram" ? "https://www.instagram.com/"+handle+"/" : "https://www.tiktok.com/@"+handle;
+          link.setAttribute("aria-label",(kind==="instagram"?"Instagram":"TikTok")+" de "+name);
+          link.textContent=kind==="instagram"?"IG":"♪"; links.append(link);
+        }
+      } else links?.remove();
+      const fields = document.querySelector<HTMLElement>("#profile-editor-fields");
+      const editor = document.querySelector<HTMLElement>(".profile-editor");
+      const toggle = document.querySelector<HTMLButtonElement>("#toggle-profile-editor");
+      const coverButton = document.querySelector<HTMLButtonElement>("#choose-cover-button");
+      if (fields) fields.hidden = true;
+      if (coverButton) coverButton.hidden = true;
+      editor?.classList.remove("is-editing");
+      toggle?.setAttribute("aria-expanded","false");
+      if (feedback) feedback.textContent = "";
+      window.scrollTo({top:0,behavior:"smooth"});
+      let toast=document.querySelector<HTMLElement>("#profile-saved-toast");
+      if (!toast) { toast=document.createElement("div"); toast.id="profile-saved-toast"; toast.setAttribute("role","status"); document.body.append(toast); }
+      toast.textContent=copy("Cambios guardados","Changes saved");
+      toast.classList.add("visible");
+      window.setTimeout(()=>toast?.classList.remove("visible"),2600);
     } catch (error) {
       if (feedback) feedback.textContent = error instanceof Error ? error.message : copy("Error al guardar.", "Save error.");
-    } finally { button.disabled = false; }
+    } finally {
+      button.disabled = false;
+      validateSocialFields();
+    }
   });
-
 
 </script>
