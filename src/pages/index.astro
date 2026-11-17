@@ -33,43 +33,31 @@ try {
 } catch (error) { console.error("[home] Community data unavailable:", error); }
 const lang = Astro.locals.lang;
 const isEnglish = lang === "en";
-let seasonalAnime = [];
-try {
-  const payload = await getSeasonFeaturedAnime();
-  seasonalAnime = payload.anime;
-} catch (error) {
-  console.error("[home] Seasonal featured anime unavailable:", error);
-}
-let weeklyEpisodes = [];
-try {
-  const requestCookie = Astro.request.headers.get("cookie");
-  const response = await fetch(new URL(`/api/weekly-popular-episodes?lang=${lang}`, Astro.url), {
-    headers: {
-      Accept: "application/json",
-      ...(requestCookie ? { Cookie: requestCookie } : {}),
-    },
-    redirect: "manual",
-    cache: "no-store",
-  });
-  if (!response.ok) throw new Error(`Weekly episodes API returned HTTP ${response.status}${response.status >= 300 && response.status < 400 ? ` (redirect ${response.headers.get("location") ?? "unknown"})` : ""}`);
+const requestCookie = Astro.request.headers.get("cookie");
+const weeklyRequest = fetch(new URL(`/api/weekly-popular-episodes?lang=${lang}`, Astro.url), {
+  headers: { Accept: "application/json", ...(requestCookie ? { Cookie: requestCookie } : {}) },
+  redirect: "manual",
+  cache: "no-store",
+}).then(async (response) => {
+  if (!response.ok) throw new Error(`Weekly episodes API returned HTTP ${response.status}`);
   const payload = await response.json();
   if (!payload.success || !Array.isArray(payload.episodes)) throw new Error("Weekly episodes API returned an invalid payload.");
-  weeklyEpisodes = payload.episodes;
-} catch (error) {
-  console.error("[home] Weekly popular episodes unavailable:", error);
-}
-let upcomingReleases = [];
-try {
-  upcomingReleases = await getUpcomingReleases();
-} catch (error) {
-  console.error("[home] Upcoming releases unavailable:", error);
-}
-let animeNews = [];
-try {
-  animeNews = await getAnimeNews();
-} catch (error) {
-  console.error("[home] Anime news unavailable:", error);
-}
+  return payload.episodes;
+});
+const [seasonalResult, weeklyResult, upcomingResult, newsResult] = await Promise.allSettled([
+  getSeasonFeaturedAnime(),
+  weeklyRequest,
+  getUpcomingReleases(),
+  getAnimeNews(),
+]);
+const seasonalAnime = seasonalResult.status === "fulfilled" ? seasonalResult.value.anime : [];
+const weeklyEpisodes = weeklyResult.status === "fulfilled" ? weeklyResult.value : [];
+const upcomingReleases = upcomingResult.status === "fulfilled" ? upcomingResult.value : [];
+const animeNews = newsResult.status === "fulfilled" ? newsResult.value : [];
+if (seasonalResult.status === "rejected") console.error("[home] Seasonal featured anime unavailable:", seasonalResult.reason);
+if (weeklyResult.status === "rejected") console.error("[home] Weekly popular episodes unavailable:", weeklyResult.reason);
+if (upcomingResult.status === "rejected") console.error("[home] Upcoming releases unavailable:", upcomingResult.reason);
+if (newsResult.status === "rejected") console.error("[home] Anime news unavailable:", newsResult.reason);
 ---
 
 <Layout

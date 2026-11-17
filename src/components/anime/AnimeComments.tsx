@@ -75,6 +75,15 @@ export default function AnimeComments({ animeId, lang = "es" }: { animeId: numbe
   }, [animeId, en]);
 
   useEffect(() => { void loadComments(); }, [loadComments]);
+  useEffect(() => {
+    if (!comments.length || typeof window === "undefined" || !window.location.hash.startsWith("#comment-")) return;
+    let frame = 0;
+    frame = window.requestAnimationFrame(() => {
+      const target = document.getElementById(decodeURIComponent(window.location.hash.slice(1)));
+      target?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [comments]);
 
   const submitComment = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -381,3 +390,7 @@ export default function AnimeComments({ animeId, lang = "es" }: { animeId: numbe
     </section>
   );
 }
+
+
+// Notification deep links include #comment-{id}. Wait until the async comment
+// list has rendered before scrolling, otherwise the browser cannot find the target.

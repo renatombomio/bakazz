@@ -112,7 +112,7 @@ const colors = ["#7c3aed", "#db2777", "#0ea5e9", "#f59e0b", "#10b981", "#ef4444"
   }
 
   function start(state: CarouselState) {
-    if (state.reduce.matches || !state.visible || state.auto) return;
+    if (state.reduce.matches || !state.visible || state.auto || state.items.length < 4) return;
     state.auto = true;
     state.raf = requestAnimationFrame(() => tick(state));
   }
