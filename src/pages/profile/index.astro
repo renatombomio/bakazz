@@ -7,6 +7,7 @@ import { localizedPath } from "../../i18n";
 import UserRankBadge from "../../components/gamification/UserRankBadge.astro";
 import { getNextAnimeRank, resolveAnimeRank } from "../../lib/gamification/ranks";
 import ProfileSectionsIsland from "../../components/profile/ProfileSectionsIsland";
+import ProfileHeader from "../../components/profile/ProfileHeader.astro";
 
 const lang = Astro.locals.lang;
 const isEnglish = lang === "en";
@@ -198,34 +199,20 @@ const profileSectionDebates = debates.slice(0, 3).map((debate: any) => ({
 
   <main class="profile-page" data-anime-base={localizedPath(Astro.locals.lang, "/anime/")}>
     <section class="profile-card">
-      <section class="profile-editor" aria-labelledby="profile-editor-title">
-        <div class="cover-preview" id="cover-preview" style={profile.cover_url ? `background-image: linear-gradient(0deg, rgba(5,5,5,.94), rgba(5,5,5,.08)), url("${profile.cover_url}")` : undefined}>
-          <button class="media-edit cover-edit" id="choose-cover-button" type="button" hidden>
-            {isEnglish ? "Add cover photo" : "Añadir foto de portada"}
-          </button>
-          <input class="cover-file-input" id="cover-input" name="cover" type="file" accept="image/jpeg,image/png,image/webp,image/avif" aria-label={isEnglish ? "Choose cover photo" : "Elegir foto de portada"} />
-          <span id="cover-upload-feedback" class="cover-upload-feedback" role="status" aria-live="polite"></span>
-          <span class="presence-status cover-presence" id="profile-presence" aria-label={isEnglish ? "Online" : "En línea"} hidden><span class="presence-dot"></span><span>{isEnglish ? "Online" : "En línea"}</span></span>
-        </div>
-        <div class="identity-editor">
-          <div class="avatar-wrap">
-            <img id="avatar-preview" class="avatar-preview" src={profile.avatar_url || "/images/profile-avatar-placeholder.svg"} alt={isEnglish ? "Profile picture" : "Foto de perfil"} />
-            <label class="avatar-edit" for="avatar-input" aria-label={isEnglish ? "Change profile picture" : "Cambiar foto de perfil"} title={isEnglish ? "Change profile picture" : "Cambiar foto de perfil"}>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5h3l1.5-2h7l1.5 2h3v11H4z"/><circle cx="12" cy="13" r="3.2"/></svg>
-            </label>
-            <input class="file-input" id="avatar-input" type="file" accept="image/jpeg,image/png,image/webp,image/avif" />
-          </div>
-          <div class="identity-copy">
-            <h2 id="identity-name">{profile.name}</h2>
-            <p class="handle" id="identity-aka">@{profile.aka}</p>
-            {currentRank && <div class="profile-rank-identity"><UserRankBadge rank={currentRank.key} size="compact" /><span>{currentRank.label}</span></div>}
-          </div>
-          <button class="profile-edit-toggle" id="toggle-profile-editor" type="button" aria-expanded="false" aria-controls="profile-editor-fields" aria-label={isEnglish ? "Edit profile information" : "Editar información del perfil"} title={isEnglish ? "Edit profile" : "Editar perfil"}>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg>
-          </button>
-        </div>
-        <div class="editor-fields" id="profile-editor-fields" hidden>
-          <h2 id="profile-editor-title">{isEnglish ? "Edit your information" : "Editar tu información"}</h2>
+      <ProfileHeader name={profile.name} handle={profile.aka} avatar={profile.avatar_url} banner={profile.cover_url} headline={profile.headline} bio={profile.bio} location={profile.location} memberDate={memberDate} interests={profile.interests || []} instagram={profile.instagram} tiktok={profile.tiktok} isEnglish={isEnglish} stats={[{value:watched.length,label:isEnglish?"Viewed":"Vistos",href:localizedPath(lang,"/collection/")},{value:pending.length,label:isEnglish?"On my list":"En mi lista",href:localizedPath(lang,"/pending/")},{value:favoritesCount,label:isEnglish?"Favorites":"Favoritos",href:"#profile-favorites-grid"},{value:profileCommentsCount,label:isEnglish?"Comments":"Comentarios"}]}>
+  <button slot="cover-actions" class="media-edit cover-edit" id="choose-cover-button" type="button" hidden>{isEnglish ? "Add cover photo" : "Añadir foto de portada"}</button>
+  <input slot="cover-actions" class="cover-file-input" id="cover-input" name="cover" type="file" accept="image/jpeg,image/png,image/webp,image/avif" aria-label={isEnglish ? "Choose cover photo" : "Elegir foto de portada"} />
+  <span slot="cover-actions" id="cover-upload-feedback" class="cover-upload-feedback" role="status" aria-live="polite"></span>
+  <label slot="avatar-actions" class="avatar-edit" for="avatar-input" aria-label={isEnglish ? "Change profile picture" : "Cambiar foto de perfil"} title={isEnglish ? "Change profile picture" : "Cambiar foto de perfil"}>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5h3l1.5-2h7l1.5 2h3v11H4z"/><circle cx="12" cy="13" r="3.2"/></svg>
+  </label>
+  <input slot="avatar-actions" class="file-input" id="avatar-input" type="file" accept="image/jpeg,image/png,image/webp,image/avif" />
+  {currentRank && <div slot="rank" class="profile-rank-identity"><UserRankBadge rank={currentRank.key} size="compact" /><span>{currentRank.label}</span></div>}
+  <button slot="identity-actions" class="profile-edit-toggle" id="toggle-profile-editor" type="button" aria-expanded="false" aria-controls="profile-editor-fields" aria-label={isEnglish ? "Edit profile information" : "Editar información del perfil"} title={isEnglish ? "Edit profile" : "Editar perfil"}>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg>
+  </button>
+  <div slot="editor-fields" class="editor-fields" id="profile-editor-fields" hidden>
+<h2 id="profile-editor-title">{isEnglish ? "Edit your information" : "Editar tu información"}</h2>
           <label>{isEnglish ? "Display name" : "Nombre"}
             <input id="profile-name" maxlength="40" value={profile.name || ""} placeholder={isEnglish ? "Your name" : "Tu nombre"} />
           </label>
@@ -268,28 +255,10 @@ const profileSectionDebates = debates.slice(0, 3).map((debate: any) => ({
             <button class="delete-account-button" id="delete-account-button" type="button">{isEnglish ? "Delete account" : "Eliminar cuenta"}</button>
             <p>{isEnglish ? "Permanently delete your account and its associated data." : "Elimina permanentemente tu cuenta y los datos asociados."}</p>
           </div>
-        </div>
-      </section>
+  </div>
+</ProfileHeader>
 
-      <section class="profile-about" aria-label={isEnglish ? "About" : "Sobre mí"}>
-        {profile.headline && <h1 id="profile-headline-view">{profile.headline}</h1>}
-        {profile.bio && <p id="profile-bio-view">{profile.bio}</p>}
-        <p class="profile-member-line">{profile.location ? profile.location + " · " : ""}{isEnglish ? "Member since" : "Miembro desde"} {memberDate}</p>
-        {(profile.instagram || profile.tiktok) && <div class="profile-social-links">
-          {profile.instagram && <a class="profile-social-button" href={`https://www.instagram.com/${profile.instagram}/`} target="_blank" rel="noopener noreferrer nofollow ugc" aria-label={`Instagram de ${profile.name}`}><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.2" fill="currentColor" stroke="none"/></svg></a>}
-          {profile.tiktok && <a class="profile-social-button" href={`https://www.tiktok.com/@${profile.tiktok}`} target="_blank" rel="noopener noreferrer nofollow ugc" aria-label={`TikTok de ${profile.name}`}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 2v12.1a4 4 0 1 1-3.5-4"/></svg></a>}
-        </div>}
-        <div class="genre-tags" id="profile-genre-tags">{(profile.interests || []).map((genre: string) => <span>#{genre}</span>)}</div>
-      </section>
-
-      <section class="profile-stats" aria-label={isEnglish ? "Anime activity" : "Actividad anime"}>
-        <a href={localizedPath(Astro.locals.lang, "/collection/")} class="profile-stat"><strong>{watched.length}</strong><span>{isEnglish ? "Viewed" : "Vistos"}</span></a>
-        <a href={localizedPath(Astro.locals.lang, "/pending/")} class="profile-stat"><strong>{pending.length}</strong><span>{isEnglish ? "On my list" : "En mi lista"}</span></a>
-        <a href="#profile-favorites-grid" class="profile-stat"><strong>{favoritesCount}</strong><span>{isEnglish ? "Favorites" : "Favoritos"}</span></a>
-        <div class="profile-stat"><strong>{profileCommentsCount}</strong><span>{isEnglish ? "Comments" : "Comentarios"}</span></div>
-      </section>
-
-      <section class="profile-rank-progress" aria-label={isEnglish ? "Community rank progress" : "Progreso de rango de comunidad"}>
+<section class="profile-rank-progress" aria-label={isEnglish ? "Community rank progress" : "Progreso de rango de comunidad"}>
         <p class="profile-rank-summary">
           <strong>{currentRank?.label || (isEnglish ? "Unranked" : "Sin rango")}</strong>
           <span aria-hidden="true">·</span>
