@@ -20,7 +20,6 @@ type Props = {
     title: string;
     subtitle: string;
     voted: string;
-    votes: (n: number) => string;
     locale: "es" | "en";
     next: string;
     voteFor: (name: string) => string;
@@ -136,7 +135,7 @@ export default function WeeklyDuel({ initial, loggedIn, loginHref, voteUrl, t }:
         className="dd-side"
         data-win={isWinner}
         data-lose={isLoser}
-        aria-label={t.voteFor(anime.title)}
+        aria-label={t.locale === "en" ? `Vote for ${anime.title}` : `Votar por ${anime.title}`}
         aria-pressed={s.myVote === key}
         disabled={done || busy}
         onClick={() => vote(key)}
@@ -164,7 +163,7 @@ export default function WeeklyDuel({ initial, loggedIn, loginHref, voteUrl, t }:
         <span className="dd-vs" aria-hidden="true">VS</span>
         {side("b", s.b, pb)}
       </div>
-      {done && <p className="dd-meta">{t.votes(total)} · {t.next}</p>}
+      {done && <p className="dd-meta">{total.toLocaleString(t.locale)} {t.locale === "en" ? (total === 1 ? "vote" : "votes") : (total === 1 ? "voto" : "votos")} · {t.next}</p>}
       {err && <p className="dd-err" role="alert">{t.error}</p>}
       <span className="dd-sr" aria-live="polite">
         {done ? t.voted : ""}
