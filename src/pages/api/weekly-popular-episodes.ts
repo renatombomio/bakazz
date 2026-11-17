@@ -12,7 +12,7 @@ type AniListResponse = { data?: { Page?: { pageInfo?: { hasNextPage?: boolean };
 type WeeklyResult = { window: { from: string; to: string }; episodes: WeeklyEpisode[] };
 const ANILIST_ENDPOINT = "https://graphql.anilist.co";
 const MAX_PAGES = 3;
-const CACHE_SECONDS = 3600;
+const CACHE_SECONDS = 900;
 const QUERY = `
   query WeeklyPopularEpisodes($page: Int!, $from: Int!, $to: Int!) {
     Page(page: $page, perPage: 50) {
@@ -23,11 +23,11 @@ const QUERY = `
       }
     }
   }`;
-function getPreviousUtcWeekRange(now: Date): { from: number; to: number } {
+function getCurrentUtcWeekRange(now: Date): { from: number; to: number } {
   const daysSinceMonday = (now.getUTCDay() + 6) % 7;
   const thisMonday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - daysSinceMonday));
-  const previousMonday = new Date(thisMonday.getTime() - 7 * 24 * 60 * 60 * 1000);
-  return { from: Math.floor(previousMonday.getTime() / 1000), to: Math.floor(thisMonday.getTime() / 1000) };
+  const nextMonday = new Date(thisMonday.getTime() + 7 * 24 * 60 * 60 * 1000);
+  return { from: Math.floor(thisMonday.getTime() / 1000), to: Math.floor(nextMonday.getTime() / 1000) };
 }
 function getAiringLabel(airingAt: number, now: Date, lang: "es" | "en"): string | null {
   if (airingAt * 1000 <= now.getTime()) return null;
@@ -49,7 +49,7 @@ async function fetchAiringPage(page: number, from: number, to: number): Promise<
 }
 export const GET: APIRoute = async ({ request }) => {
   const now = new Date(), lang = new URL(request.url).searchParams.get("lang") === "en" ? "en" : "es";
-  const { from, to } = getPreviousUtcWeekRange(now);
+  const { from, to } = getCurrentUtcWeekRange(now);
   try {
     const cached = await getPersistentCache<WeeklyResult>("weekly-popular-episodes", { from, to, lang }, CACHE_SECONDS, async () => {
       const schedules: AiringSchedule[] = [];
