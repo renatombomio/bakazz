@@ -132,7 +132,7 @@ const cats:Record<string,string>=en?{anime:"Anime",characters:"Characters",theor
  </div>:<p class="community-note">{en?"No anime likes yet.":"Todavía no hay animes con me gusta."}</p>}
  </section>
  <section class="community-top-characters-section"><div class="sec"><h2>{en?"Most loved characters":"Personajes más queridos"}</h2></div>
- {characterLikesError||characterMetadataError?<p class="community-note">{en?"Character ranking is temporarily unavailable.":"El ranking de personajes no está disponible temporalmente."}</p>:topCharacters.length?<div class="top-character-layout">
+ {characterLikesError?<p class="community-note">{en?"Character ranking is temporarily unavailable.":"El ranking de personajes no está disponible temporalmente."}</p>:topCharacters.length?<div class="top-character-layout">
   {topCharacters.map((character,index)=><article class={"top-character-card"+(index===0?" is-featured":"")}>
    <span class="top-character-position">#{index+1}</span>
    {character.image_url&&<img src={character.image_url} alt="" loading="lazy"/>}
