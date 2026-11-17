@@ -79,7 +79,11 @@ const output = {
   generatedAt: new Date().toISOString(),
   source: "AniList GraphQL",
   reviewRequired: true,
-  pairs: DUEL_SEED.map(([a, b]) => ({ a, b })),
+  pairs: DUEL_SEED.map(([a, b], index) => ({
+    number: index + 1,
+    a: { search: a, candidates: results.find((item) => item.search === a)?.candidates ?? [] },
+    b: { search: b, candidates: results.find((item) => item.search === b)?.candidates ?? [] },
+  })),
   results,
 };
 
