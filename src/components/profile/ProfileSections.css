@@ -1,5 +1,9 @@
 /* Sistema de espacios: 40px entre secciones, 14px bajo cada título, 16px de margen lateral (lo pone la página) */
-.ps { font-family: inherit; color: #f2efe9; padding: 0 0 32px; }
+.ps { font-family: inherit; color: #f2efe9; padding: 0 24px 32px; box-sizing: border-box; min-width: 0; }
+.ps, .ps * { box-sizing: border-box; }
+.ps section, .ps-h, .fw, .chs, .ps-grid { width: 100%; min-width: 0; }
+.fw, .chs, .ps-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.ps-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .ps section { margin-top: 40px; }
 .ps-h { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; min-height: 34px; }
 .ps-h h2 { margin: 0; font-size: 20px; line-height: 1.15; font-weight: 700; letter-spacing: -.01em; }
@@ -49,3 +53,6 @@
 .ps-deb b { display: block; font-size: 16px; font-weight: 700; line-height: 1.25; }
 .ps-deb span { display: block; margin-top: 4px; font-size: 13px; color: #8d8993; }
 .ps-deb a:focus-visible { outline: 2px solid #f472b6; outline-offset: 4px; border-radius: 4px; }
+@media (max-width: 520px) {
+  .ps { padding-inline: 16px; }
+}
