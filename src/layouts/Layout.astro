@@ -4,12 +4,11 @@ interface Props {
   description?: string;
 }
 
-const { lang, basePath } = Astro.locals;
+const { lang } = Astro.locals;
 const {
   title = "Renanime's Gallery",
   description = lang === "en" ? "Personal anime gallery." : "Galería personal de anime."
 } = Astro.props;
-const isGhibli = basePath.startsWith("/ghibli");
 const isAuth = basePath === "/login" || basePath === "/login/";
 const isAuthenticated = Boolean(Astro.locals.renanimeUser);
 
@@ -26,7 +25,7 @@ import Analytics from '@vercel/analytics/astro';
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content={isGhibli ? "#FFF7E8" : "#09090b"} />
+    <meta name="theme-color" content="#09090b" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -39,7 +38,7 @@ import Analytics from '@vercel/analytics/astro';
     <title>{title}</title>
   </head>
 
-  <body class:list={[isGhibli && "theme-ghibli"]} data-authenticated={isAuthenticated ? "true" : "false"}>
+  <body data-authenticated={isAuthenticated ? "true" : "false"}>
     <a class="skip-link" href="#main-content">{lang === "en" ? "Skip to content" : "Saltar al contenido"}</a>
     <slot />
     <Analytics />
@@ -48,20 +47,6 @@ import Analytics from '@vercel/analytics/astro';
 </html>
 
 <style>
-  :global(body.theme-ghibli) {
-    background: #FFF7E8;
-    color: #19362F;
-  }
-
-  :global(body.theme-ghibli .site-footer) {
-    background: #fff;
-  }
-
-  :global(body.theme-ghibli .site-header) {
-    background: rgba(255,255,255,.94);
-    border-bottom-color: rgba(25,54,47,.12);
-  }
-
   .skip-link {
     position: fixed;
     top: 0.75rem;

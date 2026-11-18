@@ -1,5 +1,3 @@
 ---
-import { localizedPath } from "../../i18n";
-const film = Astro.url.searchParams.get("film");
-return Astro.redirect(localizedPath(Astro.locals.lang, film ? "/anime/" + encodeURIComponent(film) + "/" : "/ghibli/"));
+return Astro.redirect(Astro.url.origin + (Astro.locals.lang === "en" ? "/en/" : "/"));
 ---

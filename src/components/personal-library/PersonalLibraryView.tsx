@@ -17,7 +17,6 @@ const PAGE_SIZE = 15;
 
 async function fetchMedia(ids:string[]):Promise<Record<string,Media|null>>{
   const result:Record<string,Media|null>={};
-  if(ids.includes("ghibli-red-turtle")) result["ghibli-red-turtle"]={id:0,title:{english:"The Red Turtle",romaji:"The Red Turtle"},startDate:{year:2016,month:9,day:17},format:"MOVIE",coverImage:{extraLarge:"https://www.ghibli.jp/images/red-turtle.jpg",large:"https://www.ghibli.jp/images/red-turtle.jpg"}};
   const valid=ids.map(Number).filter(Number.isFinite);
   if(!valid.length)return result;
   const variables:Record<string,number>={};

@@ -1,7 +1,6 @@
 import {useEffect,useState} from "react";
 import PersonalLibraryActions from "../personal-library/PersonalLibraryActions";
 import { getLibrary } from "../../data/library";
-import { getGhibliFilms } from "../../data/ghibli";
 import { fetchFallbackAnime } from "../../lib/api/anime-fallback";
 import { isAnimeCandidateMatch } from "../../lib/api/poster-fallback";
 import { useT, type Lang } from "../../i18n";
@@ -67,11 +66,10 @@ function getSeasonCount(media: Media){
 }
 
 interface Props {
- variant?: "default" | "ghibli";
  lang?: Lang;
 }
 
-export default function AnimeSearchDetail({ variant = "default", lang = "es" }: Props){
+export default function AnimeSearchDetail({ lang = "es" }: Props){
  const t=useT(lang);
  const params=new URLSearchParams(typeof window!=="undefined" ? window.location.search : "");
  const idParam=params.get("id");
@@ -79,11 +77,8 @@ export default function AnimeSearchDetail({ variant = "default", lang = "es" }: 
  const localEntry=idParam && !Number.isFinite(id) ? getLibrary().find(entry=>entry.animeId===idParam) : undefined;
  const[media,setMedia]=useState<Media|null>(null),[loading,setLoading]=useState(true),[translated,setTranslated]=useState(""),[translating,setTranslating]=useState(false);
  useEffect(()=>{
-  const film=params.get("film");
-
   const directId = idParam === "movie-063" ? 178788 : Number.isFinite(id) ? id : null;
-  const ghibliFilm = variant === "ghibli" ? getGhibliFilms().find((entry) => entry.id === film) : undefined;
-  const searchTitle = params.get("title") ?? localEntry?.title ?? ghibliFilm?.searchTitle ?? ghibliFilm?.title ?? null;
+  const searchTitle = params.get("title") ?? localEntry?.title ?? null;
 
   const request = directId
     ? {
@@ -99,25 +94,9 @@ export default function AnimeSearchDetail({ variant = "default", lang = "es" }: 
 
   if(!request){setLoading(false);return}
 
-  const useLocalGhibliFallback = () => {
-    if (!ghibliFilm) return;
-    setMedia({
-      id: `ghibli-${ghibliFilm.id}`,
-      title: { english: ghibliFilm.title, romaji: ghibliFilm.title },
-      startDate: { year: ghibliFilm.year },
-      format: "MOVIE",
-      status: "FINISHED",
-      episodes: 1,
-      studios: { nodes: [{ name: "Studio Ghibli" }] },
-      coverImage: ghibliFilm.id === "the-red-turtle"
-        ? { extraLarge: "https://www.ghibli.jp/images/red-turtle.jpg", large: "https://www.ghibli.jp/images/red-turtle.jpg" }
-        : undefined,
-    });
-  };
-
   const resolveWithJikan = async () => {
     if (!searchTitle) return false;
-    const recovered = await fetchFallbackAnime(searchTitle, ghibliFilm ? "MOVIE" : undefined);
+    const recovered = await fetchFallbackAnime(searchTitle);
     if (!recovered) return false;
     setMedia(recovered);
     return true;
@@ -129,7 +108,6 @@ export default function AnimeSearchDetail({ variant = "default", lang = "es" }: 
       const candidate=directId ? (p.data?.Media??null) : (p.data?.Page?.media?.[0]??null);
       const found = directId || (candidate && isAnimeCandidateMatch(
         searchTitle || "",
-        ghibliFilm ? "MOVIE" : undefined,
         candidate.title,
         candidate.format,
       )) ? candidate : null;
@@ -137,95 +115,23 @@ export default function AnimeSearchDetail({ variant = "default", lang = "es" }: 
         setMedia(found);
         return;
       }
-      if (!(await resolveWithJikan())) useLocalGhibliFallback();
+      await resolveWithJikan();
     }).catch(async ()=>{
-      if (!(await resolveWithJikan())) useLocalGhibliFallback();
+      await resolveWithJikan();
     }).finally(()=>setLoading(false));
  },[]);
  if(loading)return <div className="anime-search-detail-state">{t("detail.loading")}</div>;
  if(!media)return <div className="anime-search-detail-state">{t("detail.notFound")}</div>;
 
- const from=variant === "ghibli" ? "ghibli" : params.get("from");
- const title=idParam==="movie-063" ? "Kimetsu no Yaiba: Mugen-jō-hen" : (from==="ghibli"||lang==="en") ? (media.title?.english||media.title?.romaji||localEntry?.title||t("detail.noTitle")) : (media.title?.romaji||media.title?.english||localEntry?.title||t("detail.noTitle"));
+ const title=idParam==="movie-063" ? "Kimetsu no Yaiba: Mugen-jō-hen" : lang==="en" ? (media.title?.english||media.title?.romaji||localEntry?.title||t("detail.noTitle")) : (media.title?.romaji||media.title?.english||localEntry?.title||t("detail.noTitle"));
  const image=media.coverImage?.extraLarge||media.coverImage?.large;
  const banner=media.bannerImage||image;
  const synopsis=media.description?cleanDescription(media.description):"";
  const hasSynopsis=synopsis.replace(/[\s\\n]+/g,"").length>0;
  const translateSynopsis=async()=>{if(lang==="en"||!media.description||translating)return;setTranslating(true);setTranslated(await translate(media.description,lang));setTranslating(false)};
 
- return <div className={"anime-detail" + (from === "ghibli" ? " anime-detail--ghibli" : "")}>
-  <style>{`
-    .anime-detail--ghibli{--gd-cream:#FFF7E8;--gd-paper:#F4E9D5;--gd-sky:#DCEFF1;--gd-blue:#18528A;--gd-teal:#0B798B;--gd-coral:#F45164;--gd-pink:#F0A9A5;--gd-lime:#91CC57;--gd-ink:#19362F;min-height:100vh;background:var(--gd-sky);color:var(--gd-ink)}
-    .anime-detail--ghibli .anime-detail-hero{position:relative;isolation:isolate;min-height:0;background-color:var(--gd-ink)!important;background-position:center;background-size:cover}
-    .anime-detail--ghibli .anime-detail-hero::before{position:absolute;inset:0;z-index:0;content:"";pointer-events:none;background:radial-gradient(ellipse 52% 72% at 69% 42%,rgba(25,54,47,.62) 0%,rgba(25,54,47,.38) 46%,rgba(25,54,47,.08) 78%,transparent 100%),linear-gradient(90deg,rgba(25,54,47,.12) 0%,rgba(25,54,47,.28) 46%,rgba(25,54,47,.06) 100%),linear-gradient(0deg,rgba(25,54,47,.34) 0%,transparent 38%)}
-    .anime-detail--ghibli .anime-detail-inner{position:relative;z-index:1}
-    .anime-detail--ghibli .anime-detail-copy h1{text-shadow:0 2px 18px rgba(0,0,0,.18)}
-    .anime-detail--ghibli .anime-detail-copy h1{color:#fff;text-shadow:0 2px 22px rgba(0,0,0,.4)}
-    .anime-detail--ghibli .anime-detail-copy-main{padding:1.15rem 1.2rem;border:1px solid rgba(255,247,232,.18);border-radius:18px;background:rgba(25,54,47,.68);box-shadow:0 16px 42px rgba(25,54,47,.22);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
-    .anime-detail--ghibli .anime-detail-meta{color:rgba(255,255,255,.92);text-shadow:0 1px 8px rgba(0,0,0,.42)}
-    .anime-detail--ghibli .anime-detail-meta small{color:rgba(255,255,255,.76);text-shadow:0 1px 6px rgba(0,0,0,.42)}
-    .anime-detail--ghibli .anime-detail-meta strong{color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.42)}
-    .anime-detail--ghibli .anime-detail-genres span{border-color:rgba(255,255,255,.25);color:#fff;background:rgba(25,54,47,.35)}
-    .anime-detail--ghibli .anime-detail-synopsis-wrap{
-      max-width:42rem;
-      margin-top:1.35rem;
-      padding:1rem 1.15rem 1.1rem;
-      border:1px solid rgba(255,247,232,.22);
-      border-radius:14px;
-      background:rgba(25,54,47,.42);
-      box-shadow:0 12px 34px rgba(25,54,47,.14);
-      -webkit-backdrop-filter:blur(8px);
-      backdrop-filter:blur(8px);
-    }
-    .anime-detail--ghibli .anime-detail-synopsis{margin:0;color:#fff}
-    .anime-detail--ghibli .anime-detail-translate{border-color:rgba(255,247,232,.45);background:rgba(255,247,232,.12);color:#fff}
-    .anime-detail--ghibli .anime-detail-translate:hover:not(:disabled){background:#fff;color:var(--gd-blue)}
-    .anime-detail--ghibli .anime-detail-state span{color:#a7df72;text-shadow:0 1px 7px rgba(25,54,47,.62)}
-    .anime-detail--ghibli .personal-actions button,.anime-detail--ghibli .personal-status{border-color:rgba(255,255,255,.34);background:rgba(25,54,47,.28);color:#fff;-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);text-shadow:0 1px 5px rgba(0,0,0,.32)}
-    .anime-detail--ghibli .personal-actions button:hover,.anime-detail--ghibli .personal-actions button.is-active{background:#fff;color:var(--gd-blue);text-shadow:none}
-    .anime-detail--ghibli .anime-detail-info{border-top:0;background:var(--gd-teal);padding:0;width:100%}
-    .anime-detail--ghibli .anime-detail-info>div{background:var(--gd-teal);color:#fff;width:100%;border-top:1px solid rgba(255,255,255,.2)}
-    .anime-detail--ghibli .anime-detail-info>div:first-child{border-top:0}
-    .anime-detail--ghibli .anime-detail-info strong{color:#fff}
-    .anime-detail--ghibli .anime-detail-label{color:rgba(255,255,255,.68)}
-    .anime-detail--ghibli .anime-detail-trailer>.anime-detail-label{color:rgba(255,255,255,.78)}
-    .anime-detail--ghibli .anime-detail-video{border-color:rgba(25,54,47,.12);background:#19362F}
-    body:has(.anime-detail--ghibli){background:var(--gd-blue);color:#fff}
-    body:has(.anime-detail--ghibli) .site-footer{background:#fff;color:var(--gd-ink)}
-    body:has(.anime-detail--ghibli) .site-footer .footer-line{background:rgba(25,54,47,.14)}
-    body:has(.anime-detail--ghibli) .site-footer .closing{color:var(--gd-ink)}
-    body:has(.anime-detail--ghibli) .site-footer .thanks{color:#59756b}
-    body:has(.anime-detail--ghibli) .site-footer .footer-meta{color:#6b7d76}
-    .anime-detail-recommendations{grid-column:1 / -1;margin-top:1.25rem;width:100%;min-width:0}
-    .anime-detail-recommendations-head{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin-bottom:.7rem}
-    .anime-detail-recommendations-track{display:flex;gap:.7rem;min-height:0;overflow-x:auto;padding:.15rem 0 .65rem;scroll-snap-type:x mandatory;scrollbar-width:thin;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
-    .anime-detail-recommendation{flex:0 0 clamp(116px,30vw,138px);scroll-snap-align:start;color:inherit;text-decoration:none}
-    .anime-detail-recommendation-poster{aspect-ratio:2/3;overflow:hidden;background:#171717;border-radius:8px;border:1px solid rgba(255,255,255,.14)}
-    .anime-detail-recommendation-poster img{display:block;width:100%;height:100%;object-fit:cover;transition:transform 320ms cubic-bezier(.22,1,.36,1)}
-    .anime-detail-recommendation:hover .anime-detail-recommendation-poster img{transform:scale(1.035)}
-    .anime-detail-recommendation-title{display:block;margin-top:.48rem;font-size:.72rem;line-height:1.25;font-weight:500}
-    .anime-detail-recommendation-meta{display:block;margin-top:.22rem;font-family:var(--font-meta);font-size:.5rem;letter-spacing:.06em;text-transform:uppercase;opacity:.58}
-    .anime-detail--ghibli .anime-detail-recommendation-poster{border-radius:12px;background:var(--gd-ink)}
-    .anime-detail--ghibli .anime-detail-recommendation-title{color:#fff}
-    .anime-detail--ghibli .anime-detail-recommendation-meta{color:rgba(255,255,255,.68)}
-    @media(max-width:760px){
-      .anime-detail-recommendations{grid-column:1 / -1;width:100%;margin-top:1.35rem}
-      .anime-detail-recommendations-track{width:100%;max-width:none}
-      .anime-detail-recommendation{flex-basis:104px}
-      .anime-detail-recommendations-head{margin-bottom:.85rem}
-      .anime-detail-recommendation{flex-basis:116px}
-      .anime-detail-recommendation-title{font-size:.68rem}
-    }
-    @media(max-width:760px){
-      .anime-detail--ghibli .anime-detail-copy-main{padding:.95rem;border-radius:15px;background:rgba(25,54,47,.74)}
-      .anime-detail--ghibli .anime-detail-synopsis-wrap{
-        margin-top:1rem;
-        padding:.85rem .9rem .95rem;
-        border-radius:12px;
-      }
-    }
-  `}</style>
-  <section className="anime-detail-hero" style={banner?{backgroundImage:from==="ghibli"?'url("'+banner+'")':'linear-gradient(90deg,rgba(9,9,9,.98),rgba(9,9,9,.72) 45%,rgba(9,9,9,.35) 75%,rgba(9,9,9,.8)),linear-gradient(0deg,rgba(9,9,9,.98),transparent 45%),url("'+banner+'")'}:undefined}>
+ return <div className="anime-detail">
+  <section className="anime-detail-hero" style={banner?{backgroundImage:'linear-gradient(90deg,rgba(9,9,9,.98),rgba(9,9,9,.72) 45%,rgba(9,9,9,.35) 75%,rgba(9,9,9,.8)),linear-gradient(0deg,rgba(9,9,9,.98),transparent 45%),url("'+banner+'")'}:undefined}>
    <div className="anime-detail-inner">
     <div className={"anime-detail-layout"+(title.length>24?" has-long-title":"")}>
      <div className="anime-detail-poster-column">
@@ -271,7 +177,7 @@ export default function AnimeSearchDetail({ variant = "default", lang = "es" }: 
          {items.map((item) => {
           const recTitle=lang==="en"?(item.title?.english||item.title?.romaji||t("detail.noTitle")):(item.title?.romaji||item.title?.english||t("detail.noTitle"));
           const recImage=item.coverImage?.extraLarge||item.coverImage?.large;
-          return <a className="anime-detail-recommendation" href={`${lang === "en" ? "/en" : ""}/anime/search?id=${item.id}&from=${from==="ghibli"?"ghibli":"anime"}`} key={item.id}>
+          return <a className="anime-detail-recommendation" href={`${lang === "en" ? "/en" : ""}/anime/search?id=${item.id}`} key={item.id}>
            <div className="anime-detail-recommendation-poster">{recImage&&<img src={recImage} alt={recTitle} loading="lazy" />}</div>
            <span className="anime-detail-recommendation-title">{recTitle}</span>
            <span className="anime-detail-recommendation-meta">{item.format==="MOVIE"?t("detail.film"):t("detail.series")}{item.startDate?.year?" · "+item.startDate.year:""}</span>

@@ -343,26 +343,6 @@
   opacity: .75;
 }
 
-body.theme-ghibli .soundtrack-player {
-  --player-bg: rgba(255, 255, 255, .9);
-  --player-border: rgba(25, 54, 47, .13);
-  --player-text: #19362f;
-  --player-muted: #6a8279;
-  --player-accent: #f45164;
-}
-
-body.theme-ghibli .soundtrack-player__main-button,
-body.theme-ghibli .soundtrack-player__quick button:hover,
-body.theme-ghibli .soundtrack-player__quick button:focus-visible,
-body.theme-ghibli .soundtrack-player__queue button:hover,
-body.theme-ghibli .soundtrack-player__queue button:focus-visible,
-body.theme-ghibli .soundtrack-player__queue button.is-current {
-  background: rgba(24, 82, 138, .07);
-}
-
-body.theme-ghibli .soundtrack-player__modes button.is-active {
-  background: rgba(244, 81, 100, .1);
-}
 
 @keyframes soundtrack-bar {
   from { transform: scaleY(.45); }

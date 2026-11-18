@@ -3,11 +3,10 @@ import Container from "../ui/Container.astro";
 import { localizedPath } from "../../i18n";
 
 const year = new Date().getFullYear();
-const { lang, basePath } = Astro.locals;
-const isGhibli = basePath.startsWith("/ghibli");
+const { lang } = Astro.locals;
 ---
 
-<footer class:list={["site-footer", isGhibli && "site-footer--ghibli"]}>
+<footer class="site-footer">
   <Container class="footer-inner">
     <div class="footer-content">
       <a class="footer-wordmark" href={localizedPath(lang, "/")} aria-label="Renanime World">
@@ -82,25 +81,6 @@ const isGhibli = basePath.startsWith("/ghibli");
     font-size: .68rem;
     line-height: 1.5;
     text-align: center;
-  }
-
-  .site-footer--ghibli {
-    background: #fff;
-    color: #19362f;
-    border-top-color: rgba(25, 54, 47, .12);
-  }
-
-  .site-footer--ghibli .footer-wordmark {
-    color: #19362f;
-  }
-
-  .site-footer--ghibli .footer-tagline {
-    color: #59756b;
-  }
-
-  .site-footer--ghibli .footer-bottom {
-    color: #71877f;
-    border-top-color: rgba(25, 54, 47, .12);
   }
 
   @media (max-width: 480px) {

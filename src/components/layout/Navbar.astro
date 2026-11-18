@@ -3,9 +3,6 @@ import MobileMenu from "../navigation/MobileMenu";
 import NotificationBell from "../notifications/NotificationBell";
 import { localizedPath, useT } from "../../i18n";
 
-interface Props { variant?: "default" | "ghibli"; }
-
-const { variant = "default" } = Astro.props;
 const { lang, basePath } = Astro.locals;
 const isAuthenticated = Boolean(Astro.locals.renanimeUser);
 const t = useT(lang);
@@ -16,15 +13,14 @@ const links = [
 
   { key: "nav.search", href: "/buscar/" },
   { key: "nav.profile", href: "/profile/" },
-  { key: "nav.community", href: "/community/" },
-  { key: "nav.renSecret", href: "/ghibli/" }
+  { key: "nav.community", href: "/community/" }
 ] as const;
 
 const currentPath = basePath.replace(/\/$/, "") || "/";
 const otherLang = lang === "es" ? "en" : "es";
 ---
 
-<header class:list={["site-header", variant === "ghibli" && "site-header--ghibli"]}>
+<header class="site-header">
   <div class="header-inner">
     <a class="brand" href={localizedPath(lang, "/")} aria-label={t("nav.homeLabel")}>
       <span class="brand-accent">Ren</span>anime
@@ -43,7 +39,7 @@ const otherLang = lang === "es" ? "en" : "es";
     {isAuthenticated && <NotificationBell lang={lang} client:load />}
 
     <div class="mobile-menu">
-      <MobileMenu variant={variant} lang={lang} showLogout={isAuthenticated} client:load />
+      <MobileMenu lang={lang} showLogout={isAuthenticated} client:load />
     </div>
   </div>
 </header>
@@ -148,23 +144,6 @@ const otherLang = lang === "es" ? "en" : "es";
     transform: scaleX(1);
   }
 
-  .site-header--ghibli {
-    background: rgba(255, 255, 255, 0.94);
-    border-bottom-color: rgba(25, 54, 47, 0.12);
-    backdrop-filter: blur(10px);
-  }
-
-  .site-header--ghibli .brand { color: var(--ghibli-ink, #19362f); }
-  .site-header--ghibli .brand-accent { color: var(--ghibli-blue, #18528a); }
-  .site-header--ghibli .brand:hover,
-  .site-header--ghibli .brand:focus-visible { color: var(--ghibli-blue, #18528a); }
-  .site-header--ghibli .brand:hover .brand-accent,
-  .site-header--ghibli .brand:focus-visible .brand-accent { color: var(--ghibli-coral, #f45164); }
-  .site-header--ghibli .desktop-nav a { color: #527066; }
-  .site-header--ghibli .desktop-nav a:hover,
-  .site-header--ghibli .desktop-nav a:focus-visible { color: var(--ghibli-blue, #18528a); }
-  .site-header--ghibli .desktop-nav a::after { background: var(--ghibli-coral, #f45164); }
-
   .language-toggle {
     flex: 0 0 auto;
     margin-left: clamp(1rem, 2vw, 1.75rem);
@@ -184,23 +163,10 @@ const otherLang = lang === "es" ? "en" : "es";
 
   .language-toggle span[aria-current="true"] { font-weight: 800; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; color: var(--color-accent); }
 
-  .site-header--ghibli .language-toggle span[aria-current="true"] { color: var(--ghibli-coral, #f45164); }
-
   .language-toggle:hover,
   .language-toggle:focus-visible {
     border-color: var(--color-accent);
     outline-color: var(--color-accent);
-  }
-
-  .site-header--ghibli .language-toggle {
-    color: var(--ghibli-ink, #19362f);
-    border-color: rgba(25, 54, 47, 0.25);
-  }
-
-  .site-header--ghibli .language-toggle:hover,
-  .site-header--ghibli .language-toggle:focus-visible {
-    border-color: var(--ghibli-coral, #f45164);
-    outline-color: var(--ghibli-coral, #f45164);
   }
 
   .mobile-menu {

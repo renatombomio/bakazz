@@ -1,18 +1,17 @@
 import { useEffect, useState } from "react";
 import { localizedPath, useT, type Lang } from "../../i18n";
 
-interface Props { variant?: "default" | "ghibli"; lang: Lang; showLogout?: boolean; }
+interface Props { lang: Lang; showLogout?: boolean; }
 
 const links = [
   { key: "nav.home", href: "/" },
   { key: "nav.renCollection", href: "/ren-collection/" },
   { key: "nav.search", href: "/buscar/" },
   { key: "nav.profile", href: "/profile/" },
-  { key: "nav.community", href: "/community/" },
-  { key: "nav.renSecret", href: "/ghibli/" }
+  { key: "nav.community", href: "/community/" }
 ] as const;
 
-export default function MobileMenu({ variant = "default", lang, showLogout = false }: Props) {
+export default function MobileMenu({ lang, showLogout = false }: Props) {
   const t = useT(lang);
   const [open, setOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState<string | null>(null);
@@ -36,7 +35,7 @@ export default function MobileMenu({ variant = "default", lang, showLogout = fal
   }, []);
 
   return (
-    <div className={`mobile-nav ${variant === "ghibli" ? "mobile-nav--ghibli" : ""} ${open ? "is-open" : ""}`}>
+    <div className={`mobile-nav ${open ? "is-open" : ""}`}>
       <button
         className="mobile-toggle"
         type="button"
@@ -144,24 +143,6 @@ export default function MobileMenu({ variant = "default", lang, showLogout = fal
         .mobile-logout { min-height:58px; padding:14px 0; border:0; background:transparent; color:var(--color-accent); text-align:left; font:inherit; font-family:var(--font-body); font-size:14px; font-weight:600; letter-spacing:.01em; text-transform:none; cursor:pointer; }
         .mobile-link[aria-current="page"] { color: var(--color-text-primary); }
         .mobile-link[aria-current="page"]::after { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--color-accent); }
-        .mobile-link--secret i {
-          color: #c2ae91;
-          font-family: Georgia,serif;
-          font-size: 17px;
-          font-style: normal;
-          margin-left: 8px;
-        }
-
-        .mobile-nav--ghibli .mobile-toggle { color: #19362f; }
-        .mobile-nav--ghibli .mobile-backdrop { background: rgba(25,54,47,.16); }
-        .mobile-nav--ghibli .mobile-panel { background: #fffdf8; color: #19362f; }
-        .mobile-nav--ghibli .mobile-link { color: #527066; }
-        .mobile-nav--ghibli .mobile-logout { color:#c43c55; }
-        .mobile-nav--ghibli .mobile-link:active { color: #18528a; }
-        .mobile-nav--ghibli .mobile-link[aria-current="page"] { color: #18528a; }
-        .mobile-nav--ghibli .mobile-link[aria-current="page"]::after { background: #f45164; }
-        .mobile-nav--ghibli .mobile-link--secret i { color: #f45164; }
-
         @media (min-width: 521px) and (max-width: 1120px) {
           .mobile-panel {
             top: 74px; min-height: calc(100dvh - 74px); max-height: calc(100dvh - 74px);

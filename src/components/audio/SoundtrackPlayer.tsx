@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import "./SoundtrackPlayer.css";
 import { useT, type Lang } from "../../i18n";
 
-type PlaylistKey = "hero" | "ghibli";
+type PlaylistKey = "hero";
 type RepeatMode = "off" | "all" | "one";
 
 type Track = {
@@ -30,19 +30,13 @@ const PLAYLISTS: Record<PlaylistKey, Track[]> = {
     { title: "Goya no Machiawase (午夜の待ち合わせ) — Hello Sleepwalkers", src: "/audio/hero/Noragami-main-theme.mp3" },
     { title: "Stray — Steve Conte", src: "/audio/hero/WolfsRain-main-theme.mp3" },
   ],
-  ghibli: [
-    { title: "The Neglected Garden — Cécile Corbel", src: "/audio/ghibli/arrietys-main-theme.mp3" },
-    { title: "FREEDOM PIANO STORIES — Joe Hisaishi", src: "/audio/ghibli/howlsmovingcastle-main-theme.mp3" },
-    { title: "Ask me why — Joe Hisaishi", src: "/audio/ghibli/theboyandtheheron-main-theme.mp3" },
-  ],
 };
 
 const STORAGE_KEY = "renanime:soundtrack:v2";
 const DEFAULT_VOLUME = 0.12;
 
-function getPlaylistKey() {
-  const pathname = window.location.pathname.replace(/^\/en(?=\/|$)/, "") || "/";
-  return pathname === "/ghibli" || pathname.startsWith("/ghibli/") ? "ghibli" : "hero";
+function getPlaylistKey(): PlaylistKey {
+  return "hero";
 }
 
 function getSavedState(): SavedState {
@@ -558,7 +552,7 @@ export default function SoundtrackPlayer({ lang }: { lang: Lang }) {
             <div className="soundtrack-player__panel-head">
               <div>
                 <span className="soundtrack-player__eyebrow">
-                  {playlistKey === "ghibli" ? t("player.ghibli") : t("player.renanime")}
+                  {t("player.renanime")}
                 </span>
                 <strong>{tracks.length} {t("player.tracks")}</strong>
               </div>
