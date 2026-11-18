@@ -5,10 +5,11 @@ import Navbar from "../../components/layout/Navbar.astro";
 import CommunityPeople from "../../components/community/CommunityPeople.astro";
 import WeeklyDuel from "../../components/community/WeeklyDuel";
 import { weekKey } from "../../components/community/duel";
-import { localizedPath } from "../../i18n";
+import { localizedPath, useT } from "../../i18n";
 import "../../styles/community-social.css";
 import { createSupabaseSsrClient } from "../../lib/supabase-ssr";
 const en=Astro.locals.lang==="en", base=en?"/en":"";
+const t=useT(Astro.locals.lang);
 const duelWeek = weekKey();
 const duelInitial = {
  week: duelWeek,
@@ -110,7 +111,7 @@ const cats:Record<string,string>=en?{anime:"Anime",characters:"Characters",theor
  <div class="community-top">
   <WeeklyDuel client:visible initial={duelInitial} loggedIn={!!Astro.locals.renanimeUser} loginHref={localizedPath(Astro.locals.lang, "/login/")} voteUrl={localizedPath(Astro.locals.lang, "/api/duel/vote/")} t={duelText} />
  </div>
- <section class="community-trending-section"><div class="sec"><h2>{en?"Trending debate":"Debate en tendencia"}</h2><a href={base+"/community/debates/"}>{en?"View all":"Ver todos"}</a></div>
+ <section class="community-trending-section"><div class="sec"><h2>{en?"Trending debate":"Debate en tendencia"}</h2><a href={base+"/community/debates/"}>{t("community.search.seeAll")}</a></div>
  {debatesError||debateLikesError?<p class="community-note">{en?"Debates are temporarily unavailable.":"Los debates no están disponibles temporalmente."}</p>:trendingDebate?(()=>{const d:any=trendingDebate;const p=Array.isArray(d.profiles)?d.profiles[0]:d.profiles;return <article class="post community-searchable" data-search={[d.title,d.body,d.category,p?.aka].join(" ").toLowerCase()}><div class="hd"><a class="author" href={base+"/u/"+encodeURIComponent(p?.aka||"")+"/"}><img class="av" src={p?.avatar_url||"/images/profile-avatar-placeholder.svg"} alt="" loading="lazy"/><span>@{p?.aka}</span></a><time>{age(d.created_at)}</time></div><div class="post-content"><a class="post-main" href={base+"/community/debates/"+d.id+"/"}><h3>{d.title}</h3>{d.body&&<p class="tx">{d.body}</p>}</a>{d.image_path&&d.image_status==="approved"&&<a class="community-debate-image" href={supabase.storage.from("debate-images").getPublicUrl(d.image_path).data.publicUrl} target="_blank" rel="noreferrer"><img src={supabase.storage.from("debate-images").getPublicUrl(d.image_path).data.publicUrl} alt={d.title} loading="lazy"/></a>}<div class="tags"><span class="tag">{cats[d.category]||"General"}</span></div></div><div class="acts"><a class="act" href={base+"/community/debates/"+d.id+"/"} aria-label={en?"Likes":"Me gusta"}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.2-8.8 11-8.8 11S3.2 14 3.2 8.8a4.5 4.5 0 0 1 8.8-1.1 4.5 4.5 0 0 1 8.8 1.1Z"/></svg><span>{trendingDebateStats.likes}</span></a><a class="act" href={base+"/community/debates/"+d.id+"/"} aria-label={en?"Comments":"Comentarios"}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l-1-4.5A7.5 7.5 0 1 1 20 11.5Z"/></svg><span>{trendingDebateCommentsCount??0}</span></a><button class="act share" type="button" data-share-url={base+"/community/debates/"+d.id+"/"} aria-label={en?"Share debate":"Compartir debate"}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M4 14v6h16v-6"/></svg></button></div></article>})():<p class="community-note">{en?"No liked debates yet.":"Todavía no hay debates con me gusta."}</p>}
  </section>
  <section class="members-section">
@@ -144,13 +145,13 @@ const cats:Record<string,string>=en?{anime:"Anime",characters:"Characters",theor
  {activity.length?<div class="activity-feed">{activity.map(x=><article class="actv"><a href={base+"/u/"+encodeURIComponent(x.aka)+"/"} aria-label={"@"+x.aka}><img class="av" src={x.avatar||"/images/profile-avatar-placeholder.svg"} alt="" loading="lazy"/></a><div class="t"><a href={base+"/u/"+encodeURIComponent(x.aka)+"/"}><b>@{x.aka}</b></a> {x.kind==="like"?(en?"liked":"le ha gustado"):x.kind==="joined"?(en?"joined Renanime":"se ha unido a Renanime"):(en?"commented on":"ha comentado en")} {x.animeId!==null&&<a href={base+"/anime/"+x.animeId+"/"}><q>{x.animeTitle}</q></a>}{x.kind==="comment"&&x.content&&<span class="activity-quote"> “{x.content}”</span>}</div><em>{age(x.created)}</em></article>)}</div>:<p class="community-note">{en?"No recent activity yet.":"Todavía no hay actividad reciente."}</p>}
  </section><section id="community-search-results" class="community-search-results" aria-live="polite" hidden>
   <div id="community-search-tabs" class="community-search-tabs" role="tablist" aria-label={en?"Search result type":"Tipo de resultado"}>
-    <button type="button" role="tab" data-tab="todo" aria-selected="true">{en?"All":"Todo"}</button>
-    <button type="button" role="tab" data-tab="usuarios" aria-selected="false">{en?"Users":"Usuarios"} <i id="community-users-count">0</i></button>
-    <button type="button" role="tab" data-tab="debates" aria-selected="false">{en?"Debates":"Debates"} <i id="community-debates-count">0</i></button>
+    <button type="button" role="tab" data-tab="todo" aria-selected="true">{t("community.search.all")}</button>
+    <button type="button" role="tab" data-tab="usuarios" aria-selected="false">{t("community.search.users")} <i id="community-users-count">0</i></button>
+    <button type="button" role="tab" data-tab="debates" aria-selected="false">{t("community.search.debates")} <i id="community-debates-count">0</i></button>
   </div>
   <div id="community-search-panel" role="tabpanel">
-    <section id="community-users-group" class="search-result-group"><header><h2>{en?"Users":"Usuarios"} <i id="community-users-heading-count">0</i></h2><button type="button" class="cs-all" data-see-all="usuarios" hidden>{en?"View all":"Ver todos"}</button></header><div id="community-search-users" class="search-result-list"></div><button type="button" id="community-users-more" class="cs-all cs-more" hidden>{en?"Load more":"Cargar más"}</button></section>
-    <section id="community-debates-group" class="search-result-group"><header><h2>{en?"Debates":"Debates"} <i id="community-debates-heading-count">0</i></h2><button type="button" class="cs-all" data-see-all="debates" hidden>{en?"View all":"Ver todos"}</button></header><div id="community-search-debates" class="search-result-list"></div><button type="button" id="community-debates-more" class="cs-all cs-more" hidden>{en?"Load more":"Cargar más"}</button></section>
+    <section id="community-users-group" class="search-result-group"><header><h2>{t("community.search.users")} <i id="community-users-heading-count">0</i></h2><button type="button" class="cs-all" data-see-all="usuarios" hidden>{t("community.search.seeAll")}</button></header><div id="community-search-users" class="search-result-list"></div><button type="button" id="community-users-more" class="cs-all cs-more" hidden>{t("community.search.more")}</button></section>
+    <section id="community-debates-group" class="search-result-group"><header><h2>{en?"Debates":"Debates"} <i id="community-debates-heading-count">0</i></h2><button type="button" class="cs-all" data-see-all="debates" hidden>{t("community.search.seeAll")}</button></header><div id="community-search-debates" class="search-result-list"></div><button type="button" id="community-debates-more" class="cs-all cs-more" hidden>{t("community.search.more")}</button></section>
     <p id="community-search-empty" class="community-note" hidden>{en?"No results match your search.":"No hay resultados para esa búsqueda."}</p>
     <p id="community-search-error" class="community-note" hidden>{en?"Search is temporarily unavailable.":"La búsqueda no está disponible temporalmente."}</p>
   </div>
