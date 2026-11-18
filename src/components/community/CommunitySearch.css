@@ -2,13 +2,13 @@
 .cs { font-family: inherit; color: #f2efe9; }
 .cs-tabs { display:flex; gap:8px; margin-top:14px; overflow-x:auto; scrollbar-width:none; }
 .cs-tabs::-webkit-scrollbar { display:none; }
-.cs-tabs button { flex:none; padding:9px 15px; border:0; border-radius:999px; background:#17171b; color:#c9c5cf; font:600 13.5px/1 inherit; font-family:inherit; cursor:pointer; }
+.cs-tabs button { flex:none; height:34px; padding:0 15px; border:0; border-radius:999px; background:#17171b; color:#c9c5cf; font:600 13.5px/1 inherit; font-family:inherit; cursor:pointer; }
 .cs-tabs button i { font-style:normal; font-weight:500; opacity:.6; margin-left:5px; }
 .cs-tabs button[aria-selected="true"] { background:#f2efe9; color:#09090b; }
 .cs-tabs button[data-empty="true"]:not([aria-selected="true"]) { opacity:.55; }
 .cs-tabs button:focus-visible,.cs-all:focus-visible { outline:2px solid #f472b6; outline-offset:3px; }
 .cs section { margin-top:30px; }
-.cs section:first-child { margin-top:22px; }
+.cs section:first-child { margin-top:31px; }
 .cs header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; }
 .cs h2 { margin:0; font-size:19px; font-weight:700; }
 .cs h2 i { font-style:normal; font-size:13px; font-weight:500; color:#8d8993; margin-left:8px; }
@@ -16,7 +16,7 @@
 .cs-all:hover { background:#fff; }
 .cs-all:disabled { opacity:.5; cursor:default; }
 .cs-more { margin-top:16px; }
-.cs-u { display:flex; align-items:center; gap:12px; padding:9px 0; color:inherit; text-decoration:none; min-width:0; }
+.cs-u { display:flex; align-items:center; gap:12px; padding:11px 0; color:inherit; text-decoration:none; min-width:0; }
 .cs-u img,.cs-av { flex:none; width:46px; height:46px; border-radius:50%; object-fit:cover; background:#2a2a31; }
 .cs-av { display:grid; place-items:center; font-weight:700; font-size:16px; color:#c9c5cf; }
 .cs-u>span:last-child { min-width:0; }
