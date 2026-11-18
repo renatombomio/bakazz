@@ -254,6 +254,7 @@ export default function SearchView({ lang = "es" }: { lang?: Lang }) {
     setLoading(true);
     try {
       const params = buildParams(debouncedQuery, applied);
+      if (!debouncedQuery && !hasSelectedFilters(applied)) params.set("popular", "1");
       params.set("page", String(Math.floor(results.length / PAGE_SIZE) + 1));
       const response = await fetch("/api/anime-search?" + params.toString());
       const payload = await response.json();
