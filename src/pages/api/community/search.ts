@@ -26,9 +26,8 @@ export const GET: APIRoute = async ({ request, cookies }) => {
     const contains = () => supabase.from("profiles").select(userFields, { count: "exact", head: true }).eq("is_private", false).not("aka", "is", null).ilike("aka", "%" + query + "%").not("aka", "ilike", query + "%");
     const [exactCount, prefixCount, containsCount, debateCount] = await Promise.all([
       exact(), prefix(), contains(),
-      supabase.from("community_debates").select("id", { count: "exact", head: true })
-        .eq("status", "published").ilike("title", "%" + query + "%")
-        .not("profiles", "is", null),
+      supabase.from("community_debates").select("id,profiles!inner(id)", { count: "exact", head: true })
+        .eq("status", "published").eq("profiles.is_private", false).ilike("title", "%" + query + "%"),
     ]);
     if (exactCount.error || prefixCount.error || containsCount.error || debateCount.error) {
       console.warn("[community-search] count failed", exactCount.error?.code, prefixCount.error?.code, containsCount.error?.code, debateCount.error?.code);
