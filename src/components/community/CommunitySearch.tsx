@@ -17,7 +17,7 @@ type Props = {
   t: {
     all: string; users: string; debates: string; seeAll: string; more: string; similar: string;
     stats: (seen: number, favorites: number) => string;
-    empty: (q: string) => string;
+    empty: string;
     emptyHint: string;
   };
 };
@@ -55,7 +55,7 @@ export default function CommunitySearch(p:Props){
    {tabs.map(([k,label,n])=><button key={k} type="button" role="tab" id={`cs-t-${k}`} aria-selected={tab===k} aria-controls="cs-panel" onClick={()=>go(k)} data-empty={n===0}>{label}{n!==null&&<i>{n}</i>}</button>)}
   </div>
   <div id="cs-panel" role="tabpanel" aria-labelledby={`cs-t-${tab}`}>
-   {nothing?<div className="cs-empty"><p>{t.empty(q)}</p><span>{t.emptyHint}</span>{!!p.similar?.length&&<section><h2>{t.similar}</h2>{p.similar.map(u=><UserRow key={u.id} u={u} q="" t={t}/>)}</section>}</div>
+   {nothing?<div className="cs-empty"><p>{t.empty} “{q}”</p><span>{t.emptyHint}</span>{!!p.similar?.length&&<section><h2>{t.similar}</h2>{p.similar.map(u=><UserRow key={u.id} u={u} q="" t={t}/>)}</section>}</div>
    :tab==="todo"?<>
     {p.usersTotal>0&&<section><header><h2>{t.users}<i>{p.usersTotal}</i></h2>{p.usersTotal>CAP&&<button type="button" className="cs-all" onClick={()=>go("usuarios")}>{t.seeAll}</button>}</header>{p.users.slice(0,CAP).map(u=><UserRow key={u.id} u={u} q={q} t={t}/>)}</section>}
     {p.debatesTotal>0&&<section><header><h2>{t.debates}<i>{p.debatesTotal}</i></h2>{p.debatesTotal>CAP&&<button type="button" className="cs-all" onClick={()=>go("debates")}>{t.seeAll}</button>}</header>{p.debates.slice(0,CAP).map(d=><DebateRow key={d.id} d={d} q={q}/>)}</section>}

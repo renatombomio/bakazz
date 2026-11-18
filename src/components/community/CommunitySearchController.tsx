@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import CommunitySearch, { type DebateHit, type SearchTab, type UserHit } from "./CommunitySearch";
 
-type Props={api:string;lang:"es"|"en";t: {all:string;users:string;debates:string;seeAll:string;more:string;similar:string;stats:(seen:number,favorites:number)=>string;empty:(q:string)=>string;emptyHint:string}};
+type Props={api:string;lang:"es"|"en";t: {all:string;users:string;debates:string;seeAll:string;more:string;similar:string;stats:(seen:number,favorites:number)=>string;empty:string;emptyHint:string}};
 type Payload={users:UserHit[];usersTotal:number;debates:DebateHit[];debatesTotal:number;usersPage:number;debatesPage:number};
 export default function CommunitySearchController({api,lang,t}:Props){
  const [query,setQuery]=useState("");const [tab,setTab]=useState<SearchTab>("todo");
