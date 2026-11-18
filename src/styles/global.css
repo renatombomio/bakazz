@@ -279,8 +279,10 @@ html.mobile-menu-open,html.mobile-menu-open body { overflow:hidden; }
  .anime-detail-poster-column .anime-detail-library-actions{width:100%;margin:0;flex:0 0 auto}
  .anime-detail-library-actions .personal-actions{margin-top:0;display:grid;gap:.4rem}
  .anime-detail-library-actions .personal-actions button,.anime-detail-library-actions .personal-status{width:100%;justify-content:center;text-align:center;min-height:2.15rem;padding:.5rem .4rem;font-size:.48rem;border-color:var(--color-border-card-strong);background:var(--color-overlay-library);color:var(--color-paper-50)}
- .anime-detail-copy{display:contents}
- .anime-detail-copy-main{display:contents}
+ .anime-detail-copy,
+ .anime-detail--ghibli .anime-detail-copy{display:contents}
+ .anime-detail-copy-main,
+ .anime-detail--ghibli .anime-detail-copy-main{display:contents}
  .anime-detail-eyebrow{grid-column:2;grid-row:1;align-self:end}
  .anime-detail-copy h1{grid-column:2;grid-row:1;min-width:0;width:100%;max-width:100%;margin:.25rem 0 .8rem;font-size:clamp(2.15rem,9vw,4rem);line-height:.95;overflow-wrap:anywhere;word-break:normal}
  .anime-detail-meta{grid-column:2;grid-row:2;align-self:start;display:flex;flex-wrap:wrap;align-items:baseline;gap:.3rem .65rem;font-size:.58rem;line-height:1.25}

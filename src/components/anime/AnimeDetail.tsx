@@ -441,9 +441,9 @@ export default function AnimeDetail({entry,lang="es"}:{entry:LibraryEntry;lang?:
  const relations=(media?.relations?.edges??[]).filter(edge=>edge?.node?.type==="ANIME"&&edge.node.id!==media?.id);
  return <div className="anime-detail">
   <style>{`
-    .anime-detail .anime-detail-synopsis-wrap{max-width:42rem;margin-top:1.35rem;padding:1rem 0 1.1rem;border:0;border-radius:0;background:transparent;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
-    .anime-detail .anime-detail-synopsis{margin:0;color:var(--color-paper-50)}
-    .anime-detail .anime-detail-translate{border-color:rgba(245,242,236,.28);background:rgba(245,242,236,.06);color:var(--color-paper-200)}
+    .anime-detail:not(.anime-detail--ghibli) .anime-detail-synopsis-wrap{max-width:42rem;margin-top:1.35rem;padding:1rem 0 1.1rem;border:0;border-radius:0;background:transparent;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+    .anime-detail:not(.anime-detail--ghibli) .anime-detail-synopsis{margin:0;color:var(--color-paper-50)}
+    .anime-detail:not(.anime-detail--ghibli) .anime-detail-translate{border-color:rgba(245,242,236,.28);background:rgba(245,242,236,.06);color:var(--color-paper-200)}
     .anime-detail-poster{position:relative}\n    .anime-detail-native-title{margin:.35rem 0 0;color:var(--color-muted-400);font-family:"Hiragino Sans","Noto Sans JP",sans-serif;font-size:.82rem;line-height:1.4;letter-spacing:.04em}
     .anime-detail-like{position:absolute;right:.55rem;bottom:.55rem;z-index:3;display:inline-flex;align-items:center;gap:.35rem;padding:.45rem .6rem;border:1px solid rgba(255,255,255,.22);border-radius:999px;background:rgba(0,0,0,.72);color:#fff;font:inherit;font-size:.72rem;backdrop-filter:blur(8px);cursor:pointer}
     .anime-detail-like svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -481,7 +481,7 @@ export default function AnimeDetail({entry,lang="es"}:{entry:LibraryEntry;lang?:
     .anime-detail-recommendation:hover .anime-detail-recommendation-poster img{transform:scale(1.035)}
     .anime-detail-recommendation-title{display:block;margin-top:.48rem;font-size:.72rem;line-height:1.25;font-weight:500}
     .anime-detail-recommendation-meta{display:block;margin-top:.22rem;font-family:var(--font-meta);font-size:.5rem;letter-spacing:.06em;text-transform:uppercase;opacity:.58}
-    @media(max-width:760px){.anime-detail .anime-detail-synopsis-wrap{margin-top:1rem;padding:.85rem .9rem .95rem;border-radius:12px}.anime-detail-recommendations{grid-column:1 / -1;width:100%;margin-top:1.35rem}.anime-detail-recommendations-track{width:100%;max-width:none}.anime-detail-recommendation{flex:0 0 104px}.anime-detail-recommendation-title{font-size:.68rem}}
+    @media(max-width:760px){.anime-detail:not(.anime-detail--ghibli) .anime-detail-synopsis-wrap{margin-top:1rem;padding:.85rem .9rem .95rem;border-radius:12px}.anime-detail-recommendations{grid-column:1 / -1;width:100%;margin-top:1.35rem}.anime-detail-recommendations-track{width:100%;max-width:none}.anime-detail-recommendation{flex:0 0 104px}.anime-detail-recommendation-title{font-size:.68rem}}
   `}</style>
   <AnimeTop
    title={title} bannerImage={banner} poster={poster}
