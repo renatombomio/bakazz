@@ -104,19 +104,15 @@ async function translateToSpanish(text:string){
 
 function getSeasonCount(media: Media|null){
   if(!media || media.format==="MOVIE") return null;
-  const relatedTv=(media.relations?.edges??[])
-    .filter((edge)=>edge.relationType==="PREQUEL"||edge.relationType==="SEQUEL")
-    .filter((edge)=>edge.node?.format==="TV")
-    .map((edge)=>edge.node?.id)
-    .filter((id): id is number => typeof id==="number");
-  return Math.max(1,new Seconst DETAIL_CACHE_PREFIX="renanime:anime-detail:v2:";
+  const relatedTv=(media.relations?.edges??[]).filter(edge=>edge.relationType==="PREQUEL"||edge.relationType==="SEQUEL").filter(edge=>edge.node?.format==="TV").map(edge=>edge.node?.id).filter((id):id is number=>typeof id==="number");
+  return Math.max(1,new Set(relatedTv).size+1);
+}
+
+const DETAIL_CACHE_PREFIX="renanime:anime-detail:v2:";
 const DETAIL_CACHE_TTL=7*24*60*60*1000;
 const DETAIL_STALE_TTL=30*24*60*60*1000;
 const detailPending=new Map<string,Promise<Media|null>>();
-
-function readDetailCache(key:string):{media:Media;age:number}|null{
- try{const raw=localStorage.getItem(DETAIL_CACHE_PREFIX+key);if(!raw)return null;const parsed=JSON.parse(raw);if(!parsed?.media||!parsed?.savedAt||Date.now()-parsed.savedAt>DETAIL_STALE_TTL)return null;return {media:parsed.media as Media,age:Date.now()-parsed.savedAt};}catch{return null;}
-}
+function readDetailCache(key:string):{media:Media;age:number}|null{try{const raw=localStorage.getItem(DETAIL_CACHE_PREFIX+key);if(!raw)return null;const parsed=JSON.parse(raw);if(!parsed?.media||!parsed?.savedAt||Date.now()-parsed.savedAt>DETAIL_STALE_TTL)return null;return {media:parsed.media as Media,age:Date.now()-parsed.savedAt};}catch{return null;}}
 function writeDetailCache(key:string,media:Media){if(typeof media.id!=="number")return;try{localStorage.setItem(DETAIL_CACHE_PREFIX+key,JSON.stringify({media,savedAt:Date.now()}));}catch{}}
 async function fetchAniListWithRetry(query:string,variables:Record<string,unknown>,attempts=3):Promise<any>{
  let lastError:unknown;
@@ -137,8 +133,7 @@ async function resolveAnime(entry:LibraryEntry):Promise<Media|null>{
  const fields="id idMal title{romaji english native} description(asHtml:false) genres startDate{year month day} format status episodes duration averageScore seasonYear studios(isMain:true){nodes{name}} coverImage{extraLarge large} bannerImage trailer{id site thumbnail} characters(page:1,perPage:12,sort:ROLE){edges{role node{id name{full} image{large}}}} relations{edges{relationType node{id type format title{romaji english native} coverImage{extraLarge large}}}} recommendations(sort:RATING_DESC,page:1,perPage:12){nodes{mediaRecommendation{id title{romaji english native} coverImage{extraLarge large} format startDate{year}}}}";
  const query=mediaId?"query DetailById($id:Int!){Media(id:$id,type:ANIME){"+fields+"}}":"query DetailBySearch($search:String!){Page(page:1,perPage:10){media(search:$search,type:ANIME,sort:SEARCH_MATCH){"+fields+"}}}";
  const data=await fetchAniListWithRetry(query,mediaId?{id:mediaId}:{search:entry.title});
- const candidate=mediaId?(data?.Media??null):selectBestAnimeCandidate(data?.Page?.media??[],entry.title,entry.format);
- return candidate as Media|null;
+ return (mediaId?data?.Media??null:selectBestAnimeCandidate(data?.Page?.media??[],entry.title,entry.format)) as Media|null;
 }
 async function findAnime(entry:LibraryEntry):Promise<Media|null>{
  const key=entry.animeId;const cached=readDetailCache(key);if(cached&&cached.age<=DETAIL_CACHE_TTL)return cached.media;
@@ -149,7 +144,6 @@ async function findAnime(entry:LibraryEntry):Promise<Media|null>{
   if(fallback?.idMal){try{const mapped=await fetchAniListWithRetry("query DetailByMalId($idMal:Int!){Media(idMal:$idMal,type:ANIME){id idMal title{romaji english native} description(asHtml:false) genres startDate{year month day} format status episodes duration averageScore seasonYear studios(isMain:true){nodes{name}} coverImage{extraLarge large} bannerImage trailer{id site thumbnail}}}",{idMal:fallback.idMal},2);if(mapped?.Media){const resolved={...fallback,...mapped.Media};writeDetailCache(key,resolved);return resolved as Media;}}catch{}}
   if(cached)return cached.media;return fallback as Media|null;
  })().finally(()=>detailPending.delete(key));detailPending.set(key,task);return task;
-}.title, entry.format);
 }
 
 async function findAnimeBatch(entries: LibraryEntry[]): Promise<Record<string, Media|null>> {
