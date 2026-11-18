@@ -240,5 +240,12 @@
   "search.hiddenGemsDescription": "Grandes valoraciones y una popularidad más discreta.",
   "search.awardsTitle": "Ganadores del anime del año",
   "search.awardsDescription": "Las series elegidas como Anime del Año en los Crunchyroll Anime Awards.",
-  "search.awardLabel": "Crunchyroll Anime Awards"
+  "search.awardLabel": "Crunchyroll Anime Awards",
+  "community.search.all": "Todo",
+  "community.search.users": "Usuarios",
+  "community.search.debates": "Debates",
+  "community.search.seeAll": "Ver todos",
+  "community.search.more": "Cargar más",
+  "community.search.empty": "No hay resultados para esta búsqueda.",
+  "community.search.error": "La búsqueda no está disponible temporalmente."
 }

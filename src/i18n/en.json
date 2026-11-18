@@ -240,5 +240,12 @@
   "search.hiddenGemsDescription": "Highly rated anime with a smaller audience.",
   "search.awardsTitle": "Anime of the Year winners",
   "search.awardsDescription": "The series selected as Anime of the Year at the Crunchyroll Anime Awards.",
-  "search.awardLabel": "Crunchyroll Anime Awards"
+  "search.awardLabel": "Crunchyroll Anime Awards",
+  "community.search.all": "All",
+  "community.search.users": "Users",
+  "community.search.debates": "Debates",
+  "community.search.seeAll": "View all",
+  "community.search.more": "Load more",
+  "community.search.empty": "No results match your search.",
+  "community.search.error": "Search is temporarily unavailable."
 }

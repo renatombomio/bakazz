@@ -2,65 +2,77 @@ import type { APIRoute } from "astro";
 import { createSupabaseSsrClient } from "../../../lib/supabase-ssr";
 
 export const prerender = false;
+const PAGE_SIZE = 20;
+const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
+  status, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
+});
 
-const json = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), {
-    status,
-    headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
-  });
+function safePage(value: string | null) {
+  const page = Number.parseInt(value ?? "0", 10);
+  return Number.isFinite(page) ? Math.max(0, Math.min(1000, page)) : 0;
+}
 
 export const GET: APIRoute = async ({ request, cookies }) => {
   const url = new URL(request.url);
-  const raw = (url.searchParams.get("q") ?? "").trim().replace(/^@/, "").slice(0, 60);
-  const query = raw.replace(/[,%()\\]/g, " ").replace(/\s+/g, " ").trim();
-  if (query.length < 2) return json({ ok: true, users: [], debates: [] });
-
+  const query = (url.searchParams.get("q") ?? "").trim().replace(/^@+/, "").replace(/[,%()\\]/g, " ").replace(/\s+/g, " ").slice(0, 60).trim();
+  if (query.length < 2) return json({ ok: true, users: [], debates: [], usersTotal: 0, debatesTotal: 0 });
+  const usersPage = safePage(url.searchParams.get("usersPage"));
+  const debatesPage = safePage(url.searchParams.get("debatesPage"));
   try {
     const supabase = createSupabaseSsrClient(request, cookies);
-    const pattern = `%${query}%`;
-    const [users, titleMatches, bodyMatches] = await Promise.all([
-      supabase.from("profiles").select("id,aka,avatar_url,last_seen_at")
-        .eq("is_private", false).not("aka", "is", null).ilike("aka", pattern)
-        .order("last_seen_at", { ascending: false, nullsFirst: false }).limit(12),
-      supabase.from("community_debates")
-        .select("id,title,body,category,created_at,profiles!inner(aka,avatar_url,is_private)")
-        .eq("status", "published").eq("profiles.is_private", false).ilike("title", pattern)
-        .order("created_at", { ascending: false }).limit(12),
-      supabase.from("community_debates")
-        .select("id,title,body,category,created_at,profiles!inner(aka,avatar_url,is_private)")
-        .eq("status", "published").eq("profiles.is_private", false).ilike("body", pattern)
-        .order("created_at", { ascending: false }).limit(12),
+    const userFields = "id,aka,avatar_url,last_seen_at";
+    const exact = () => supabase.from("profiles").select(userFields, { count: "exact", head: true }).eq("is_private", false).not("aka", "is", null).ilike("aka", query);
+    const prefix = () => supabase.from("profiles").select(userFields, { count: "exact", head: true }).eq("is_private", false).not("aka", "is", null).ilike("aka", query + "%").not("aka", "ilike", query);
+    const contains = () => supabase.from("profiles").select(userFields, { count: "exact", head: true }).eq("is_private", false).not("aka", "is", null).ilike("aka", "%" + query + "%").not("aka", "ilike", query + "%");
+    const [exactCount, prefixCount, containsCount, debateCount] = await Promise.all([
+      exact(), prefix(), contains(),
+      supabase.from("community_debates").select("id", { count: "exact", head: true })
+        .eq("status", "published").ilike("title", "%" + query + "%")
+        .not("profiles", "is", null),
     ]);
-    if (users.error || titleMatches.error || bodyMatches.error) {
-      console.warn("[community-search] query failed", users.error?.code, titleMatches.error?.code, bodyMatches.error?.code);
+    if (exactCount.error || prefixCount.error || containsCount.error || debateCount.error) {
+      console.warn("[community-search] count failed", exactCount.error?.code, prefixCount.error?.code, containsCount.error?.code, debateCount.error?.code);
       return json({ ok: false, error: "SEARCH_UNAVAILABLE" }, 503);
     }
-    const uniqueDebates = new Map<string, any>();
-    for (const row of [...(titleMatches.data ?? []), ...(bodyMatches.data ?? [])]) uniqueDebates.set(row.id, row);
-    const debates = [...uniqueDebates.values()]
-      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-      .slice(0, 12)
-      .map((row) => {
-        const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
-        return {
-          id: row.id,
-          title: row.title,
-          body: row.body,
-          category: row.category,
-          aka: profile?.aka ?? "",
-          avatar_url: profile?.avatar_url ?? null,
-        };
-      });
-    return json({
-      ok: true,
-      users: (users.data ?? []).filter((row) => row.aka).map((row) => ({
-        id: row.id,
-        aka: row.aka,
-        avatar_url: row.avatar_url,
-        isOnline: Boolean(row.last_seen_at && Date.now() - new Date(row.last_seen_at).getTime() <= 120_000),
-      })),
-      debates,
+    const bucketCounts = [exactCount.count ?? 0, prefixCount.count ?? 0, containsCount.count ?? 0];
+    const usersTotal = bucketCounts.reduce((sum, count) => sum + count, 0);
+    const offset = usersPage * PAGE_SIZE;
+    let skip = offset;
+    let remaining = PAGE_SIZE;
+    const userRows: any[] = [];
+    const buckets = [
+      { count: bucketCounts[0], query: () => supabase.from("profiles").select(userFields).eq("is_private", false).not("aka", "is", null).ilike("aka", query) },
+      { count: bucketCounts[1], query: () => supabase.from("profiles").select(userFields).eq("is_private", false).not("aka", "is", null).ilike("aka", query + "%").not("aka", "ilike", query) },
+      { count: bucketCounts[2], query: () => supabase.from("profiles").select(userFields).eq("is_private", false).not("aka", "is", null).ilike("aka", "%" + query + "%").not("aka", "ilike", query + "%") },
+    ];
+    for (const bucket of buckets) {
+      if (remaining <= 0) break;
+      if (skip >= bucket.count) { skip -= bucket.count; continue; }
+      const take = Math.min(remaining, bucket.count - skip);
+      const result = await bucket.query().order("aka", { ascending: true }).range(skip, skip + take - 1);
+      if (result.error) return json({ ok: false, error: "SEARCH_UNAVAILABLE" }, 503);
+      userRows.push(...(result.data ?? []));
+      remaining -= take;
+      skip = 0;
+    }
+    const debateResult = await supabase.from("community_debates")
+      .select("id,title,created_at,profiles!inner(aka,avatar_url,is_private)")
+      .eq("status", "published").eq("profiles.is_private", false).ilike("title", "%" + query + "%")
+      .order("created_at", { ascending: false })
+      .range(debatesPage * PAGE_SIZE, debatesPage * PAGE_SIZE + PAGE_SIZE - 1);
+    if (debateResult.error) {
+      console.warn("[community-search] debates failed", debateResult.error.code);
+      return json({ ok: false, error: "SEARCH_UNAVAILABLE" }, 503);
+    }
+    const users = userRows.filter(row => row.aka).map(row => ({
+      id: row.id, aka: row.aka, avatar_url: row.avatar_url,
+      isOnline: Boolean(row.last_seen_at && Date.now() - new Date(row.last_seen_at).getTime() <= 120_000),
+    }));
+    const debates = (debateResult.data ?? []).map((row: any) => {
+      const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
+      return { id: row.id, title: row.title, aka: profile?.aka ?? "", avatar_url: profile?.avatar_url ?? null };
     });
+    return json({ ok: true, users, debates, usersTotal, debatesTotal: debateCount.count ?? 0, pageSize: PAGE_SIZE });
   } catch (error) {
     console.error("[community-search] failed", error);
     return json({ ok: false, error: "SEARCH_UNAVAILABLE" }, 503);

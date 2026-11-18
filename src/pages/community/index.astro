@@ -143,11 +143,18 @@ const cats:Record<string,string>=en?{anime:"Anime",characters:"Characters",theor
  <section class="activity-section"><div class="sec"><h2>{en?"Recent activity":"Actividad reciente"}</h2></div>
  {activity.length?<div class="activity-feed">{activity.map(x=><article class="actv"><a href={base+"/u/"+encodeURIComponent(x.aka)+"/"} aria-label={"@"+x.aka}><img class="av" src={x.avatar||"/images/profile-avatar-placeholder.svg"} alt="" loading="lazy"/></a><div class="t"><a href={base+"/u/"+encodeURIComponent(x.aka)+"/"}><b>@{x.aka}</b></a> {x.kind==="like"?(en?"liked":"le ha gustado"):x.kind==="joined"?(en?"joined Renanime":"se ha unido a Renanime"):(en?"commented on":"ha comentado en")} {x.animeId!==null&&<a href={base+"/anime/"+x.animeId+"/"}><q>{x.animeTitle}</q></a>}{x.kind==="comment"&&x.content&&<span class="activity-quote"> “{x.content}”</span>}</div><em>{age(x.created)}</em></article>)}</div>:<p class="community-note">{en?"No recent activity yet.":"Todavía no hay actividad reciente."}</p>}
  </section><section id="community-search-results" class="community-search-results" aria-live="polite" hidden>
-  <div class="search-result-group"><h2>{en ? 'Users' : 'Usuarios'}</h2><div id="community-search-users" class="search-result-list"></div></div>
-  <div class="search-result-group"><h2>{en ? 'Debates' : 'Debates'}</h2><div id="community-search-debates" class="search-result-list"></div></div>
-  <p id="community-search-empty" class="community-note" hidden>{en ? 'No users or debates match your search.' : 'No hay usuarios ni debates que coincidan.'}</p>
+  <div id="community-search-tabs" class="community-search-tabs" role="tablist" aria-label={en?"Search result type":"Tipo de resultado"}>
+    <button type="button" role="tab" data-tab="todo" aria-selected="true">{en?"All":"Todo"}</button>
+    <button type="button" role="tab" data-tab="usuarios" aria-selected="false">{en?"Users":"Usuarios"} <i id="community-users-count">0</i></button>
+    <button type="button" role="tab" data-tab="debates" aria-selected="false">{en?"Debates":"Debates"} <i id="community-debates-count">0</i></button>
+  </div>
+  <div id="community-search-panel" role="tabpanel">
+    <section id="community-users-group" class="search-result-group"><header><h2>{en?"Users":"Usuarios"} <i id="community-users-heading-count">0</i></h2><button type="button" class="cs-all" data-see-all="usuarios" hidden>{en?"View all":"Ver todos"}</button></header><div id="community-search-users" class="search-result-list"></div><button type="button" id="community-users-more" class="cs-all cs-more" hidden>{en?"Load more":"Cargar más"}</button></section>
+    <section id="community-debates-group" class="search-result-group"><header><h2>{en?"Debates":"Debates"} <i id="community-debates-heading-count">0</i></h2><button type="button" class="cs-all" data-see-all="debates" hidden>{en?"View all":"Ver todos"}</button></header><div id="community-search-debates" class="search-result-list"></div><button type="button" id="community-debates-more" class="cs-all cs-more" hidden>{en?"Load more":"Cargar más"}</button></section>
+    <p id="community-search-empty" class="community-note" hidden>{en?"No results match your search.":"No hay resultados para esa búsqueda."}</p>
+    <p id="community-search-error" class="community-note" hidden>{en?"Search is temporarily unavailable.":"La búsqueda no está disponible temporalmente."}</p>
+  </div>
 </section>
-<p id="community-no-results" class="community-note" hidden>{en?"No results match your search.":"No hay resultados para esa búsqueda."}</p>
 </main>
 <style>
 /* Keep the trending debate card aligned with the full Debates feed. */
@@ -193,7 +200,7 @@ const cats:Record<string,string>=en?{anime:"Anime",characters:"Characters",theor
 .members-section{min-width:0;overflow:hidden}
 .members-section .sec{padding-bottom:0}
 .members-section .cp{padding-top:0}
-.community-search-results{padding:8px 16px 24px}.search-result-group{margin:0 0 18px}.search-result-group h2{margin:0 0 9px;font-size:13px;font-weight:800;color:#a39fa9}.search-result-list{display:grid;gap:7px}.community-search-user,.community-search-debate{display:flex;align-items:center;gap:11px;min-width:0;padding:9px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:#111114;color:#f2efe9;text-decoration:none}.community-search-user>img,.community-search-debate>img{width:42px;height:42px;flex:0 0 42px;border-radius:50%;object-fit:cover}.search-user-meta{display:flex;align-items:center;gap:9px;font-size:13px}.search-presence{width:9px;height:9px;border-radius:50%;background:#777}.search-presence.is-online{background:#22c55e}.search-debate-content{display:grid;gap:4px;min-width:0}.search-debate-content strong{font-size:13px;line-height:1.3}.search-debate-content small{overflow:hidden;color:#96919d;font-size:11px;text-overflow:ellipsis;white-space:nowrap}
+.community-search-results{padding:8px 16px 24px}.community-search-tabs{display:flex;gap:8px;margin:0 0 18px;overflow-x:auto;scrollbar-width:none}.community-search-tabs::-webkit-scrollbar{display:none}.community-search-tabs button{flex:none;padding:9px 15px;border:0;border-radius:999px;background:#17171b;color:#c9c5cf;font:600 13.5px/1 inherit;font-family:inherit;cursor:pointer}.community-search-tabs button[aria-selected="true"]{background:#f2efe9;color:#09090b}.community-search-tabs button i,.search-result-group h2 i{font-style:normal;font-weight:500;opacity:.65;margin-left:4px}.community-search-tabs button:focus-visible,.cs-all:focus-visible{outline:2px solid #f472b6;outline-offset:3px}.search-result-group{margin:0 0 18px}.search-result-group header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.search-result-group h2{margin:0;font-size:19px;font-weight:700;color:#f2efe9}.search-result-group h2 i{font-size:13px;color:#8d8993}.search-result-list{display:grid;gap:7px}.community-search-user,.community-search-debate{display:flex;align-items:center;gap:11px;min-width:0;padding:9px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:#111114;color:#f2efe9;text-decoration:none}.community-search-user>img,.community-search-debate>img{width:42px;height:42px;flex:0 0 42px;border-radius:50%;object-fit:cover}.search-user-meta{display:flex;align-items:center;gap:9px;font-size:13px}.search-presence{width:9px;height:9px;border-radius:50%;background:#777}.search-presence.is-online{background:#22c55e}.search-debate-content{display:grid;gap:4px;min-width:0}.search-debate-content strong{font-size:13px;line-height:1.3}.search-debate-content small{overflow:hidden;color:#96919d;font-size:11px;text-overflow:ellipsis;white-space:nowrap}
 </style>
 </Layout>
 <script>
@@ -202,46 +209,103 @@ const results=document.querySelector<HTMLElement>("#community-search-results");
 const usersBox=document.querySelector<HTMLElement>("#community-search-users");
 const debatesBox=document.querySelector<HTMLElement>("#community-search-debates");
 const empty=document.querySelector<HTMLElement>("#community-search-empty");
+const errorBox=document.querySelector<HTMLElement>("#community-search-error");
+const tabs=[...document.querySelectorAll<HTMLButtonElement>("#community-search-tabs [role=tab]")];
 const searchable=[...document.querySelectorAll<HTMLElement>(".community-searchable")];
-let timer=0;
-let controller:AbortController|null=null;
 const locale=document.documentElement.lang.toLowerCase().startsWith("en")?"en":"es";
+const api=(locale==="en"?"/en":"")+"/api/community/search/";
+const PAGE_SIZE=20;
+let timer=0,controller:AbortController|null=null,activeQuery="",activeTab="todo",userPage=0,debatePage=0,userTotal=0,debateTotal=0,users:any[]=[],debates:any[]=[],loadingUsers=false,loadingDebates=false;
 const make=(tag:string,className:string,text:string)=>{const node=document.createElement(tag);node.className=className;node.textContent=text;return node;};
-const clear=(node:HTMLElement|null)=>{if(node)node.replaceChildren();};
+const clear=(node:HTMLElement|null)=>{node?.replaceChildren();};
+function setCount(id:string,value:number){const el=document.getElementById(id);if(el)el.textContent=String(value);}
+function setSearching(q:string){searchable.forEach(el=>el.hidden=Boolean(q));if(results)results.hidden=!q;}
+function updateUrl(q:string,tab:string,replace=false){
+ const url=new URL(window.location.href);
+ if(q){url.searchParams.set("q",q);url.searchParams.set("tipo",tab);}else{url.searchParams.delete("q");url.searchParams.delete("tipo");}
+ history[replace?"replaceState":"pushState"](null,"",url);
+}
+function setTab(tab:string,update=true){
+ activeTab=tab;
+ tabs.forEach(button=>{const selected=button.dataset.tab===tab;button.setAttribute("aria-selected",String(selected));});
+ const ug=document.getElementById("community-users-group"),dg=document.getElementById("community-debates-group");
+ if(ug)ug.hidden=tab==="debates";if(dg)dg.hidden=tab==="usuarios";
+ const uSee=document.querySelector<HTMLElement>('[data-see-all="usuarios"]'),dSee=document.querySelector<HTMLElement>('[data-see-all="debates"]');
+ if(uSee)uSee.hidden=tab!=="todo"||userTotal<=3;if(dSee)dSee.hidden=tab!=="todo"||debateTotal<=3;
+ const um=document.getElementById("community-users-more"),dm=document.getElementById("community-debates-more");
+ if(um)um.hidden=tab!=="usuarios"||users.length>=userTotal;if(dm)dm.hidden=tab!=="debates"||debates.length>=debateTotal;
+ if(update&&activeQuery)updateUrl(activeQuery,tab);
+ render();
+}
 function renderUsers(rows:any[]){
  if(!usersBox)return;clear(usersBox);
- for(const user of rows){const a=document.createElement("a");a.className="community-search-user";a.href=(locale==="en"?"/en":"")+"/u/"+encodeURIComponent(user.aka)+"/";
+ const shown=activeTab==="todo"?rows.slice(0,3):rows;
+ for(const user of shown){const a=document.createElement("a");a.className="community-search-user";a.href=(locale==="en"?"/en":"")+"/u/"+encodeURIComponent(user.aka)+"/";
  const img=document.createElement("img");img.src=user.avatar_url||"/images/profile-avatar-placeholder.svg";img.alt="";img.loading="lazy";
  const meta=make("span","search-user-meta","");meta.append(make("strong","", "@"+user.aka));
- const presence=make("i","search-presence "+(user.isOnline?"is-online":"is-offline"),"");presence.title=user.isOnline?(locale==="en"?"Online":"En línea"):(locale==="en"?"Offline":"Desconectado");meta.append(presence);
- a.append(img,meta);usersBox.append(a);}
+ const presence=make("i","search-presence "+(user.isOnline?"is-online":"is-offline"),"");presence.title=user.isOnline?(locale==="en"?"Online":"En línea"):(locale==="en"?"Offline":"Desconectado");meta.append(presence);a.append(img,meta);usersBox.append(a);}
 }
 function renderDebates(rows:any[]){
  if(!debatesBox)return;clear(debatesBox);
- for(const debate of rows){const a=document.createElement("a");a.className="community-search-debate";a.href=(locale==="en"?"/en":"")+"/community/debates/"+encodeURIComponent(debate.id)+"/";
+ const shown=activeTab==="todo"?rows.slice(0,3):rows;
+ for(const debate of shown){const a=document.createElement("a");a.className="community-search-debate";a.href=(locale==="en"?"/en":"")+"/community/debates/"+encodeURIComponent(debate.id)+"/";
  const avatar=document.createElement("img");avatar.src=debate.avatar_url||"/images/profile-avatar-placeholder.svg";avatar.alt="";avatar.loading="lazy";
- const content=make("span","search-debate-content","");content.append(make("strong","",debate.title),make("small","", "@"+debate.aka+(debate.body?" · "+debate.body.slice(0,100):"")));
- a.append(avatar,content);debatesBox.append(a);}
+ const content=make("span","search-debate-content","");content.append(make("strong","",debate.title),make("small","", "@"+debate.aka));a.append(avatar,content);debatesBox.append(a);}
 }
-function setSearching(q:string){
- searchable.forEach(el=>el.hidden=Boolean(q));
- if(results)results.hidden=!q;
+function render(){
+ renderUsers(users);renderDebates(debates);
+ const none=(activeTab==="todo"?userTotal+debateTotal===0:activeTab==="usuarios"?userTotal===0:debateTotal===0);
+ if(empty)empty.hidden=!none;
+ const um=document.getElementById("community-users-more"),dm=document.getElementById("community-debates-more");
+ if(um)um.hidden=activeTab!=="usuarios"||users.length>=userTotal;
+ if(dm)dm.hidden=activeTab!=="debates"||debates.length>=debateTotal;
+}
+function updateCounts(){
+ setCount("community-users-count",userTotal);setCount("community-debates-count",debateTotal);
+ setCount("community-users-heading-count",userTotal);setCount("community-debates-heading-count",debateTotal);
+}
+async function requestSearch(q:string,tab:string,replaceUrl=false){
+ controller?.abort();controller=new AbortController();activeQuery=q;
+ if(!q){setSearching("");clear(usersBox);clear(debatesBox);if(empty)empty.hidden=true;if(errorBox)errorBox.hidden=true;users=[];debates=[];userTotal=debateTotal=0;return;}
+ setSearching(q);if(results)results.hidden=false;if(errorBox)errorBox.hidden=true;
+ const url=new URL(api,window.location.origin);url.searchParams.set("q",q);url.searchParams.set("usersPage","0");url.searchParams.set("debatesPage","0");
+ try{
+  const response=await fetch(url,{signal:controller.signal,credentials:"same-origin",headers:{"Accept":"application/json"}});
+  if(!response.ok)throw new Error("SEARCH_FAILED");
+  const data=await response.json();if(q!==activeQuery)return;
+  users=data.users||[];debates=data.debates||[];userTotal=Number(data.usersTotal)||0;debateTotal=Number(data.debatesTotal)||0;userPage=debatePage=0;
+  updateCounts();setTab(tab,false);if(replaceUrl)updateUrl(q,tab,true);
+ }catch(err){if(err instanceof DOMException&&err.name==="AbortError")return;if(errorBox){errorBox.hidden=false;errorBox.textContent=locale==="en"?"Search is temporarily unavailable.":"La búsqueda no está disponible temporalmente.";}}
+}
+async function loadMore(kind:"usuarios"|"debates"){
+ const isUsers=kind==="usuarios";if(isUsers?loadingUsers:loadingDebates)return;
+ if(isUsers)loadingUsers=true;else loadingDebates=true;
+ const next=(isUsers?userPage:debatePage)+1;const url=new URL(api,window.location.origin);url.searchParams.set("q",activeQuery);url.searchParams.set(isUsers?"usersPage":"debatesPage",String(next));
+ const button=document.getElementById(isUsers?"community-users-more":"community-debates-more") as HTMLButtonElement|null;if(button)button.disabled=true;
+ try{
+  const response=await fetch(url,{credentials:"same-origin",headers:{"Accept":"application/json"}});if(!response.ok)throw new Error("PAGE_FAILED");
+  const data=await response.json();if(activeQuery!==input?.value.trim())return;
+  if(isUsers){users=[...users,...(data.users||[])];userPage=next;}else{debates=[...debates,...(data.debates||[])];debatePage=next;}
+  render();
+ }catch{if(errorBox){errorBox.hidden=false;errorBox.textContent=locale==="en"?"Could not load more results. Try again.":"No se pudieron cargar más resultados. Inténtalo de nuevo.";}}
+ finally{if(isUsers)loadingUsers=false;else loadingDebates=false;if(button)button.disabled=false;}
 }
 input?.addEventListener("input",()=>{
- const q=input.value.trim();window.clearTimeout(timer);controller?.abort();
- setSearching(q);
- if(!q){clear(usersBox);clear(debatesBox);if(empty)empty.hidden=true;return;}
- if(q.replace(/^@/,"").length<2){clear(usersBox);clear(debatesBox);if(empty)empty.hidden=true;return;}
- timer=window.setTimeout(async()=>{
-  controller=new AbortController();
-  try{
-   const response=await fetch("/api/community/search/?q="+encodeURIComponent(q),{signal:controller.signal,credentials:"same-origin",headers:{"Accept":"application/json"}});
-   if(!response.ok)throw new Error("SEARCH_FAILED");
-   const data=await response.json();
-   renderUsers(data.users||[]);renderDebates(data.debates||[]);
-   if(empty)empty.hidden=Boolean((data.users||[]).length||(data.debates||[]).length);
-  }catch(error){if(error instanceof DOMException&&error.name==="AbortError")return;clear(usersBox);clear(debatesBox);if(empty){empty.hidden=false;empty.textContent=locale==="en"?"Search is temporarily unavailable.":"La búsqueda no está disponible temporalmente.";}}
- },220);
+ const q=input.value.trim();window.clearTimeout(timer);controller?.abort();setSearching(q);
+ if(!q){activeQuery="";updateUrl("", "todo",true);requestSearch("","todo");return;}
+ if(q.replace(/^@/,"").length<2){activeQuery=q;clear(usersBox);clear(debatesBox);if(empty)empty.hidden=true;return;}
+ timer=window.setTimeout(()=>requestSearch(q,"todo",true),250);
 });
+tabs.forEach(button=>button.addEventListener("click",()=>setTab(button.dataset.tab||"todo")));
+document.querySelectorAll<HTMLButtonElement>("[data-see-all]").forEach(button=>button.addEventListener("click",()=>setTab(button.dataset.seeAll||"todo")));
+document.getElementById("community-users-more")?.addEventListener("click",()=>loadMore("usuarios"));
+document.getElementById("community-debates-more")?.addEventListener("click",()=>loadMore("debates"));
+function restoreFromUrl(){
+ const url=new URL(window.location.href),q=(url.searchParams.get("q")||"").trim(),tab=url.searchParams.get("tipo")||"todo";
+ if(input)input.value=q;setSearching(q);
+ if(q.length>=2)void requestSearch(q,["todo","usuarios","debates"].includes(tab)?tab:"todo",false);else{activeQuery="";setTab("todo",false);}
+}
+window.addEventListener("popstate",restoreFromUrl);
+restoreFromUrl();
 document.querySelectorAll<HTMLButtonElement>(".share").forEach(button=>button.addEventListener("click",async()=>{const url=new URL(button.dataset.shareUrl||"",window.location.origin).toString();try{if(navigator.share)await navigator.share({url});else if(navigator.clipboard)await navigator.clipboard.writeText(url);}catch{}}));
 </script>
