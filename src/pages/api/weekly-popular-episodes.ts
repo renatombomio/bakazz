@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { getPersistentCache } from "../../lib/server/persistent-cache";
+import { requestAniList } from "../../lib/server/anilist-gateway";
 
 type AniListMedia = {
   id: number; title: { romaji: string | null; english: string | null };
@@ -10,7 +11,6 @@ type AiringSchedule = { episode: number; airingAt: number; media: AniListMedia }
 type WeeklyEpisode = { animeId: number; title: string; banner: string | null; tint: string | null; format: string | null; episode: number; airingLabel: string | null; popularity: number };
 type AniListResponse = { data?: { Page?: { pageInfo?: { hasNextPage?: boolean }; airingSchedules?: AiringSchedule[] } }; errors?: Array<{ message?: string }> };
 type WeeklyResult = { window: { from: string; to: string }; episodes: WeeklyEpisode[] };
-const ANILIST_ENDPOINT = "https://graphql.anilist.co";
 const MAX_PAGES = 3;
 const CACHE_SECONDS = 900;
 const QUERY = `
@@ -37,15 +37,9 @@ function getAiringLabel(airingAt: number, now: Date, lang: "es" | "en"): string 
   return `${weekday.charAt(0).toLocaleUpperCase(locale)}${weekday.slice(1)} ${time}`;
 }
 async function fetchAiringPage(page: number, from: number, to: number): Promise<AniListResponse> {
-  const response = await fetch(ANILIST_ENDPOINT, {
-    method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" },
-    body: JSON.stringify({ query: QUERY, variables: { page, from, to } }), signal: AbortSignal.timeout(12_000),
-  });
-  if (!response.ok) throw new Error(`AniList returned HTTP ${response.status}`);
-  const payload = await response.json() as AniListResponse;
-  if (payload.errors?.length) throw new Error(payload.errors.map((item) => item.message).filter(Boolean).join("; "));
+  const payload = await requestAniList<AniListResponse>(QUERY, { page, from, to }, { timeoutMs: 12000 });
   if (!payload.data?.Page || !Array.isArray(payload.data.Page.airingSchedules)) throw new Error("AniList returned an invalid airing schedule response.");
-  return payload;
+  return payload;;
 }
 export const GET: APIRoute = async ({ request }) => {
   const now = new Date(), lang = new URL(request.url).searchParams.get("lang") === "en" ? "en" : "es";

@@ -1,19 +1,18 @@
 import type { APIRoute } from "astro";
 import { getPersistentCache } from "../../lib/server/persistent-cache";
+import { requestAniList } from "../../lib/server/anilist-gateway";
 type Media = { id:number; title:{romaji:string|null;english:string|null}; coverImage:{extraLarge:string|null;large:string|null}; format:string|null; startDate:{year:number|null;month:number|null;day:number|null}; isAdult:boolean };
 type ApiResponse = { data?:{Page?:{pageInfo?:{hasNextPage?:boolean};media?:Media[]}}; errors?:Array<{message?:string}> };
 export type UpcomingRelease = {id:number;title:string;poster:string|null;date:string;format:"SERIES"|"MOVIE"};
-const ENDPOINT="https://graphql.anilist.co", FORMATS=["TV","TV_SHORT","MOVIE","OVA","ONA"], TTL=3600;
+const FORMATS=["TV","TV_SHORT","MOVIE","OVA","ONA"], TTL=3600;
 const QUERY=`query UpcomingAnimeReleases($page:Int!,$from:FuzzyDateInt!,$to:FuzzyDateInt!,$formats:[MediaFormat!]){Page(page:$page,perPage:50){pageInfo{hasNextPage} media(type:ANIME,status:NOT_YET_RELEASED,isAdult:false,format_in:$formats,startDate_greater:$from,startDate_lesser:$to,sort:START_DATE){id title{romaji english} coverImage{extraLarge large} format startDate{year month day} isAdult}}}`;
 const fuzzy=(d:Date)=>d.getUTCFullYear()*10000+(d.getUTCMonth()+1)*100+d.getUTCDate();
 async function load(from:number,to:number):Promise<UpcomingRelease[]>{
  const all:Media[]=[];let next=true;
  for(let page=1;page<=3&&next;page++){
-  const r=await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({query:QUERY,variables:{page,from,to,formats:FORMATS}}),signal:AbortSignal.timeout(12000)});
-  if(!r.ok)throw new Error(`AniList returned HTTP ${r.status}`);
-  const p=await r.json() as ApiResponse;if(p.errors?.length)throw new Error(p.errors.map(x=>x.message).filter(Boolean).join("; "));
-  if(!p.data?.Page||!Array.isArray(p.data.Page.media))throw new Error("Invalid upcoming releases response");
-  all.push(...p.data.Page.media);next=Boolean(p.data.Page.pageInfo?.hasNextPage);
+  const p=await requestAniList<ApiResponse>(QUERY,{page,from,to,formats:FORMATS},{timeoutMs:12000});
+  if(!p.Page||!Array.isArray(p.Page.media))throw new Error("Invalid upcoming releases response");
+  all.push(...p.Page.media);next=Boolean(p.Page.pageInfo?.hasNextPage);
  }
  const seen=new Set<number>();
  return all.filter(x=>!x.isAdult&&x.format&&FORMATS.includes(x.format)).map((x):UpcomingRelease|null=>{

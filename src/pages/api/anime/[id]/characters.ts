@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { createSupabaseSsrClient } from "../../../../lib/supabase-ssr";
+import { requestAniList } from "../../../../lib/server/anilist-gateway";
 
 export const prerender = false;
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
@@ -36,15 +37,8 @@ export const GET: APIRoute = async ({ request, cookies, params }) => {
         }
       }
     }`;
-    const response = await fetch("https://graphql.anilist.co", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify({ query, variables: { id: animeId, page, perPage: 25 } }),
-      signal: AbortSignal.timeout(12000),
-    });
-    if (!response.ok) return json({ ok: false, error: "ANILIST_UNAVAILABLE" }, 502);
-    const payload = await response.json();
-    const connection = payload.data?.Media?.characters;
+    const payload = await requestAniList<any>(query, { id: animeId, page, perPage: 25 }, { timeoutMs: 12000 });
+    const connection = payload.Media?.characters;
     if (!connection) return json({ ok: false, error: "CHARACTERS_NOT_FOUND" }, 404);
 
     const edges = (connection.edges ?? []).filter((edge: any) => edge?.node?.id && edge?.node?.name?.full);
