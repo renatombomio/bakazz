@@ -16,7 +16,7 @@ type Props = {
   onTabChange?: (t: SearchTab) => void;
   t: {
     all: string; users: string; debates: string; seeAll: string; more: string; similar: string;
-    stats: (seen: number, favorites: number) => string;
+    stats: string;
     empty: string;
     emptyHint: string;
   };
@@ -34,7 +34,7 @@ function UserRow({u,q,t}:{u:UserHit;q:string;t:Props["t"]}){
  const main=u.name?.trim()||u.username;
  return <a className="cs-u" href={u.href}>
   {u.avatar?<img src={u.avatar} alt="" width={46} height={46} loading="lazy"/>:<span className="cs-av" aria-hidden="true">{main.charAt(0).toUpperCase()}</span>}
-  <span><b><Mark text={main} q={q}/></b><small>@<Mark text={u.username} q={q}/> · {t.stats(u.seen,u.favorites)}</small></span>
+  <span><b><Mark text={main} q={q}/></b><small>@<Mark text={u.username} q={q}/> · {t.stats.replace("{seen}",String(u.seen)).replace("{favorites}",String(u.favorites))}</small></span>
  </a>;
 }
 function DebateRow({d,q}:{d:DebateHit;q:string}){
