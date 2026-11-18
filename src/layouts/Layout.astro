@@ -5,6 +5,7 @@ interface Props {
 }
 
 const { lang } = Astro.locals;
+const basePath = Astro.url.pathname.replace(/^\/en(?=\/|$)/, "") || "/";
 const {
   title = "Renanime's Gallery",
   description = lang === "en" ? "Personal anime gallery." : "Galería personal de anime."
