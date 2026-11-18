@@ -24,7 +24,7 @@ let otakuCount = 0;
 try {
   const [{ data: memberRows, error: memberError }, { count: userCount, error: userCountError }] = await Promise.all([
     supabase.from("profiles").select("id, aka, avatar_url, last_seen_at").eq("is_private", false).not("aka", "is", null).order("last_seen_at", { ascending: false, nullsFirst: false }).limit(18),
-    supabase.from("profiles").select("id", { count: "exact", head: true }),
+    supabase.from("profiles").select("id", { count: "exact", head: true }).eq("is_private", false).not("aka", "is", null),
   ]);
   if (userCountError) console.error("[home] Historical otaku count unavailable:", userCountError.message);
   otakuCount = userCountError ? 0 : userCount ?? 0;

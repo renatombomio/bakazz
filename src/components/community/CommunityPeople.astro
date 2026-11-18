@@ -124,7 +124,7 @@ const colors = ["#7c3aed", "#db2777", "#0ea5e9", "#f59e0b", "#10b981", "#ef4444"
     const track = state.track;
     const loopWidth = state.loopWidth;
     if (loopWidth > 0 && track.clientWidth > 0) {
-      track.scrollLeft += 0.45;
+      track.scrollLeft += 0.8;
       if (track.scrollLeft >= loopWidth) track.scrollLeft -= loopWidth;
     }
     state.raf = requestAnimationFrame(() => tick(state));
@@ -194,8 +194,8 @@ const colors = ["#7c3aed", "#db2777", "#0ea5e9", "#f59e0b", "#10b981", "#ef4444"
         window.clearTimeout(state.resumeTimer);
         state.resumeTimer = window.setTimeout(() => start(state), 2500);
       },
-      onMouseEnter: () => stop(state),
-      onMouseLeave: () => { window.clearTimeout(state.resumeTimer); state.resumeTimer = window.setTimeout(() => start(state), 2500); },
+      onMouseEnter: () => { /* Auto-scroll continues while hovered; pointer interaction pauses it explicitly. */ },
+      onMouseLeave: () => { window.clearTimeout(state.resumeTimer); start(state); },
       onFocusIn: () => stop(state),
       onFocusOut: () => { window.clearTimeout(state.resumeTimer); state.resumeTimer = window.setTimeout(() => start(state), 2500); },
       onClick: (event) => {
@@ -220,13 +220,16 @@ const colors = ["#7c3aed", "#db2777", "#0ea5e9", "#f59e0b", "#10b981", "#ef4444"
     };
     if (items.length >= 2) {
       const originals = items.map((item) => item.cloneNode(true) as HTMLElement);
+      const firstOriginalLeft = items[0].getBoundingClientRect().left;
       originals.forEach((item) => {
         item.classList.add("cp-item--duplicate");
         item.setAttribute("aria-hidden", "true");
         item.setAttribute("tabindex", "-1");
         track.appendChild(item);
       });
-      state.loopWidth = track.scrollWidth / 2;
+      // Measure the exact distance between the first original and its duplicate.
+      // scrollWidth / 2 is incorrect here because the track has 50% side padding.
+      state.loopWidth = originals[0].getBoundingClientRect().left - firstOriginalLeft;
     }
     states.set(track, state);
     track.addEventListener("scroll", state.onScroll, { passive: true });
