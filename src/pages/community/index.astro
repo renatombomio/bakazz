@@ -3,6 +3,7 @@ export const prerender = false;
 import Layout from "../../layouts/Layout.astro";
 import Navbar from "../../components/layout/Navbar.astro";
 import CommunityPeople from "../../components/community/CommunityPeople.astro";
+import CommunitySearchController from "../../components/community/CommunitySearchController";
 import WeeklyDuel from "../../components/community/WeeklyDuel";
 import { weekKey } from "../../components/community/duel";
 import { localizedPath, useT } from "../../i18n";
@@ -108,6 +109,8 @@ const cats:Record<string,string>=en?{anime:"Anime",characters:"Characters",theor
 <main id="main-content" class="community-feed">
  <header class="community-top"><h1>{en?"Community":"Comunidad"}</h1></header>
  <label class="srch"><span class="sr-only">{en?"Search debates or people":"Busca un debate o a alguien"}</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><input id="community-search" data-search-api={localizedPath(Astro.locals.lang, "/api/community/search/")} type="search" placeholder={en?"Search debates or people":"Busca un debate o a alguien"} autocomplete="off"/></label>
+ <CommunitySearchController client:load api={localizedPath(Astro.locals.lang, "/api/community/search/")} lang={en?"en":"es"} t={{all:t("community.search.all"),users:t("community.search.users"),debates:t("community.search.debates"),seeAll:t("community.search.seeAll"),more:t("community.search.more"),similar:t("community.search.similar"),stats:(seen:number,favorites:number)=>en?seen+" seen · "+favorites+" favorites":seen+" vistos · "+favorites+" favoritos",empty:(q:string)=>en?'No results for “'+q+'”':'No encontramos nada con “'+q+'”',emptyHint:t("community.search.emptyHint")}}/>
+ <div id="community-normal">
  <div class="community-top">
   <WeeklyDuel client:visible initial={duelInitial} loggedIn={!!Astro.locals.renanimeUser} loginHref={localizedPath(Astro.locals.lang, "/login/")} voteUrl={localizedPath(Astro.locals.lang, "/api/duel/vote/")} t={duelText} />
  </div>
@@ -156,6 +159,7 @@ const cats:Record<string,string>=en?{anime:"Anime",characters:"Characters",theor
     <p id="community-search-error" class="community-note" hidden>{en?"Search is temporarily unavailable.":"La búsqueda no está disponible temporalmente."}</p>
   </div>
 </section>
+</div>
 </main>
 <style>
 /* Keep the trending debate card aligned with the full Debates feed. */
@@ -205,108 +209,5 @@ const cats:Record<string,string>=en?{anime:"Anime",characters:"Characters",theor
 </style>
 </Layout>
 <script>
-const input=document.querySelector<HTMLInputElement>("#community-search");
-const results=document.querySelector<HTMLElement>("#community-search-results");
-const usersBox=document.querySelector<HTMLElement>("#community-search-users");
-const debatesBox=document.querySelector<HTMLElement>("#community-search-debates");
-const empty=document.querySelector<HTMLElement>("#community-search-empty");
-const errorBox=document.querySelector<HTMLElement>("#community-search-error");
-const tabs=[...document.querySelectorAll<HTMLButtonElement>("#community-search-tabs [role=tab]")];
-const searchable=[...document.querySelectorAll<HTMLElement>(".community-searchable")];
-const locale=document.documentElement.lang.toLowerCase().startsWith("en")?"en":"es";
-const api=input?.dataset.searchApi||"/api/community/search/";
-const PAGE_SIZE=20;
-let timer=0,controller:AbortController|null=null,activeQuery="",activeTab="todo",userPage=0,debatePage=0,userTotal=0,debateTotal=0,users:any[]=[],debates:any[]=[],loadingUsers=false,loadingDebates=false;
-const make=(tag:string,className:string,text:string)=>{const node=document.createElement(tag);node.className=className;node.textContent=text;return node;};
-const clear=(node:HTMLElement|null)=>{node?.replaceChildren();};
-function setCount(id:string,value:number){const el=document.getElementById(id);if(el)el.textContent=String(value);}
-function setSearching(q:string){searchable.forEach(el=>el.hidden=Boolean(q));if(results)results.hidden=!q;}
-function updateUrl(q:string,tab:string,replace=false){
- const url=new URL(window.location.href);
- if(q){url.searchParams.set("q",q);url.searchParams.set("tipo",tab);}else{url.searchParams.delete("q");url.searchParams.delete("tipo");}
- history[replace?"replaceState":"pushState"](null,"",url);
-}
-function setTab(tab:string,update=true){
- activeTab=tab;
- tabs.forEach(button=>{const selected=button.dataset.tab===tab;button.setAttribute("aria-selected",String(selected));});
- const ug=document.getElementById("community-users-group"),dg=document.getElementById("community-debates-group");
- if(ug)ug.hidden=tab==="debates";if(dg)dg.hidden=tab==="usuarios";
- const uSee=document.querySelector<HTMLElement>('[data-see-all="usuarios"]'),dSee=document.querySelector<HTMLElement>('[data-see-all="debates"]');
- if(uSee)uSee.hidden=tab!=="todo"||userTotal<=3;if(dSee)dSee.hidden=tab!=="todo"||debateTotal<=3;
- const um=document.getElementById("community-users-more"),dm=document.getElementById("community-debates-more");
- if(um)um.hidden=tab!=="usuarios"||users.length>=userTotal;if(dm)dm.hidden=tab!=="debates"||debates.length>=debateTotal;
- if(update&&activeQuery)updateUrl(activeQuery,tab);
- render();
-}
-function renderUsers(rows:any[]){
- if(!usersBox)return;clear(usersBox);
- const shown=activeTab==="todo"?rows.slice(0,3):rows;
- for(const user of shown){const a=document.createElement("a");a.className="community-search-user";a.href=(locale==="en"?"/en":"")+"/u/"+encodeURIComponent(user.aka)+"/";
- const img=document.createElement("img");img.src=user.avatar_url||"/images/profile-avatar-placeholder.svg";img.alt="";img.loading="lazy";
- const meta=make("span","search-user-meta","");meta.append(make("strong","", "@"+user.aka));
- const presence=make("i","search-presence "+(user.isOnline?"is-online":"is-offline"),"");presence.title=user.isOnline?(locale==="en"?"Online":"En línea"):(locale==="en"?"Offline":"Desconectado");meta.append(presence);a.append(img,meta);usersBox.append(a);}
-}
-function renderDebates(rows:any[]){
- if(!debatesBox)return;clear(debatesBox);
- const shown=activeTab==="todo"?rows.slice(0,3):rows;
- for(const debate of shown){const a=document.createElement("a");a.className="community-search-debate";a.href=(locale==="en"?"/en":"")+"/community/debates/"+encodeURIComponent(debate.id)+"/";
- const avatar=document.createElement("img");avatar.src=debate.avatar_url||"/images/profile-avatar-placeholder.svg";avatar.alt="";avatar.loading="lazy";
- const content=make("span","search-debate-content","");content.append(make("strong","",debate.title),make("small","", "@"+debate.aka));a.append(avatar,content);debatesBox.append(a);}
-}
-function render(){
- renderUsers(users);renderDebates(debates);
- const none=(activeTab==="todo"?userTotal+debateTotal===0:activeTab==="usuarios"?userTotal===0:debateTotal===0);
- if(empty)empty.hidden=!none;
- const um=document.getElementById("community-users-more"),dm=document.getElementById("community-debates-more");
- if(um)um.hidden=activeTab!=="usuarios"||users.length>=userTotal;
- if(dm)dm.hidden=activeTab!=="debates"||debates.length>=debateTotal;
-}
-function updateCounts(){
- setCount("community-users-count",userTotal);setCount("community-debates-count",debateTotal);
- setCount("community-users-heading-count",userTotal);setCount("community-debates-heading-count",debateTotal);
-}
-async function requestSearch(q:string,tab:string,replaceUrl=false){
- controller?.abort();controller=new AbortController();activeQuery=q;
- if(!q){setSearching("");clear(usersBox);clear(debatesBox);if(empty)empty.hidden=true;if(errorBox)errorBox.hidden=true;users=[];debates=[];userTotal=debateTotal=0;return;}
- setSearching(q);if(results)results.hidden=false;if(errorBox)errorBox.hidden=true;
- const url=new URL(api,window.location.origin);url.searchParams.set("q",q);url.searchParams.set("usersPage","0");url.searchParams.set("debatesPage","0");
- try{
-  const response=await fetch(url,{signal:controller.signal,credentials:"same-origin",headers:{"Accept":"application/json"}});
-  if(!response.ok)throw new Error("SEARCH_FAILED");
-  const data=await response.json();if(q!==activeQuery)return;
-  users=data.users||[];debates=data.debates||[];userTotal=Number(data.usersTotal)||0;debateTotal=Number(data.debatesTotal)||0;userPage=debatePage=0;
-  updateCounts();setTab(tab,false);if(replaceUrl)updateUrl(q,tab,true);
- }catch(err){if(err instanceof DOMException&&err.name==="AbortError")return;if(errorBox){errorBox.hidden=false;errorBox.textContent=locale==="en"?"Search is temporarily unavailable.":"La búsqueda no está disponible temporalmente.";}}
-}
-async function loadMore(kind:"usuarios"|"debates"){
- const isUsers=kind==="usuarios";if(isUsers?loadingUsers:loadingDebates)return;
- if(isUsers)loadingUsers=true;else loadingDebates=true;
- const next=(isUsers?userPage:debatePage)+1;const url=new URL(api,window.location.origin);url.searchParams.set("q",activeQuery);url.searchParams.set(isUsers?"usersPage":"debatesPage",String(next));
- const button=document.getElementById(isUsers?"community-users-more":"community-debates-more") as HTMLButtonElement|null;if(button)button.disabled=true;
- try{
-  const response=await fetch(url,{credentials:"same-origin",headers:{"Accept":"application/json"}});if(!response.ok)throw new Error("PAGE_FAILED");
-  const data=await response.json();if(activeQuery!==input?.value.trim())return;
-  if(isUsers){users=[...users,...(data.users||[])];userPage=next;}else{debates=[...debates,...(data.debates||[])];debatePage=next;}
-  render();
- }catch{if(errorBox){errorBox.hidden=false;errorBox.textContent=locale==="en"?"Could not load more results. Try again.":"No se pudieron cargar más resultados. Inténtalo de nuevo.";}}
- finally{if(isUsers)loadingUsers=false;else loadingDebates=false;if(button)button.disabled=false;}
-}
-input?.addEventListener("input",()=>{
- const q=input.value.trim();window.clearTimeout(timer);controller?.abort();setSearching(q);
- if(!q){activeQuery="";updateUrl("", "todo",true);requestSearch("","todo");return;}
- if(q.replace(/^@/,"").length<2){activeQuery=q;clear(usersBox);clear(debatesBox);if(empty)empty.hidden=true;return;}
- timer=window.setTimeout(()=>requestSearch(q,"todo",true),250);
-});
-tabs.forEach(button=>button.addEventListener("click",()=>setTab(button.dataset.tab||"todo")));
-document.querySelectorAll<HTMLButtonElement>("[data-see-all]").forEach(button=>button.addEventListener("click",()=>setTab(button.dataset.seeAll||"todo")));
-document.getElementById("community-users-more")?.addEventListener("click",()=>loadMore("usuarios"));
-document.getElementById("community-debates-more")?.addEventListener("click",()=>loadMore("debates"));
-function restoreFromUrl(){
- const url=new URL(window.location.href),q=(url.searchParams.get("q")||"").trim(),tab=url.searchParams.get("tipo")||"todo";
- if(input)input.value=q;setSearching(q);
- if(q.length>=2)void requestSearch(q,["todo","usuarios","debates"].includes(tab)?tab:"todo",false);else{activeQuery="";setTab("todo",false);}
-}
-window.addEventListener("popstate",restoreFromUrl);
-restoreFromUrl();
 document.querySelectorAll<HTMLButtonElement>(".share").forEach(button=>button.addEventListener("click",async()=>{const url=new URL(button.dataset.shareUrl||"",window.location.origin).toString();try{if(navigator.share)await navigator.share({url});else if(navigator.clipboard)await navigator.clipboard.writeText(url);}catch{}}));
 </script>

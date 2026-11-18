@@ -247,5 +247,7 @@
   "community.search.seeAll": "Ver todos",
   "community.search.more": "Cargar más",
   "community.search.empty": "No hay resultados para esta búsqueda.",
-  "community.search.error": "La búsqueda no está disponible temporalmente."
+  "community.search.error": "La búsqueda no está disponible temporalmente.",
+  "community.search.similar": "Usuarios parecidos",
+  "community.search.emptyHint": "Prueba con otro nombre o con menos letras."
 }

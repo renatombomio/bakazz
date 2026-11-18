@@ -247,5 +247,7 @@
   "community.search.seeAll": "View all",
   "community.search.more": "Load more",
   "community.search.empty": "No results match your search.",
-  "community.search.error": "Search is temporarily unavailable."
+  "community.search.error": "Search is temporarily unavailable.",
+  "community.search.similar": "Similar users",
+  "community.search.emptyHint": "Try another name or fewer letters."
 }

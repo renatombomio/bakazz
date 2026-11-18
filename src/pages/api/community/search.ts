@@ -20,7 +20,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
   const debatesPage = safePage(url.searchParams.get("debatesPage"));
   try {
     const supabase = createSupabaseSsrClient(request, cookies);
-    const userFields = "id,aka,avatar_url,last_seen_at";
+    const userFields = "id,name,aka,avatar_url,last_seen_at";
     const exact = () => supabase.from("profiles").select(userFields, { count: "exact", head: true }).eq("is_private", false).not("aka", "is", null).ilike("aka", query);
     const prefix = () => supabase.from("profiles").select(userFields, { count: "exact", head: true }).eq("is_private", false).not("aka", "is", null).ilike("aka", query + "%").not("aka", "ilike", query);
     const contains = () => supabase.from("profiles").select(userFields, { count: "exact", head: true }).eq("is_private", false).not("aka", "is", null).ilike("aka", "%" + query + "%").not("aka", "ilike", query + "%");
@@ -63,14 +63,31 @@ export const GET: APIRoute = async ({ request, cookies }) => {
       console.warn("[community-search] debates failed", debateResult.error.code);
       return json({ ok: false, error: "SEARCH_UNAVAILABLE" }, 503);
     }
-    const users = userRows.filter(row => row.aka).map(row => ({
-      id: row.id, aka: row.aka, avatar_url: row.avatar_url,
-      isOnline: Boolean(row.last_seen_at && Date.now() - new Date(row.last_seen_at).getTime() <= 120_000),
+    const users = await Promise.all(userRows.filter(row => row.aka).map(async (row) => {
+      const { data: stats, error: statsError } = await supabase.rpc("get_public_profile_stats", { target_user_id: row.id });
+      if (statsError) console.warn("[community-search] user stats unavailable", statsError.code);
+      const aggregate = Array.isArray(stats) ? stats[0] : stats;
+      return {
+        id: row.id, username: row.aka, name: row.name ?? null, avatar: row.avatar_url ?? null,
+        href: (url.pathname.startsWith("/en/") ? "/en" : "") + "/u/" + encodeURIComponent(row.aka) + "/",
+        seen: Number(aggregate?.watched_count) || 0,
+        favorites: Number(aggregate?.anime_likes_count) || 0,
+      };
     }));
-    const debates = (debateResult.data ?? []).map((row: any) => {
+    const debates = await Promise.all((debateResult.data ?? []).map(async (row: any) => {
       const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
-      return { id: row.id, title: row.title, aka: profile?.aka ?? "", avatar_url: profile?.avatar_url ?? null };
-    });
+      const { count } = await supabase.from("community_debate_comments").select("id", { count: "exact", head: true }).eq("debate_id", row.id).eq("status", "visible");
+      const minutes = Math.max(0, Math.floor((Date.now() - new Date(row.created_at).getTime()) / 60000));
+      const english = url.pathname.startsWith("/en/");
+      const age = minutes < 60 ? (minutes < 1 ? (english ? "now" : "ahora") : minutes + (english ? "m" : " min"))
+        : minutes < 1440 ? Math.floor(minutes / 60) + (english ? "h" : " h")
+        : Math.floor(minutes / 1440) + (english ? "d" : " d");
+      return {
+        id: row.id, title: row.title,
+        meta: (count ?? 0) + (english ? " replies · " : " respuestas · ") + age + (english ? " · by @" : " · por @") + (profile?.aka ?? ""),
+        href: (english ? "/en" : "") + "/community/debates/" + row.id + "/",
+      };
+    }));
     return json({ ok: true, users, debates, usersTotal, debatesTotal: debateCount.count ?? 0, pageSize: PAGE_SIZE });
   } catch (error) {
     console.error("[community-search] failed", error);
