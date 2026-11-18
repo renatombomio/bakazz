@@ -107,7 +107,7 @@ const cats:Record<string,string>=en?{anime:"Anime",characters:"Characters",theor
 <Navbar/>
 <main id="main-content" class="community-feed">
  <header class="community-top"><h1>{en?"Community":"Comunidad"}</h1></header>
- <label class="srch"><span class="sr-only">{en?"Search debates or people":"Busca un debate o a alguien"}</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><input id="community-search" type="search" placeholder={en?"Search debates or people":"Busca un debate o a alguien"} autocomplete="off"/></label>
+ <label class="srch"><span class="sr-only">{en?"Search debates or people":"Busca un debate o a alguien"}</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><input id="community-search" data-search-api={localizedPath(Astro.locals.lang, "/api/community/search/")} type="search" placeholder={en?"Search debates or people":"Busca un debate o a alguien"} autocomplete="off"/></label>
  <div class="community-top">
   <WeeklyDuel client:visible initial={duelInitial} loggedIn={!!Astro.locals.renanimeUser} loginHref={localizedPath(Astro.locals.lang, "/login/")} voteUrl={localizedPath(Astro.locals.lang, "/api/duel/vote/")} t={duelText} />
  </div>
@@ -214,7 +214,7 @@ const errorBox=document.querySelector<HTMLElement>("#community-search-error");
 const tabs=[...document.querySelectorAll<HTMLButtonElement>("#community-search-tabs [role=tab]")];
 const searchable=[...document.querySelectorAll<HTMLElement>(".community-searchable")];
 const locale=document.documentElement.lang.toLowerCase().startsWith("en")?"en":"es";
-const api=(locale==="en"?"/en":"")+"/api/community/search/";
+const api=input?.dataset.searchApi||"/api/community/search/";
 const PAGE_SIZE=20;
 let timer=0,controller:AbortController|null=null,activeQuery="",activeTab="todo",userPage=0,debatePage=0,userTotal=0,debateTotal=0,users:any[]=[],debates:any[]=[],loadingUsers=false,loadingDebates=false;
 const make=(tag:string,className:string,text:string)=>{const node=document.createElement(tag);node.className=className;node.textContent=text;return node;};
