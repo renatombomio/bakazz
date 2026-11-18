@@ -16,6 +16,7 @@ import AnimeTop from "./AnimeTop";
 
 interface Media {
   id: number | string;
+  idMal?: number | null;
   title?: { romaji?: string|null; english?: string|null; native?: string|null };
   description?: string|null;
   genres?: string[];
@@ -108,135 +109,47 @@ function getSeasonCount(media: Media|null){
     .filter((edge)=>edge.node?.format==="TV")
     .map((edge)=>edge.node?.id)
     .filter((id): id is number => typeof id==="number");
-  return Math.max(1,new Set(relatedTv).size+1);
+  return Math.max(1,new Seconst DETAIL_CACHE_PREFIX="renanime:anime-detail:v2:";
+const DETAIL_CACHE_TTL=7*24*60*60*1000;
+const DETAIL_STALE_TTL=30*24*60*60*1000;
+const detailPending=new Map<string,Promise<Media|null>>();
+
+function readDetailCache(key:string):{media:Media;age:number}|null{
+ try{const raw=localStorage.getItem(DETAIL_CACHE_PREFIX+key);if(!raw)return null;const parsed=JSON.parse(raw);if(!parsed?.media||!parsed?.savedAt||Date.now()-parsed.savedAt>DETAIL_STALE_TTL)return null;return {media:parsed.media as Media,age:Date.now()-parsed.savedAt};}catch{return null;}
 }
-
-async function findAnime(entry: LibraryEntry): Promise<Media|null> {
-  const numericId=Number(entry.animeId);
-  const mediaId=getRenAniListId(entry.animeId) ?? FRANCHISE_MEDIA_ALIASES[entry.animeId] ?? (
-    Number.isInteger(numericId) && numericId > 0 ? numericId : undefined
-  );
-
-  const query=mediaId
-    ? `query DetailById($id:Int!){
-        Media(id:$id,type:ANIME){
-          id
-          title{romaji english native}
-          description(asHtml:false)
-          genres
-          startDate{year month day}
-          format
-          status
-          episodes
-          duration
-          averageScore
-          seasonYear
-          studios(isMain:true){nodes{name}}
-          coverImage{extraLarge large}
-          bannerImage
-          trailer{id site thumbnail}
-          characters(page:1,perPage:12,sort:ROLE){edges{role node{id name{full} image{large}}}}
-          relations{
-            edges{
-              relationType
-              node{
-                id
-                type
-                format
-                title{romaji english native}
-                coverImage{extraLarge large}
-              }
-            }
-          }
-          recommendations(sort:RATING_DESC,page:1,perPage:12){
-            nodes{
-              mediaRecommendation{
-                id
-                title{romaji english native}
-                coverImage{extraLarge large}
-                format
-                startDate{year}
-              }
-            }
-          }
-        }
-      }`
-    : `query DetailBySearch($search:String!){
-        Page(page:1,perPage:10){
-          media(search:$search,type:ANIME,sort:SEARCH_MATCH){
-            id
-            title{romaji english native}
-            description(asHtml:false)
-            genres
-            startDate{year month day}
-            format
-            status
-            episodes
-            duration
-            averageScore
-            seasonYear
-            studios(isMain:true){nodes{name}}
-            coverImage{extraLarge large}
-            bannerImage
-            trailer{id site thumbnail}
-            characters(page:1,perPage:12,sort:ROLE){edges{role node{id name{full} image{large}}}}
-            relations{
-              edges{
-                relationType
-                node{
-                  id
-                  type
-                  format
-                  title{romaji english native}
-                  coverImage{extraLarge large}
-                }
-              }
-            }
-            recommendations(sort:RATING_DESC,page:1,perPage:12){
-              nodes{
-                mediaRecommendation{
-                  id
-                  title{romaji english native}
-                  coverImage{extraLarge large}
-                  format
-                  startDate{year}
-                }
-              }
-            }
-          }
-        }
-      }`;
-
+function writeDetailCache(key:string,media:Media){if(typeof media.id!=="number")return;try{localStorage.setItem(DETAIL_CACHE_PREFIX+key,JSON.stringify({media,savedAt:Date.now()}));}catch{}}
+async function fetchAniListWithRetry(query:string,variables:Record<string,unknown>,attempts=3):Promise<any>{
+ let lastError:unknown;
+ for(let attempt=0;attempt<attempts;attempt++){
+  const controller=new AbortController();const timeout=window.setTimeout(()=>controller.abort(),10000);
   try{
-    // A stalled AniList request must not leave the detail loading forever.
-    const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), 6500);
-    let response: Response;
-    try {
-      response = await fetch(ENDPOINT,{
-        method:"POST",
-        headers:{"Content-Type":"application/json",Accept:"application/json"},
-        body:JSON.stringify(
-          mediaId
-            ? {query,variables:{id:mediaId}}
-            : {query,variables:{search:entry.title}}
-        ),
-        signal: controller.signal,
-      });
-    } finally {
-      window.clearTimeout(timeout);
-    }
-    if(!response.ok) throw new Error("AniList detail lookup failed");
-    const payload=await response.json();
-    const candidate = mediaId
-      ? (payload.data?.Media ?? null)
-      : selectBestAnimeCandidate(payload.data?.Page?.media ?? [], entry.title, entry.format);
-    if (candidate) return candidate;
-  }catch{
-    // AniList unavailable or unable to identify the requested title: try Jikan.
-  }
-
-  return fetchFallbackAnime(entry.title, entry.format);
+   const response=await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({query,variables}),signal:controller.signal});
+   if(response.status===429||response.status>=500){const retryAfter=Number(response.headers.get("Retry-After"));if(attempt<attempts-1){await new Promise(resolve=>window.setTimeout(resolve,Math.min(8000,Math.max(retryAfter*1000||0,900*(attempt+1)))));continue;}throw new Error("ANILIST_TEMPORARILY_UNAVAILABLE");}
+   if(!response.ok)throw new Error("ANILIST_HTTP_"+response.status);
+   const payload=await response.json();if(payload.errors?.length)throw new Error("ANILIST_GRAPHQL_ERROR");return payload.data;
+  }catch(error){lastError=error;if(attempt<attempts-1)await new Promise(resolve=>window.setTimeout(resolve,700*(attempt+1)));}
+  finally{window.clearTimeout(timeout);}
+ }
+ throw lastError??new Error("ANILIST_UNAVAILABLE");
+}
+async function resolveAnime(entry:LibraryEntry):Promise<Media|null>{
+ const numericId=Number(entry.animeId);const mediaId=getRenAniListId(entry.animeId)??FRANCHISE_MEDIA_ALIASES[entry.animeId]??(Number.isInteger(numericId)&&numericId>0?numericId:undefined);
+ const fields="id idMal title{romaji english native} description(asHtml:false) genres startDate{year month day} format status episodes duration averageScore seasonYear studios(isMain:true){nodes{name}} coverImage{extraLarge large} bannerImage trailer{id site thumbnail} characters(page:1,perPage:12,sort:ROLE){edges{role node{id name{full} image{large}}}} relations{edges{relationType node{id type format title{romaji english native} coverImage{extraLarge large}}}} recommendations(sort:RATING_DESC,page:1,perPage:12){nodes{mediaRecommendation{id title{romaji english native} coverImage{extraLarge large} format startDate{year}}}}";
+ const query=mediaId?"query DetailById($id:Int!){Media(id:$id,type:ANIME){"+fields+"}}":"query DetailBySearch($search:String!){Page(page:1,perPage:10){media(search:$search,type:ANIME,sort:SEARCH_MATCH){"+fields+"}}}";
+ const data=await fetchAniListWithRetry(query,mediaId?{id:mediaId}:{search:entry.title});
+ const candidate=mediaId?(data?.Media??null):selectBestAnimeCandidate(data?.Page?.media??[],entry.title,entry.format);
+ return candidate as Media|null;
+}
+async function findAnime(entry:LibraryEntry):Promise<Media|null>{
+ const key=entry.animeId;const cached=readDetailCache(key);if(cached&&cached.age<=DETAIL_CACHE_TTL)return cached.media;
+ const existing=detailPending.get(key);if(existing)return existing;
+ const task=(async()=>{
+  try{const media=await resolveAnime(entry);if(media){writeDetailCache(key,media);return media;}}catch{}
+  const fallback=await fetchFallbackAnime(entry.title,entry.format);
+  if(fallback?.idMal){try{const mapped=await fetchAniListWithRetry("query DetailByMalId($idMal:Int!){Media(idMal:$idMal,type:ANIME){id idMal title{romaji english native} description(asHtml:false) genres startDate{year month day} format status episodes duration averageScore seasonYear studios(isMain:true){nodes{name}} coverImage{extraLarge large} bannerImage trailer{id site thumbnail}}}",{idMal:fallback.idMal},2);if(mapped?.Media){const resolved={...fallback,...mapped.Media};writeDetailCache(key,resolved);return resolved as Media;}}catch{}}
+  if(cached)return cached.media;return fallback as Media|null;
+ })().finally(()=>detailPending.delete(key));detailPending.set(key,task);return task;
+}.title, entry.format);
 }
 
 async function findAnimeBatch(entries: LibraryEntry[]): Promise<Record<string, Media|null>> {

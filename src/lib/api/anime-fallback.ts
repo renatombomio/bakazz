@@ -2,6 +2,7 @@ import { isAnimeCandidateMatch, type PosterFormat } from "./poster-fallback";
 
 export interface FallbackAnimeMedia {
   id: string;
+  idMal?: number;
   title?: { romaji?: string | null; english?: string | null };
   description?: string | null;
   genres?: string[];
@@ -67,6 +68,7 @@ function toMedia(item: JikanAnime): FallbackAnimeMedia {
     || item.images?.jpg?.image_url;
   return {
     id: `mal-${item.mal_id}`,
+    idMal: item.mal_id,
     title: { romaji: item.title || null, english: item.title_english || null },
     description: item.synopsis || null,
     genres: item.genres?.map((genre) => genre.name) ?? [],
