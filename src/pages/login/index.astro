@@ -269,6 +269,12 @@ const completeProfile = Astro.url.searchParams.get("complete-profile") === "1";
         throw new Error(message);
       }
       if (mode === "register") {
+        if (data.requiresEmailConfirmation === false) {
+          // Supabase returned an active session: enter the app instead of
+          // asking the newly authenticated user to sign in a second time.
+          window.location.assign(isEnglish ? "/en/" : "/");
+          return;
+        }
         setMode("login");
         setFeedback(isEnglish ? "Account created. Check your email to confirm it before signing in." : "Cuenta creada. Revisa tu email para confirmarla antes de iniciar sesión.");
       } else if (mode === "recovery") {
