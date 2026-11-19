@@ -157,7 +157,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   if (isPublicAuthPage) {
     if (routePath === "/auth/callback" || routePath === "/login" || routePath === "/register") {
-      if (!context.url.searchParams.has("recovery")) {
+      const isCompletingProfile =
+        routePath === "/login" && context.url.searchParams.get("complete-profile") === "1";
+
+      // An authenticated user without a nickname must be allowed to render
+      // the profile-completion form instead of being redirected to itself.
+      if (!context.url.searchParams.has("recovery") && !isCompletingProfile) {
         return hasNickname
           ? context.redirect(isEnglish ? "/en/" : "/", 303)
           : context.redirect(localizedPath(context.locals.lang, "/login/") + "?complete-profile=1", 303);
