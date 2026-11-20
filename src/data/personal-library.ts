@@ -1,7 +1,9 @@
 import type { PersonalAnimeEntry, PersonalAnimeStatus } from "../types/personal";
 
-const STORAGE_KEY = "renanime:personal-library:v1";
-const CHANGE_EVENT = "renanime:personal-library-change";
+const STORAGE_KEY = "bakazz:personal-library:v1";
+const LEGACY_STORAGE_KEY = "renanime:personal-library:v1";
+const CHANGE_EVENT = "bakazz:personal-library-change";
+const LEGACY_CHANGE_EVENT = "renanime:personal-library-change";
 
 let library: PersonalAnimeEntry[] = [];
 let hydrated = false;
@@ -59,7 +61,7 @@ function isBrowser() { return typeof window !== "undefined"; }
 function readLegacy(): PersonalAnimeEntry[] {
   if (!isBrowser()) return [];
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = window.localStorage.getItem(STORAGE_KEY) ?? window.localStorage.getItem(LEGACY_STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as unknown;
     if (!Array.isArray(parsed)) return [];
@@ -73,6 +75,7 @@ function readLegacy(): PersonalAnimeEntry[] {
 
 function notify() {
   if (isBrowser()) window.dispatchEvent(new CustomEvent(CHANGE_EVENT));
+    window.dispatchEvent(new CustomEvent(LEGACY_CHANGE_EVENT));
 }
 
 async function request(input: RequestInfo, init?: RequestInit) {
@@ -119,6 +122,7 @@ export async function hydratePersonalLibrary() {
       }
 
       window.localStorage.removeItem(STORAGE_KEY);
+      window.localStorage.removeItem(LEGACY_STORAGE_KEY);
       hydrated = true;
       notify();
     } catch {
