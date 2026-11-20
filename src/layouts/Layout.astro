@@ -11,7 +11,7 @@ const {
   description = lang === "en" ? "Personal anime gallery." : "Galería personal de anime."
 } = Astro.props;
 const isAuth = basePath === "/login" || basePath === "/login/";
-const isAuthenticated = Boolean(Astro.locals.renanimeUser);
+const isAuthenticated = Boolean(Astro.locals.bakazzUser);
 
 import "../styles/global.css";
 import "@fontsource/anton/400.css";
@@ -67,7 +67,7 @@ import Analytics from '@vercel/analytics/astro';
 </style>
 
 <script>
-  let renanimePresenceTimer: number | undefined;
+  let bakazzPresenceTimer: number | undefined;
   const sendPresenceHeartbeat = async () => {
     if (document.body.dataset.authenticated !== "true" || document.visibilityState !== "visible") return;
     try {
@@ -85,16 +85,16 @@ import Analytics from '@vercel/analytics/astro';
       // Presence is best-effort and must never block page rendering.
     }
   };
-  const startRenanimePresence = () => {
-    if (renanimePresenceTimer) window.clearInterval(renanimePresenceTimer);
+  const startBakazzPresence = () => {
+    if (bakazzPresenceTimer) window.clearInterval(bakazzPresenceTimer);
     void sendPresenceHeartbeat();
-    renanimePresenceTimer = window.setInterval(sendPresenceHeartbeat, 45_000);
+    bakazzPresenceTimer = window.setInterval(sendPresenceHeartbeat, 45_000);
   };
-  document.addEventListener("astro:page-load", startRenanimePresence);
+  document.addEventListener("astro:page-load", startBakazzPresence);
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") void sendPresenceHeartbeat();
   });
-  startRenanimePresence();
+  startBakazzPresence();
 </script>
 
 
