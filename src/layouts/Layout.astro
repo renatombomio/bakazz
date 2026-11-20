@@ -7,7 +7,7 @@ interface Props {
 const { lang } = Astro.locals;
 const basePath = Astro.url.pathname.replace(/^\/en(?=\/|$)/, "") || "/";
 const {
-  title = "Renanime's Gallery",
+  title = "BAKAZZ — Anime Community",
   description = lang === "en" ? "Personal anime gallery." : "Galería personal de anime."
 } = Astro.props;
 const isAuth = basePath === "/login" || basePath === "/login/";
