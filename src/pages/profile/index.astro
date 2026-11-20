@@ -11,7 +11,7 @@ import ProfileHeader from "../../components/profile/ProfileHeader.astro";
 
 const lang = Astro.locals.lang;
 const isEnglish = lang === "en";
-const user = Astro.locals.renanimeUser;
+const user = Astro.locals.bakazzUser;
 if (!user) return Astro.redirect(localizedPath(Astro.locals.lang, "/login/"));
 const supabase = createSupabaseSsrClient(Astro.request, Astro.cookies);
 const { data: libraryData, error: libraryError } = await supabase
@@ -21,7 +21,7 @@ const { data: libraryData, error: libraryError } = await supabase
   .order("updated_at", { ascending: false });
 
 if (libraryError) {
-  console.error("Renanime profile library error:", libraryError.message);
+  console.error("BAKAZZ profile library error:", libraryError.message);
 }
 
 const { data: profileData } = await supabase
@@ -47,7 +47,7 @@ const { data: favoriteData, error: favoriteError } = await supabase
   .eq("user_id", user.id)
   .order("created_at", { ascending: false })
   .limit(5);
-if (favoriteError) console.error("Renanime profile favorites error:", favoriteError.message);
+if (favoriteError) console.error("BAKAZZ profile favorites error:", favoriteError.message);
 const favorites = Array.isArray(favoriteData) ? favoriteData : [];
 const { data: characterFavoriteData, error: characterFavoriteError } = await supabase
   .from("character_likes")
@@ -55,7 +55,7 @@ const { data: characterFavoriteData, error: characterFavoriteError } = await sup
   .eq("user_id", user.id)
   .order("created_at", { ascending: false })
   .limit(4);
-if (characterFavoriteError) console.error("Renanime profile character favorites error:", characterFavoriteError.message);
+if (characterFavoriteError) console.error("BAKAZZ profile character favorites error:", characterFavoriteError.message);
 const characterFavorites = (characterFavoriteData ?? []).map((row: any) => ({
   ...(Array.isArray(row.characters) ? row.characters[0] : row.characters),
   character_id: row.character_id,
@@ -67,7 +67,7 @@ const favoriteCharacterIds = characterFavorites.map((item: any) => item.id).filt
 let favoriteCharacterLikeTotals: Record<number, number> = {};
 if (favoriteCharacterIds.length) {
   const { data: totals, error } = await supabase.from("character_like_totals").select("character_id, like_count").in("character_id", favoriteCharacterIds);
-  if (error) console.error("Renanime favorite character like totals error:", error.message);
+  if (error) console.error("BAKAZZ favorite character like totals error:", error.message);
   else favoriteCharacterLikeTotals = Object.fromEntries((totals ?? []).map((row: any) => [row.character_id, Number(row.like_count ?? 0)]));
 }
 const { count: characterFavoritesCount } = await supabase
@@ -79,17 +79,17 @@ const { count: commentsCount, error: commentsCountError } = await supabase
   .from("anime_comments")
   .select("id", { count: "exact", head: true })
   .eq("user_id", user.id);
-if (commentsCountError) console.error("Renanime profile comments count error:", commentsCountError.message);
+if (commentsCountError) console.error("BAKAZZ profile comments count error:", commentsCountError.message);
 const profileCommentsCount = commentsCountError ? 0 : commentsCount ?? 0;
 const memberDate = profile.created_at ? new Date(profile.created_at).toLocaleDateString(isEnglish ? "en" : "es", { month: "short", year: "numeric" }) : "";
 const { data: debateRows, error: debatesError } = await supabase.from("community_debates").select("id, title, created_at").eq("author_id", user.id).eq("status", "published").order("created_at", { ascending: false }).limit(6);
-if (debatesError) console.error("Renanime profile debates error:", debatesError.message);
+if (debatesError) console.error("BAKAZZ profile debates error:", debatesError.message);
 const debates = Array.isArray(debateRows) ? debateRows : [];
 const debateIds = debates.map((debate: any) => debate.id);
 let debateReplyCounts: Record<string, number> = {};
 if (debateIds.length) {
   const { data: replies, error: repliesError } = await supabase.from("community_debate_comments").select("debate_id").in("debate_id", debateIds).eq("status", "published");
-  if (repliesError) console.error("Renanime profile debate replies error:", repliesError.message);
+  if (repliesError) console.error("BAKAZZ profile debate replies error:", repliesError.message);
   else debateReplyCounts = (replies ?? []).reduce((acc: Record<string, number>, row: any) => { acc[row.debate_id] = (acc[row.debate_id] ?? 0) + 1; return acc; }, {});
 }
 
@@ -121,14 +121,14 @@ if (profileAnimeIds.length) {
       if (media?.id) animeById.set(id, media);
     });
   } catch (error) {
-    console.error("Renanime profile sections AniList error:", error);
+    console.error("BAKAZZ profile sections AniList error:", error);
   }
 }
 
 const { data: favoriteAnimeTotals, error: favoriteAnimeTotalsError } = favoriteAnimeIds.length
   ? await supabase.from("anime_like_totals").select("anime_id, like_count").in("anime_id", favoriteAnimeIds)
   : { data: [], error: null };
-if (favoriteAnimeTotalsError) console.error("Renanime profile anime like totals error:", favoriteAnimeTotalsError.message);
+if (favoriteAnimeTotalsError) console.error("BAKAZZ profile anime like totals error:", favoriteAnimeTotalsError.message);
 const favoriteAnimeLikeCounts = Object.fromEntries((favoriteAnimeTotals ?? []).map((row: any) => [Number(row.anime_id), Number(row.like_count ?? 0)]));
 
 const profileSectionFavorites = favorites.slice(0, 5).flatMap((entry: any) => {
@@ -192,8 +192,8 @@ const profileSectionDebates = debates.slice(0, 3).map((debate: any) => ({
 ---
 
 <Layout
-  title={`${isEnglish ? "My Profile" : "Mi perfil"} — Renanime's Gallery`}
-  description={isEnglish ? "Your personal profile on Renanime." : "Tu perfil personal en Renanime."}
+  title={`${isEnglish ? "My Profile" : "Mi perfil"} — BAKAZZ`}
+  description={isEnglish ? "Your personal profile on BAKAZZ." : "Tu perfil personal en BAKAZZ."}
 >
   <Navbar />
 
