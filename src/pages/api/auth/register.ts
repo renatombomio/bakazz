@@ -59,6 +59,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       if (error.code === "weak_password") {
         return json({ ok: false, error: "PASSWORD_REQUIREMENTS_NOT_MET" }, 400);
       }
+      if (error.code === "over_email_send_rate_limit") {
+        return json({ ok: false, error: "EMAIL_RATE_LIMIT_EXCEEDED" }, 429);
+      }
       return json({ ok: false, error: "SIGNUP_FAILED" }, 400);
     }
 
