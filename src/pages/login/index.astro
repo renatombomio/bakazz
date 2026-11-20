@@ -261,6 +261,10 @@ const completeProfile = Astro.url.searchParams.get("complete-profile") === "1";
             ? (isEnglish ? "That nickname is already taken." : "Ese mote ya está en uso.")
             : data.error === "EMAIL_PASSWORD_SIGNUP_DISABLED"
               ? (isEnglish ? "Email sign-up is not enabled yet." : "El registro por email aún no está habilitado.")
+              : data.error === "EMAIL_RATE_LIMIT_EXCEEDED"
+                ? (isEnglish
+                    ? "The email confirmation service has reached its sending limit. Please try again later or use Google sign-in."
+                    : "El servicio de confirmación por email ha alcanzado su límite de envíos. Inténtalo más tarde o utiliza Google.")
               : data.error === "PROFILE_UPDATE_FAILED"
                 ? (isEnglish
                     ? `Profile update failed (${data.code || "UNKNOWN"}).`
