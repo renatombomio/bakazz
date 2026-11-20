@@ -135,7 +135,7 @@ export default function AnimeSearchDetail({ lang = "es" }: Props){
    <div className="anime-detail-inner">
     <div className={"anime-detail-layout"+(title.length>24?" has-long-title":"")}>
      <div className="anime-detail-poster-column">
-      <div className="anime-detail-poster">{image?<img src={image} alt={title}/>:<div className="anime-detail-placeholder">RENANIME</div>}</div>
+      <div className="anime-detail-poster">{image?<img src={image} alt={title}/>:<div className="anime-detail-placeholder">BAKAZZ</div>}</div>
       <div className="anime-detail-library-actions"><PersonalLibraryActions animeId={localEntry?.animeId ?? media.id} lang={lang} /></div>
      </div>
 
