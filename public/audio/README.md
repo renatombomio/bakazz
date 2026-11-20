@@ -1,4 +1,4 @@
-# Renanime soundtrack
+# BAKAZZ soundtrack
 
 Place personal soundtrack files in these directories:
 
