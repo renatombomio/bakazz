@@ -67,7 +67,7 @@ export const GET: APIRoute = async ({ request }) => {
       }));
       return { window: { from: new Date(from * 1000).toISOString(), to: new Date(to * 1000).toISOString() }, episodes };
     });
-    return Response.json({ success: true, ...cached.value }, { headers: { "Cache-Control": "no-store", "X-Renanime-Cache": cached.cache } });
+    return Response.json({ success: true, ...cached.value }, { headers: { "Cache-Control": "no-store", "X-BAKAZZ-Cache": cached.cache } });
   } catch (error) {
     console.error("[weekly-popular-episodes] AniList request failed:", error);
     return Response.json({ success: false, error: "WEEKLY_POPULAR_EPISODES_UNAVAILABLE" }, { status: 502, headers: { "Cache-Control": "no-store" } });
