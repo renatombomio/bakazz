@@ -1,8 +1,8 @@
-# Renanime's Gallery
+# BAKAZZ — Anime Community
 
-Biblioteca personal de anime con una experiencia visual centrada en descubrir títulos, organizar lo que has visto y mantener tu lista pendiente. Renanime se está preparando para una nueva etapa con funciones sociales y una arquitectura de autenticación más segura.
+BAKAZZ es una comunidad de anime para descubrir series y películas, compartir gustos, participar en debates y conectar con otros fans. Sitio oficial: https://www.bakazz.com.
 
-> **Estado del proyecto:** Renanime está temporalmente en mantenimiento mientras se prepara la migración de autenticación de la versión 2.0. La migración aún no está activa en producción. No despliegues ni desactives el modo mantenimiento hasta completar las pruebas indicadas en la documentación de seguridad.
+> **Estado del proyecto:** BAKAZZ está temporalmente en mantenimiento mientras se prepara la migración de autenticación de la versión 2.0. La migración aún no está activa en producción. No despliegues ni desactives el modo mantenimiento hasta completar las pruebas indicadas en la documentación de seguridad.
 
 ## Funcionalidades
 
