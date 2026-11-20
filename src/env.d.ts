@@ -2,7 +2,7 @@ declare namespace App {
   interface Locals {
     lang: "es" | "en";
     basePath: string;
-    renanimeUser?: {
+    bakazzUser?: {
       id: string;
       name: string;
       aka: string;
