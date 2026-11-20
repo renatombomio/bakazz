@@ -8,7 +8,7 @@ const { lang } = Astro.locals;
 const basePath = Astro.url.pathname.replace(/^\/en(?=\/|$)/, "") || "/";
 const {
   title = "BAKAZZ — Anime Community",
-  description = lang === "en" ? "Personal anime gallery." : "Galería personal de anime."
+  description = lang === "en" ? "Discover anime, share your passion and connect with the BAKAZZ anime community." : "Descubre anime, comparte tu pasión y conecta con la comunidad de BAKAZZ."
 } = Astro.props;
 const isAuth = basePath === "/login" || basePath === "/login/";
 const isAuthenticated = Boolean(Astro.locals.bakazzUser);
@@ -26,6 +26,7 @@ import Analytics from '@vercel/analytics/astro';
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
+    <meta property="og:site_name" content="BAKAZZ" />
     <meta name="theme-color" content="#09090b" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
