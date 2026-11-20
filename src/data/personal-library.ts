@@ -14,7 +14,7 @@ const resolvedAnimeIds = new Map<string, Promise<string>>();
 /**
  * The library database stores AniList IDs. Jikan fallback detail pages expose
  * MAL IDs (mal-123), so resolve those to the canonical AniList ID before save.
- * Renanime's curated local IDs are resolved through the identity catalogue.
+ * BAKAZZ curated local IDs are resolved through the identity catalogue.
  */
 export async function resolvePersonalLibraryAnimeId(animeId: string): Promise<string> {
   const value = String(animeId).trim();
