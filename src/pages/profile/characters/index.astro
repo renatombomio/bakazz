@@ -7,7 +7,7 @@ import { localizedPath } from "../../../i18n";
 
 const lang = Astro.locals.lang;
 const isEnglish = lang === "en";
-const user = Astro.locals.renanimeUser;
+const user = Astro.locals.bakazzUser;
 if (!user) return Astro.redirect(localizedPath(lang, "/login/"));
 const supabase = createSupabaseSsrClient(Astro.request, Astro.cookies);
 const { data, error } = await supabase
@@ -16,7 +16,7 @@ const { data, error } = await supabase
   .eq("user_id", user.id)
   .order("created_at", { ascending: false })
   .range(0, 11);
-if (error) console.error("Renanime all character favorites error:", error.message);
+if (error) console.error("BAKAZZ all character favorites error:", error.message);
 const totalCharacters = (await supabase.from("character_likes").select("id", { count: "exact", head: true }).eq("user_id", user.id)).count ?? 0;
 const characters = (data ?? []).map((row: any) => ({
   ...(Array.isArray(row.characters) ? row.characters[0] : row.characters),
@@ -48,14 +48,14 @@ if (characterAnimeIds.length) {
       }).filter((entry: any) => entry[1]));
     }
   } catch (error) {
-    console.error("Renanime character anime titles error:", error);
+    console.error("BAKAZZ character anime titles error:", error);
   }
 }
 for (const character of characters) {
   character.anime_title = character.anime_id ? characterAnimeTitles[character.anime_id] ?? "" : "";
 }
 ---
-<Layout title={isEnglish ? "Favourite characters — Renanime" : "Personajes favoritos — Renanime"}>
+<Layout title={isEnglish ? "Favourite characters — BAKAZZ" : "Personajes favoritos — BAKAZZ"}>
   <Navbar />
   <main class="liked-characters-page">
     <a class="back-link" href={localizedPath(lang, "/profile/")}>← {isEnglish ? "Back to profile" : "Volver al perfil"}</a>
