@@ -40,7 +40,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
         JSON.stringify({
           ok: false,
           error: "MAINTENANCE_MODE",
-          message: "Renanime 2.0 is being updated. Please try again later.",
+          message: "BAKAZZ is being updated. Please try again later.",
         }),
         {
           status: 503,
@@ -137,7 +137,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
       });
     }
 
-    context.locals.renanimeUser = {
+    context.locals.bakazzUser = {
       id: user.id,
       name: profile?.name ?? user.user_metadata?.name ?? "Usuario",
       aka: profile?.aka ?? user.user_metadata?.aka ?? "",
@@ -152,7 +152,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     });
   }
 
-  const nickname = context.locals.renanimeUser.aka?.trim() ?? "";
+  const nickname = context.locals.bakazzUser.aka?.trim() ?? "";
   const hasNickname = Boolean(nickname && !nickname.startsWith("nakama_"));
 
   if (isPublicAuthPage) {
