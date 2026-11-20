@@ -37,7 +37,7 @@ export default function AnimePosterDisplay({
     <div className={`anime-poster-placeholder ${className}`} role="img" aria-label={`Portada no disponible: ${title}`}>
       <span className="anime-poster-placeholder__mark" aria-hidden="true">{initials || "R"}</span>
       <span className="anime-poster-placeholder__title">{title}</span>
-      <span className="anime-poster-placeholder__brand" aria-hidden="true">RENANIME</span>
+      <span className="anime-poster-placeholder__brand" aria-hidden="true">BAKAZZ</span>
     </div>
   );
 }
