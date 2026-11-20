@@ -20,7 +20,7 @@ const cacheToken = import.meta.env.ANIME_SEARCH_CACHE_TOKEN;
 const cacheClient = supabaseUrl && supabaseKey
   ? createClient(supabaseUrl, supabaseKey, {
       auth: { persistSession:false, autoRefreshToken:false, detectSessionInUrl:false },
-      global: { headers: { "x-cache-token": cacheToken ?? "", "X-Client-Info": "renanime-search-cache" } }
+      global: { headers: { "x-cache-token": cacheToken ?? "", "X-Client-Info": "bakazz-search-cache" } }
     })
   : null;
 
@@ -234,8 +234,8 @@ export const GET:APIRoute=async({request})=>{
     return Response.json({success:true,...result.data},{headers:{
       "Cache-Control":"public, max-age=0, s-maxage=300, stale-while-revalidate=600",
       "Vercel-CDN-Cache-Control":"max-age=300, stale-while-revalidate=600",
-      "X-Renanime-Search-Source":result.data.source,
-      "X-Renanime-Cache":result.cache
+      "X-BAKAZZ-Search-Source":result.data.source,
+      "X-BAKAZZ-Cache":result.cache
     }});
   } catch(e) {
     console.error("[anime-search] request failed",e instanceof Error?{name:e.name,message:e.message}:String(e));
