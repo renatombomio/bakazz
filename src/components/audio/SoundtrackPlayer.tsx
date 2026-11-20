@@ -552,7 +552,7 @@ export default function SoundtrackPlayer({ lang }: { lang: Lang }) {
             <div className="soundtrack-player__panel-head">
               <div>
                 <span className="soundtrack-player__eyebrow">
-                  {t("player.renanime")}
+                  {t("player.brand")}
                 </span>
                 <strong>{tracks.length} {t("player.tracks")}</strong>
               </div>
