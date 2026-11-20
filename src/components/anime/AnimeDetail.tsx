@@ -37,8 +37,8 @@ interface Media {
 }
 
 const ENDPOINT="https://graphql.anilist.co";
-const FRANCHISE_CACHE_PREFIX="renanime:franchise:v1:";
-const TRANSLATION_PREFIX="renanime:translation:en-es:v1:";
+const FRANCHISE_CACHE_PREFIX="bakazz:franchise:v1:";
+const TRANSLATION_PREFIX="bakazz:translation:en-es:v1:";
 const FRANCHISE_MEDIA_ALIASES: Record<string, number> = {
   "movie-063": 178788,
 };
@@ -108,7 +108,7 @@ function getSeasonCount(media: Media|null){
   return Math.max(1,new Set(relatedTv).size+1);
 }
 
-const DETAIL_CACHE_PREFIX="renanime:anime-detail:v2:";
+const DETAIL_CACHE_PREFIX="bakazz:anime-detail:v2:";
 const DETAIL_CACHE_TTL=7*24*60*60*1000;
 const DETAIL_STALE_TTL=30*24*60*60*1000;
 const detailPending=new Map<string,Promise<Media|null>>();
