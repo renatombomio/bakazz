@@ -12,8 +12,8 @@ const completeProfile = Astro.url.searchParams.get("complete-profile") === "1";
 ---
 
 <Layout
-  title={isEnglish ? "Sign in — Renanime's Gallery" : "Acceso — Renanime's Gallery"}
-  description={isEnglish ? "Sign in or create your Renanime account." : "Inicia sesión o crea tu cuenta de Renanime."}
+  title={isEnglish ? "Sign in — BAKAZZ" : "Acceso — BAKAZZ"}
+  description={isEnglish ? "Join the BAKAZZ anime community." : "Únete a la comunidad anime de BAKAZZ."}
 >
   <main class="auth-shell" data-initial-recovery={recovery ? "true" : "false"} data-initial-confirmed={confirmed ? "true" : "false"} data-initial-complete-profile={completeProfile ? "true" : "false"}>
     <a class="language-toggle-auth" data-astro-reload href={`${localizedPath(Astro.locals.lang === "es" ? "en" : "es", "/login/")}${Astro.url.search}`} hreflang={Astro.locals.lang === "es" ? "en" : "es"} aria-label={t(Astro.locals.lang === "es" ? "language.switchToEnglish" : "language.switchToSpanish")} title={t(Astro.locals.lang === "es" ? "language.switchToEnglish" : "language.switchToSpanish")}>
@@ -22,7 +22,7 @@ const completeProfile = Astro.url.searchParams.get("complete-profile") === "1";
     <div class="auth-art" aria-hidden="true">
       <img src="/images/login2.jpg" alt="" />
       <div class="art-shade"></div>
-      <a class="brand" href={localizedPath(lang, "/")} aria-label="Renanime"><span>Ren</span>anime</a>
+      <a class="brand" href={localizedPath(lang, "/")} aria-label="BAKAZZ"><span>BAKAZZ</a>
       <p class="art-caption">{isEnglish ? "YOUR ANIME WORLD. YOUR STORY." : "TU MUNDO ANIME. TU HISTORIA."}</p>
     </div>
 
@@ -70,7 +70,7 @@ const completeProfile = Astro.url.searchParams.get("complete-profile") === "1";
         <p class="feedback" id="auth-feedback" role="status" aria-live="polite"></p>
       </form>
 
-      <p class="legal">{isEnglish ? "By continuing, you agree to use Renanime respectfully. Account and privacy terms will be available before public launch." : "Al continuar, te comprometes a utilizar Renanime de forma respetuosa. Las condiciones de cuenta y privacidad estarán disponibles antes del lanzamiento público."}</p>
+      <p class="legal">{isEnglish ? "By continuing, you agree to use BAKAZZ respectfully. Account and privacy terms will be available before public launch." : "Al continuar, te comprometes a utilizar BAKAZZ de forma respetuosa. Las condiciones de cuenta y privacidad estarán disponibles antes del lanzamiento público."}</p>
     </section>
   </main>
 </Layout>
@@ -136,7 +136,7 @@ const completeProfile = Astro.url.searchParams.get("complete-profile") === "1";
     if (intro) intro.textContent = recovering
       ? (isEnglish ? "Choose a strong password for your account." : "Elige una contraseña segura para tu cuenta.")
       : completingProfile
-        ? (isEnglish ? "One last step before entering Renanime." : "Un último paso antes de entrar en Renanime.")
+        ? (isEnglish ? "One last step before joining BAKAZZ." : "Un último paso antes de entrar en BAKAZZ.")
         : (isEnglish ? (registering ? "Create your account and choose your otaku nickname." : "Sign in to your collection or create your own space.") : (registering ? "Crea tu cuenta y elige tu mote otaku." : "Entra en tu colección o crea tu propio espacio."));
     if (submit) submit.textContent = recovering
       ? (isEnglish ? "Update password" : "Actualizar contraseña")
