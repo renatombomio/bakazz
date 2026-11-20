@@ -13,7 +13,7 @@ const profile=debate?(Array.isArray(debate.profiles)?debate.profiles[0]:debate.p
 const imageUrl=debate?.image_path&&debate.image_status==="approved"?supabase.storage.from("debate-images").getPublicUrl(debate.image_path).data.publicUrl:null;
 const age=(v:string)=>{const m=Math.max(0,Math.floor((Date.now()-new Date(v).getTime())/60000));if(en){if(m<1)return"now";if(m<60)return m+"m";if(m<1440)return Math.floor(m/60)+"h";return Math.floor(m/1440)+"d";}if(m<1)return"ahora";if(m<60)return m+" min";if(m<1440)return Math.floor(m/60)+" h";return Math.floor(m/1440)+" d";};
 ---
-<Layout title={debate?debate.title+" — Renanime":"Debate no encontrado — Renanime"}><Navbar/>
+<Layout title={debate?debate.title+" — BAKAZZ":"Debate no encontrado — BAKAZZ"}><Navbar/>
 <main class="conversation">
 <a class="back" href={base+"/community/debates/"}>← {en?"All debates":"Todos los debates"}</a>
 {debate&&profile?<><article class="thread">
