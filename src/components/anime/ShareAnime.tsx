@@ -16,13 +16,13 @@ export default function ShareAnime({ title, animeId, lang }: ShareAnimeProps) {
     setUrl(new URL((isEnglish ? "/en" : "") + "/anime/" + animeId, window.location.origin).toString());
   }, [animeId, isEnglish]);
   const message = isEnglish
-    ? `Take a look at ${title} on Renanime World: ${url}`
-    : `Mira este anime en Renanime World: ${title} — ${url}`;
+    ? `Take a look at ${title} on BAKAZZ: ${url}`
+    : `Mira este anime en BAKAZZ: ${title} — ${url}`;
 
   async function shareNative() {
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
-        await navigator.share({ title: `${title} — Renanime World`, text: message, url });
+        await navigator.share({ title: `${title} — BAKAZZ`, text: message, url });
         setMenuOpen(false);
       } catch (error) {
         if (error instanceof Error && error.name !== "AbortError") setNotice(isEnglish ? "Could not open sharing." : "No se pudo abrir el menú para compartir.");
