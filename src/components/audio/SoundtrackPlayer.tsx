@@ -32,7 +32,8 @@ const PLAYLISTS: Record<PlaylistKey, Track[]> = {
   ],
 };
 
-const STORAGE_KEY = "renanime:soundtrack:v2";
+const STORAGE_KEY = "bakazz:soundtrack:v2";
+const LEGACY_STORAGE_KEY = "renanime:soundtrack:v2";
 const DEFAULT_VOLUME = 0.12;
 
 function getPlaylistKey(): PlaylistKey {
@@ -51,9 +52,11 @@ function getSavedState(): SavedState {
   };
 
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = window.localStorage.getItem(STORAGE_KEY) ?? window.localStorage.getItem(LEGACY_STORAGE_KEY);
     if (!raw) return fallback;
     const parsed = JSON.parse(raw) as Partial<SavedState>;
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+    window.localStorage.removeItem(LEGACY_STORAGE_KEY);
     const repeat = parsed.repeat === "one" || parsed.repeat === "all" ? parsed.repeat : "off";
 
     return {
