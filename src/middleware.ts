@@ -86,6 +86,13 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return isEnglish ? next(basePath + search) : next();
   }
 
+  // Keep the BAKAZZ homepage publicly viewable on Preview so the rebrand,
+  // editorial landing page and community sections can be reviewed without
+  // requiring a Supabase account. Production remains behind maintenance mode.
+  if (routePath === "/") {
+    return isEnglish ? next(basePath + search) : next();
+  }
+
   // Public API responses must not emit a language Set-Cookie header:
   // it prevents shared CDN caching for otherwise public, cacheable responses.
   context.cookies.set("lang", context.locals.lang, {
