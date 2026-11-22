@@ -26,7 +26,7 @@ if (libraryError) {
 
 const { data: profileData } = await supabase
   .from("profiles")
-  .select("id, name, aka, headline, bio, location, avatar_url, cover_url, interests, created_at, last_seen_at, instagram, tiktok")
+  .select("id, name, aka, headline, bio, location, avatar_url, cover_url, interests, created_at, last_seen_at, instagram, tiktok, is_private")
   .eq("id", user.id)
   .maybeSingle();
 const profile = { ...user, ...profileData };
