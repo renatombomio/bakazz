@@ -23,7 +23,7 @@ const otherLang = lang === "es" ? "en" : "es";
 <header class="site-header">
   <div class="header-inner">
     <a class="brand" href={localizedPath(lang, "/")} aria-label={t("nav.homeLabel")}>
-      <span class="brand-accent">Ren</span>anime
+      BAKAZZ
     </a>
 
     <nav class="desktop-nav" aria-label={t("nav.main")}>
@@ -77,19 +77,12 @@ const otherLang = lang === "es" ? "en" : "es";
     transition: opacity var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
   }
 
-  .brand-accent {
-    color: var(--color-accent);
-  }
 
   .brand:hover,
   .brand:focus-visible {
     color: var(--color-paper-50);
   }
 
-  .brand:hover .brand-accent,
-  .brand:focus-visible .brand-accent {
-    color: var(--color-accent);
-  }
 
   .desktop-nav {
     margin-left: auto;
