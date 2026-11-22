@@ -3,7 +3,7 @@ interface Props { src?: string; alt: string; ratio?: "portrait" | "landscape"; l
 const { src, alt, ratio="portrait", loading="lazy" } = Astro.props;
 ---
 <div class:list={["anime-poster", ratio === "landscape" && "is-landscape"]}>
-  {src ? <img src={src} alt={alt} loading={loading} decoding="async" /> : <div class="poster-placeholder" aria-hidden="true"><span>RENANIME</span></div>}
+  {src ? <img src={src} alt={alt} loading={loading} decoding="async" /> : <div class="poster-placeholder" aria-hidden="true"><span>BAKAZZ</span></div>}
 </div>
 <style>
 .anime-poster{position:relative;aspect-ratio:2/3;overflow:hidden;background:var(--color-ink-800)}

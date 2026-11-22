@@ -1,166 +1,99 @@
 ---
 import Container from "../ui/Container.astro";
-import { localizedPath, useT } from "../../i18n";
+import { localizedPath } from "../../i18n";
 
 const year = new Date().getFullYear();
-const { lang, basePath } = Astro.locals;
-const t = useT(lang);
-const isGhibli = basePath.startsWith("/ghibli");
+const { lang } = Astro.locals;
 ---
 
-<footer class:list={["site-footer", isGhibli && "site-footer--ghibli"]}>
-  <div class="footer-line"></div>
-
+<footer class="site-footer">
   <Container class="footer-inner">
-    <p class="closing">
-      {lang === "en" ? <>Every story has an ending.<br />Sometimes bitter, sometimes sweet,<br />but every ending brings new beginnings.</> : <>Todas las historias tienen un final.<br />A veces amargo, otras placentero,<br />pero cada final solo trae nuevos comienzos.</>}
-    </p>
+    <div class="footer-content">
+      <a class="footer-wordmark" href={localizedPath(lang, "/")} aria-label="BAKAZZ">
+        <span>Ren</span>anime World
+      </a>
+      <p class="footer-tagline">
+        {lang === "en"
+          ? "A world of stories. A community that brings them together."
+          : "Un mundo de historias. Una comunidad que las une."}
+      </p>
+    </div>
 
-    <p class="thanks">{lang === "en" ? "Thanks for visiting my anime gallery." : "Gracias por visitar mi galería de Anime."}</p>
-
-    <nav class="footer-nav" aria-label={lang === "en" ? "Footer links" : "Enlaces del pie de página"}>
-      <a href={localizedPath(lang, "/")}>{lang === "en" ? "Home" : "Inicio"}</a>
-      <a href={localizedPath(lang, "/ren-collection/")}>{lang === "en" ? "Ren's Collection" : "Colección de Ren"}</a>
-      <a href={localizedPath(lang, "/favorites/")}>{lang === "en" ? "Favorites" : "Favoritos"}</a>
-      <a href={localizedPath(lang, "/genres/")}>{lang === "en" ? "Genres" : "Géneros"}</a>
-      <a href={localizedPath(lang, "/search/")}>{lang === "en" ? "Search" : "Buscar"}</a>
-      <a href={localizedPath(lang, "/pending/")}>{lang === "en" ? "My List" : "Mi lista"}</a>
-      <a href={localizedPath(lang, "/collection/")}>{lang === "en" ? "My Collection" : "Mi colección"}</a>
-      <a href={localizedPath(lang, "/profile/")}>{lang === "en" ? "My Profile" : "Mi perfil"}</a>
-      <a href={localizedPath(lang, "/ghibli/")}>{lang === "en" ? "Ren's Secret" : "El secreto de Ren"}</a>
-    </nav>
-
-    <div class="footer-meta">
-      <span>Renanime</span>
-      <span>© {year}</span>
+    <div class="footer-bottom">
+      <span>© {year} BAKAZZ.</span>
+      <span>{lang === "en" ? "All rights reserved." : "Todos los derechos reservados."}</span>
     </div>
   </Container>
 </footer>
 
 <style>
   .site-footer {
-    background: #000;
+    position: relative;
+    overflow: hidden;
+    background: #08080b;
+    color: #f7f5f8;
+    border-top: 1px solid rgba(255, 255, 255, .08);
   }
 
-  .site-footer--ghibli {
-    background: #fff;
-    color: #19362f;
+  .footer-inner {
+    width: 100%;
+    padding-block: clamp(2.5rem, 5vw, 4rem) 1.25rem;
   }
 
-  .site-footer--ghibli .footer-line {
-    background: rgba(25, 54, 47, .12);
-  }
-
-  .site-footer--ghibli :global(.closing) {
-    color: #19362f !important;
-    opacity: 1 !important;
-  }
-
-  .site-footer--ghibli :global(.thanks) {
-    color: #486b61 !important;
-    opacity: 1 !important;
-  }
-
-  .site-footer--ghibli :global(.footer-meta) {
-    color: #4d665f !important;
-    opacity: 1 !important;
-  }
-
-  .footer-line {
-    height: 1px;
-    background: var(--color-border);
-  }
-
-  :global(.footer-inner) {
+  .footer-content {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100%;
-    padding-block: clamp(4rem, 7vw, 6rem) 2rem;
+    gap: .8rem;
+    padding-bottom: clamp(2rem, 4vw, 3rem);
     text-align: center;
   }
 
-  :global(.closing) {
-    width: 100%;
-    max-width: 44rem;
-    margin: 0 auto;
-    color: var(--color-paper-200);
-    font-family: var(--font-body);
-    font-size: clamp(1rem, 1.6vw, 1.2rem);
-    line-height: 1.8;
-    letter-spacing: 0.01em;
-    text-align: center;
+  .footer-wordmark {
+    color: #f7f5f8;
+    font-size: clamp(1.45rem, 3vw, 2rem);
+    font-weight: 850;
+    letter-spacing: -.065em;
+    line-height: 1;
+    text-decoration: none;
   }
 
-  :global(.thanks) {
-    margin: 2rem 0 0;
-    color: var(--color-muted-400);
-    font-size: 0.75rem;
-    line-height: 1.5;
-    letter-spacing: 0.04em;
-    text-align: center;
+  .footer-wordmark span {
+    color: #ec4899;
   }
 
-  :global(.footer-nav) {
+  .footer-tagline {
+    max-width: 32rem;
+    margin: 0;
+    color: #aaa5b1;
+    font-size: clamp(.82rem, 1.5vw, .95rem);
+    line-height: 1.6;
+  }
+
+  .footer-bottom {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: .6rem 1.2rem;
-    max-width: 58rem;
-    margin-top: 2.25rem;
+    gap: .35rem .5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, .09);
+    color: #77727e;
+    font-size: .68rem;
+    line-height: 1.5;
+    text-align: center;
   }
 
-  :global(.footer-nav a) {
-    color: var(--color-muted-400);
-    font-family: var(--font-meta);
-    font-size: .52rem;
-    letter-spacing: .09em;
-    text-transform: uppercase;
-    transition: color var(--duration-fast) var(--ease-out);
-  }
-
-  :global(.footer-nav a:hover),
-  :global(.footer-nav a:focus-visible) {
-    color: var(--color-paper-50);
-  }
-
-  .site-footer--ghibli :global(.footer-nav a) { color: #59756b; }
-  .site-footer--ghibli :global(.footer-nav a:hover),
-  .site-footer--ghibli :global(.footer-nav a:focus-visible) { color: #18528a; }
-
-  :global(.footer-meta) {
-    display: flex;
-    gap: var(--space-5);
-    margin-top: 2.5rem;
-    color: var(--color-muted-500);
-    font-family: var(--font-meta);
-    font-size: 0.55rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-  }
-
-  @media (max-width: 640px) {
-    :global(.footer-inner) {
-      padding-block: 4rem 1.75rem;
+  @media (max-width: 480px) {
+    .footer-inner {
+      padding-block: 2.25rem 1rem;
     }
 
-    :global(.closing) {
-      max-width: 20rem;
-      font-size: 0.95rem;
-      line-height: 1.8;
+    .footer-content {
+      padding-bottom: 1.75rem;
     }
 
-    :global(.thanks) {
-      margin-top: 1.75rem;
-    }
-
-    :global(.footer-nav) {
-      gap: .65rem .9rem;
-      margin-top: 2rem;
-    }
-
-    :global(.footer-meta) {
-      margin-top: 2.5rem;
+    .footer-bottom {
+      font-size: .62rem;
     }
   }
 </style>

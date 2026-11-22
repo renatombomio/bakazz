@@ -1,9 +1,10 @@
 import { defineMiddleware } from "astro:middleware";
-import { getRenanimeUser } from "./lib/auth";
+import type { User } from "@supabase/supabase-js";
+import { createSupabaseSsrClient } from "./lib/supabase-ssr";
 import { localizedPath } from "./i18n";
 
-// Temporary switch for the Renanime 2.0 maintenance window.
-// Set to false when the updated site is ready to reopen.
+// Keep production and Preview in maintenance until the Supabase Auth cutover
+// has been fully tested and explicitly approved.
 const MAINTENANCE_MODE = true;
 
 export const onRequest = defineMiddleware(async (context, next) => {
@@ -15,21 +16,22 @@ export const onRequest = defineMiddleware(async (context, next) => {
   context.locals.lang = isEnglish ? "en" : "es";
   context.locals.basePath = basePath;
 
-  if (MAINTENANCE_MODE) {
-    // Keep the maintenance page and static assets available, but pause the app and API.
-    if (routePath === "/maintenance") {
-      return next();
-    }
+  if (MAINTENANCE_MODE && import.meta.env.VERCEL_ENV !== "preview") {
+    if (routePath === "/maintenance") return next();
 
     const isStaticAsset =
       routePath.startsWith("/_astro/") ||
       routePath.startsWith("/audio/") ||
       routePath.startsWith("/videos/") ||
+      routePath.startsWith("/video/") ||
       routePath.startsWith("/images/") ||
       routePath === "/favicon.svg" ||
       routePath === "/favicon.ico";
 
-    if (isStaticAsset) {
+    if (isStaticAsset) return next();
+
+    // Preview permits only auth endpoints for controlled migration testing.
+    if (import.meta.env.VERCEL_ENV === "preview" && routePath.startsWith("/api/auth/")) {
       return next();
     }
 
@@ -38,7 +40,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
         JSON.stringify({
           ok: false,
           error: "MAINTENANCE_MODE",
-          message: "Renanime 2.0 is being updated. Please try again later.",
+          message: "BAKAZZ is being updated. Please try again later.",
         }),
         {
           status: 503,
@@ -47,13 +49,52 @@ export const onRequest = defineMiddleware(async (context, next) => {
             "Retry-After": "3600",
             "Cache-Control": "no-store",
           },
-        }
+        },
       );
+    }
+
+    if (import.meta.env.VERCEL_ENV === "preview") {
+      return isEnglish ? next(basePath + search) : next();
     }
 
     return context.redirect("/maintenance/", 307);
   }
 
+  const isPublicAssetOrApi =
+    routePath.startsWith("/api/") ||
+    routePath.startsWith("/_astro/") ||
+    routePath.startsWith("/audio/") ||
+    routePath.startsWith("/videos/") ||
+    routePath.startsWith("/video/") ||
+    routePath.startsWith("/images/") ||
+    routePath === "/favicon.svg" ||
+    routePath === "/favicon.ico";
+
+  const isPublicAuthPage = [
+    "/login",
+    "/login/",
+    "/register",
+    "/register/",
+    "/auth/callback",
+    "/auth/callback/",
+  ].includes(routePath);
+
+  if (isPublicAssetOrApi) {
+    // Login and OAuth callback pages must render even when Supabase is
+    // misconfigured or temporarily unavailable, so the user can see the UI
+    // and auth endpoints can report their own actionable errors.
+    return isEnglish ? next(basePath + search) : next();
+  }
+
+  // Keep the BAKAZZ homepage publicly viewable on Preview so the rebrand,
+  // editorial landing page and community sections can be reviewed without
+  // requiring a Supabase account. Production remains behind maintenance mode.
+  if (routePath === "/") {
+    return isEnglish ? next(basePath + search) : next();
+  }
+
+  // Public API responses must not emit a language Set-Cookie header:
+  // it prevents shared CDN caching for otherwise public, cacheable responses.
   context.cookies.set("lang", context.locals.lang, {
     path: "/",
     maxAge: 60 * 60 * 24 * 365,
@@ -62,26 +103,81 @@ export const onRequest = defineMiddleware(async (context, next) => {
     secure: context.url.protocol === "https:",
   });
 
-  const isPublicAssetOrApi =
-    routePath.startsWith("/api/") ||
-    routePath.startsWith("/_astro/") ||
-    routePath.startsWith("/audio/") ||
-    routePath.startsWith("/videos/") ||
-    routePath.startsWith("/images/") ||
-    routePath === "/favicon.svg" ||
-    routePath === "/favicon.ico";
+  let user: User | null = null;
 
-  if (isPublicAssetOrApi || ["/login", "/login/", "/register", "/register/"].includes(routePath)) {
-    return isEnglish ? next(basePath + search) : next();
+  try {
+    const supabase = createSupabaseSsrClient(context.request, context.cookies);
+    const { data, error } = await supabase.auth.getUser();
+    if (!error) user = data.user;
+  } catch (error) {
+    console.error("Supabase middleware authentication failed:", error);
+    if (import.meta.env.VERCEL_ENV === "preview") {
+      // Public auth pages must remain reachable when Supabase is unavailable.
+      // Redirecting /login back to itself creates ERR_TOO_MANY_REDIRECTS.
+      if (isPublicAuthPage) return isEnglish ? next(basePath + search) : next();
+      return context.redirect(localizedPath(context.locals.lang, "/login/"), 303);
+    }
+    return new Response("Authentication service unavailable.", {
+      status: 503,
+      headers: { "Cache-Control": "no-store" },
+    });
   }
 
-  const token = context.cookies.get("renanime_session")?.value;
-  const user = await getRenanimeUser(token);
-
   if (!user) {
+    if (isPublicAuthPage) return isEnglish ? next(basePath + search) : next();
     return context.redirect(localizedPath(context.locals.lang, "/login/"));
   }
 
-  context.locals.renanimeUser = user;
+  try {
+    const supabase = createSupabaseSsrClient(context.request, context.cookies);
+    const { data: profile, error } = await supabase
+      .from("profiles")
+      .select("id, name, aka, created_at")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Supabase profile lookup failed:", error.code);
+      return new Response("Profile service unavailable.", {
+        status: 503,
+        headers: { "Cache-Control": "no-store" },
+      });
+    }
+
+    context.locals.bakazzUser = {
+      id: user.id,
+      name: profile?.name ?? user.user_metadata?.name ?? "Usuario",
+      aka: profile?.aka ?? user.user_metadata?.aka ?? "",
+      created_at: profile?.created_at ?? user.created_at,
+      email: user.email ?? "",
+    };
+  } catch (error) {
+    console.error("Supabase profile lookup failed:", error);
+    return new Response("Profile service unavailable.", {
+      status: 503,
+      headers: { "Cache-Control": "no-store" },
+    });
+  }
+
+  const nickname = context.locals.bakazzUser.aka?.trim() ?? "";
+  const hasNickname = Boolean(nickname && !nickname.startsWith("nakama_"));
+
+  if (isPublicAuthPage) {
+    if (routePath === "/auth/callback" || routePath === "/login" || routePath === "/register") {
+      const isCompletingProfile =
+        routePath === "/login" && context.url.searchParams.get("complete-profile") === "1";
+
+      // An authenticated user without a nickname must be allowed to render
+      // the profile-completion form instead of being redirected to itself.
+      if (!context.url.searchParams.has("recovery") && !isCompletingProfile) {
+        return hasNickname
+          ? context.redirect(isEnglish ? "/en/" : "/", 303)
+          : context.redirect(localizedPath(context.locals.lang, "/login/") + "?complete-profile=1", 303);
+      }
+    }
+  } else if (!hasNickname) {
+    return context.redirect(localizedPath(context.locals.lang, "/login/") + "?complete-profile=1", 303);
+  }
+
   return isEnglish ? next(basePath + search) : next();
 });

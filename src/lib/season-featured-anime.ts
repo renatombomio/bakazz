@@ -1,0 +1,44 @@
+import { getPersistentCache } from "./server/persistent-cache";
+import { requestAniList } from "./server/anilist-gateway";
+
+type AniListAnime = {
+  id: number;
+  title: { romaji: string | null; english: string | null };
+  coverImage: { extraLarge: string | null; large: string | null; color: string | null };
+  bannerImage: string | null;
+  format: string | null;
+  popularity: number;
+};
+type AniListResponse = { data?: { Page?: { pageInfo?: { hasNextPage: boolean }; media?: AniListAnime[] } }; errors?: Array<{ message?: string }> };
+export type SeasonalAnime = { id: number; title: string; cover: string; tint: string; popularity: number };
+type SeasonalResult = { season: { season: string; year: number }; anime: SeasonalAnime[] };
+function getCurrentSeason(date: Date) {
+  const month = date.getUTCMonth() + 1;
+  if (month === 12) return { season: "WINTER", year: date.getUTCFullYear() + 1 };
+  if (month <= 2) return { season: "WINTER", year: date.getUTCFullYear() };
+  if (month <= 5) return { season: "SPRING", year: date.getUTCFullYear() };
+  if (month <= 8) return { season: "SUMMER", year: date.getUTCFullYear() };
+  return { season: "FALL", year: date.getUTCFullYear() };
+}
+export async function getSeasonFeaturedAnime(): Promise<SeasonalResult> {
+  const current = getCurrentSeason(new Date());
+  const cached = await getPersistentCache<SeasonalResult>("season-featured", current, 3600, async () => {
+    const allMedia: AniListAnime[] = [];
+    let page = 1, hasNextPage = true;
+    while (hasNextPage) {
+      const payload = await requestAniList<AniListResponse>(`query SeasonalAnime($season: MediaSeason!, $year: Int!, $page: Int!) { Page(page: $page, perPage: 50) { pageInfo { hasNextPage } media(type: ANIME, season: $season, seasonYear: $year, status: RELEASING, isAdult: false, sort: POPULARITY_DESC) { id title { romaji english } coverImage { extraLarge large color } bannerImage format popularity } } }`, { season: current.season, year: current.year, page }, { timeoutMs: 12000 });
+      const pageData = payload.Page;
+      if (!pageData || !Array.isArray(pageData.media)) throw new Error("AniList returned an invalid seasonal anime response.");
+      allMedia.push(...pageData.media);
+      hasNextPage = pageData.pageInfo?.hasNextPage ?? false;
+      page += 1;
+    }
+    const anime = allMedia.map((item) => ({
+      id: item.id, title: item.title.romaji || item.title.english || "Untitled",
+      cover: item.coverImage.extraLarge || item.coverImage.large || item.bannerImage || "",
+      tint: item.coverImage.color || "#ec4899", popularity: item.popularity,
+    })).filter((item) => Boolean(item.cover));
+    return { season: current, anime };
+  });
+  return cached.value;
+}

@@ -17,7 +17,6 @@ const PAGE_SIZE = 15;
 
 async function fetchMedia(ids:string[]):Promise<Record<string,Media|null>>{
   const result:Record<string,Media|null>={};
-  if(ids.includes("ghibli-red-turtle")) result["ghibli-red-turtle"]={id:0,title:{english:"The Red Turtle",romaji:"The Red Turtle"},startDate:{year:2016,month:9,day:17},format:"MOVIE",coverImage:{extraLarge:"https://www.ghibli.jp/images/red-turtle.jpg",large:"https://www.ghibli.jp/images/red-turtle.jpg"}};
   const valid=ids.map(Number).filter(Number.isFinite);
   if(!valid.length)return result;
   const variables:Record<string,number>={};
@@ -53,6 +52,8 @@ export default function PersonalLibraryView({mode,lang="es"}:Props){
   const [loading,setLoading]=useState(true);
   const [loadError,setLoadError]=useState(false);
   const [visible,setVisible]=useState(PAGE_SIZE);
+  const visibleEntries=entries.slice(0,visible);
+  const visibleIds=visibleEntries.map(entry=>entry.animeId).join("|");
 
   useEffect(()=>{
     void hydratePersonalLibrary();
@@ -67,7 +68,7 @@ export default function PersonalLibraryView({mode,lang="es"}:Props){
 
   useEffect(()=>{
     let cancelled=false;
-    const missing=entries.map(entry=>entry.animeId).filter(id=>!(id in media));
+    const missing=visibleEntries.map(entry=>entry.animeId).filter(id=>!(id in media));
     if(!missing.length){setLoading(false);return;}
     setLoading(true);
     setLoadError(false);
@@ -78,9 +79,8 @@ export default function PersonalLibraryView({mode,lang="es"}:Props){
       setLoadError(failed);
     }).catch(()=>{if(!cancelled)setLoadError(true);}).finally(()=>{if(!cancelled)setLoading(false);});
     return()=>{cancelled=true;};
-  },[entries.map(entry=>entry.animeId).join("|")]);
+  },[visibleIds]);
 
-  const visibleEntries=entries.slice(0,visible);
   const hasMore=visible<entries.length;
 
   if(loading&&!entries.length)return <p className="personal-library-status" role="status" aria-live="polite">{t("library.loading")}</p>;
@@ -118,7 +118,7 @@ export default function PersonalLibraryView({mode,lang="es"}:Props){
     </div>:<div className="personal-library-empty">
       <strong>{mode==="WATCHED"?t("library.emptyWatchedTitle"):t("library.emptyPendingTitle")}</strong>
       <span>{mode==="WATCHED"?t("library.emptyWatchedCopy"):t("library.emptyPendingCopy")}</span>
-      <a className="personal-library-empty-cta" href={lang === "en" ? "/en/search/" : "/search/"}>{mode==="WATCHED"?t("library.explore"):t("library.findSomething")}</a>
+      <a className="personal-library-empty-cta" href={lang === "en" ? "/en/buscar/" : "/buscar/"}>{mode==="WATCHED"?t("library.explore"):t("library.findSomething")}</a>
     </div>}
 
     {hasMore&&<button type="button" className="personal-library-load-more" onClick={()=>setVisible(value=>Math.min(value+PAGE_SIZE,entries.length))}>{t("library.loadMore").replace("{count}",String(entries.length-visible))}</button>}

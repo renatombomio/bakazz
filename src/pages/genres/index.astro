@@ -1,49 +1,8 @@
 ---
-import Layout from "../../layouts/Layout.astro";
-import { useT } from "../../i18n";
-import Navbar from "../../components/layout/Navbar.astro";
-import Footer from "../../components/layout/Footer.astro";
-import Container from "../../components/ui/Container.astro";
-import SectionHeader from "../../components/ui/SectionHeader.astro";
-import GenresView from "../../components/genres/GenresView";
-import { getWatchedLibrary } from "../../data/library";
-
-const entries = getWatchedLibrary();
-const t = useT(Astro.locals.lang);
+import { localizedPath } from "../../i18n";
+const lang = Astro.locals.lang;
+const genres = Astro.url.searchParams.getAll("genre").map((value) => value.trim()).filter(Boolean);
+const target = new URL(localizedPath(lang, "/buscar/"), Astro.url);
+if (genres.length) target.searchParams.set("genre", genres.join(","));
+return Astro.redirect(target.pathname + target.search, 301);
 ---
-
-<Layout title={`${t("genres.pageTitle")} — Renanime's Gallery`}>
-  <Navbar />
-  <main id="main-content" class="genres-page">
-    <Container>
-      <SectionHeader
-        variant="ren"
-        title={t("genres.heading")}
-        description={t("genres.description")}
-      />
-      <div class="genres-page-content">
-        <GenresView entries={entries} lang={Astro.locals.lang} client:load />
-      </div>
-    </Container>
-  </main>
-  <Footer />
-</Layout>
-
-<style>
-  .genres-page {
-    min-height: 70vh;
-    padding-block: clamp(6rem, 11vw, 10rem) var(--section-space);
-  }
-
-  .genres-page-content {
-    margin-top: clamp(5rem, 10vw, 9rem);
-  }
-
-  .genres-page.is-genre-selected :global(.section-header) {
-    display: none;
-  }
-
-  .genres-page.is-genre-selected .genres-page-content {
-    margin-top: 0;
-  }
-</style>

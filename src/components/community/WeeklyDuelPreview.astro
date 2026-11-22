@@ -1,0 +1,95 @@
+---
+const en = Astro.locals.lang === "en";
+const base = en ? "/en" : "";
+const duel = {
+  a: {
+    id: 20,
+    title: "Naruto",
+    image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20-YJvLbgJQPCoI.jpg",
+  },
+  b: {
+    id: 269,
+    title: "Bleach",
+    image: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx269-d2GmRkJbMopq.png",
+  },
+};
+---
+<section class="weekly-duel" aria-labelledby="weekly-duel-title" data-weekly-duel>
+  <header class="weekly-duel-heading">
+    <div>
+      <h2 id="weekly-duel-title">{en ? "Duel of the week" : "Duelo de la semana"}</h2>
+      <p>{en ? "Which one do you pick?" : "¿Cuál te quedas?"}</p>
+    </div>
+    <span class="weekly-duel-week">{en ? "WEEKLY" : "SEMANAL"}</span>
+  </header>
+
+  <div class="weekly-duel-matchup">
+    <article class="weekly-duel-side" data-side="a">
+      <a class="weekly-duel-poster" href={base + "/anime/" + duel.a.id + "/"} tabindex="-1" aria-hidden="true">
+        <img src={duel.a.image} alt="" loading="lazy" decoding="async" />
+        <span class="weekly-duel-letter">A</span>
+      </a>
+      <h3>{duel.a.title}</h3>
+      <button type="button" class="weekly-duel-vote" data-choice="a">{en ? "Choose A" : "Elegir A"}</button>
+    </article>
+
+    <span class="weekly-duel-vs" aria-hidden="true">VS</span>
+
+    <article class="weekly-duel-side" data-side="b">
+      <a class="weekly-duel-poster" href={base + "/anime/" + duel.b.id + "/"} tabindex="-1" aria-hidden="true">
+        <img src={duel.b.image} alt="" loading="lazy" decoding="async" />
+        <span class="weekly-duel-letter">B</span>
+      </a>
+      <h3>{duel.b.title}</h3>
+      <button type="button" class="weekly-duel-vote" data-choice="b">{en ? "Choose B" : "Elegir B"}</button>
+    </article>
+  </div>
+  <p class="weekly-duel-preview-note">{en ? "Interactive design preview · Votes are not saved yet" : "Vista previa interactiva · Los votos todavía no se guardan"}</p>
+</section>
+
+<style>
+  .weekly-duel{padding:22px 16px 24px;min-width:0;color:#f2efe9}
+  .weekly-duel-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:18px}
+  .weekly-duel-heading h2{margin:0;font-size:clamp(19px,4vw,24px);font-weight:850;letter-spacing:-.035em;line-height:1.1}
+  .weekly-duel-heading p{margin:6px 0 0;color:#aaa4b0;font-size:13px}
+  .weekly-duel-week{padding-top:3px;color:#aaa4b0;font-size:9px;font-weight:800;letter-spacing:.16em}
+  .weekly-duel-matchup{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;max-width:620px;margin:0 auto}
+  .weekly-duel-side{min-width:0;text-align:center}
+  .weekly-duel-poster{position:relative;display:block;aspect-ratio:2/3;overflow:hidden;border-radius:11px;background:#211d25;outline:2px solid transparent;outline-offset:3px;transition:outline-color .18s,opacity .18s}
+  .weekly-duel-poster img{display:block;width:100%;height:100%;object-fit:cover}
+  .weekly-duel-letter{position:absolute;left:9px;top:9px;display:grid;place-items:center;width:25px;height:25px;border-radius:50%;background:rgba(0,0,0,.72);color:#fff;font-size:11px;font-weight:850}
+  .weekly-duel-side h3{min-height:2.4em;margin:12px 0 9px;font-size:clamp(13px,2.8vw,16px);font-weight:800;line-height:1.2}
+  .weekly-duel-vote{width:100%;min-height:42px;border:1px solid rgba(255,255,255,.18);border-radius:8px;background:transparent;color:#f2efe9;font:inherit;font-size:12px;font-weight:800;cursor:pointer;transition:background .18s,border-color .18s,color .18s}
+  .weekly-duel-vote:hover{border-color:#ec4899}
+  .weekly-duel-side.is-selected .weekly-duel-poster{outline-color:#ec4899}
+  .weekly-duel-side.is-selected .weekly-duel-vote{border-color:#ec4899;background:#ec4899;color:#160d14}
+  .weekly-duel-side.is-unselected{opacity:.48}
+  .weekly-duel-vs{position:absolute;z-index:2;left:50%;top:36%;display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:#17141b;border:1px solid rgba(255,255,255,.16);color:#f2efe9;font-size:13px;font-weight:950;font-style:italic;transform:translate(-50%,-50%)}
+  .weekly-duel-preview-note{margin:15px 0 0;text-align:center;color:#8f8995;font-size:10px;line-height:1.4}
+  @media(min-width:600px){.weekly-duel{padding:26px 20px 28px}.weekly-duel-matchup{gap:22px}.weekly-duel-vs{width:48px;height:48px}}
+  @media(prefers-reduced-motion:reduce){.weekly-duel-poster,.weekly-duel-vote{transition:none}}
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-weekly-duel]").forEach((root) => {
+    if (root.dataset.initialized === "true") return;
+    root.dataset.initialized = "true";
+    const sides = [...root.querySelectorAll<HTMLElement>(".weekly-duel-side")];
+    root.querySelectorAll<HTMLButtonElement>("[data-choice]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const choice = button.dataset.choice;
+        sides.forEach((side) => {
+          const selected = side.dataset.side === choice;
+          side.classList.toggle("is-selected", selected);
+          side.classList.toggle("is-unselected", !selected);
+          const action = side.querySelector<HTMLButtonElement>("[data-choice]");
+          if (action) action.setAttribute("aria-pressed", String(selected));
+        });
+        const note = root.querySelector<HTMLElement>(".weekly-duel-preview-note");
+        if (note) note.textContent = document.documentElement.lang === "en"
+          ? "Preview selection only · Your vote has not been saved"
+          : "Selección de prueba · Tu voto no se ha guardado";
+      });
+    });
+  });
+</script>

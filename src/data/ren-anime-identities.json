@@ -1,0 +1,2840 @@
+{
+  "version": 1,
+  "generatedAt": "2026-11-04T13:46:42.198Z",
+  "entries": [
+    {
+      "animeId": "personal-001",
+      "displayTitle": "Boku no Hero Academia",
+      "format": "SERIES",
+      "anilistId": 21459,
+      "matchedTitle": "Boku no Hero Academia",
+      "providerTitles": {
+        "romaji": "Boku no Hero Academia",
+        "english": "My Hero Academia",
+        "native": "僕のヒーローアカデミア"
+      },
+      "synonyms": [
+        "BNHA",
+        "MHA",
+        "나의 히어로 아카데미아 1기",
+        "나히아 1기",
+        "אקדמיית הגיבורים שלי",
+        "我的英雄学院",
+        "มายฮีโร่ อคาเดเมีย",
+        "أكاديميتي للأبطال",
+        "Η Δική Μου Ακαδημία Ηρώων",
+        "Akademia bohaterów",
+        "Моя геройская академия",
+        "Hősakadémia",
+        "Học Viện Anh Hùng"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21459-nYh85uj2Fuwr.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21459-nYh85uj2Fuwr.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-002",
+      "displayTitle": "Dragon Ball Z",
+      "format": "SERIES",
+      "anilistId": 813,
+      "matchedTitle": "Dragon Ball Z",
+      "providerTitles": {
+        "romaji": "Dragon Ball Z",
+        "english": "Dragon Ball Z",
+        "native": "ドラゴンボールZ"
+      },
+      "synonyms": [
+        "DBZ",
+        "Dragonball Z",
+        "דרגון בול זי",
+        "What's My Destiny Dragon Ball",
+        "ดราก้อนบอล Z",
+        "Bảy Viên Ngọc Rồng Z",
+        "Драконий жемчуг Зет"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx813-ZhnFNOeCU5dQ.png",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx813-ZhnFNOeCU5dQ.png"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-005",
+      "displayTitle": "Shingeki no Kyojin",
+      "format": "SERIES",
+      "anilistId": 16498,
+      "matchedTitle": "Shingeki no Kyojin",
+      "providerTitles": {
+        "romaji": "Shingeki no Kyojin",
+        "english": "Attack on Titan",
+        "native": "進撃の巨人"
+      },
+      "synonyms": [
+        "SnK",
+        "AoT",
+        "Ataque a los Titanes",
+        "Ataque dos Titãs",
+        "L'Attacco dei Giganti",
+        "מתקפת הטיטאנים",
+        "进击的巨人",
+        "L’Attaque des Titans",
+        "الهجوم على العمالقة",
+        "ผ่าพิภพไททัน",
+        "حمله به تایتان",
+        "Ataque de Titãs",
+        "Atak Tytanów",
+        "Атака титанов",
+        "Đại Chiến Titan"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx16498-buvcRTBx4NSm.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx16498-buvcRTBx4NSm.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-007",
+      "displayTitle": "Akame ga Kill!",
+      "format": "SERIES",
+      "anilistId": 20613,
+      "matchedTitle": "Akame ga Kill!",
+      "providerTitles": {
+        "romaji": "Akame ga Kill!",
+        "english": "Akame ga Kill!",
+        "native": "アカメが斬る！"
+      },
+      "synonyms": [
+        "Akame ga Kiru!",
+        "أكامي: قاتلة بالإكراه!",
+        "Red Eyes Sword",
+        "斬！赤紅之瞳"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20613-HXHpec4bemk5.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20613-HXHpec4bemk5.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-008",
+      "displayTitle": "Toradora!",
+      "format": "SERIES",
+      "anilistId": 4224,
+      "matchedTitle": "Toradora!",
+      "providerTitles": {
+        "romaji": "Toradora!",
+        "english": "Toradora!",
+        "native": "とらドラ！"
+      },
+      "synonyms": [
+        "Tiger X Dragon",
+        "龙与虎",
+        "النمر والتنين",
+        "ยัยเสือใสกับนายหน้าโหด",
+        "Τίγρης και Δράκος"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx4224-PXVMBLNwy2aF.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx4224-PXVMBLNwy2aF.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-010",
+      "displayTitle": "One Punch Man",
+      "format": "SERIES",
+      "anilistId": 21087,
+      "matchedTitle": "One Punch Man",
+      "providerTitles": {
+        "romaji": "One Punch Man",
+        "english": "One-Punch Man",
+        "native": "ワンパンマン"
+      },
+      "synonyms": [
+        "OPM",
+        "Wanpanman",
+        "איש האגרוף הבודד",
+        "一拳超人",
+        "วันพันช์แมน",
+        "Jagoan Sekali Pukul S1",
+        "رجل اللكمة الواحدة",
+        "ون بنش مان",
+        "Ванпанчмен",
+        "Nhất Quyền Nhân"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21087-B5DHjqZ3kW4b.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21087-B5DHjqZ3kW4b.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-011",
+      "displayTitle": "Soul Eater",
+      "format": "SERIES",
+      "anilistId": 3588,
+      "matchedTitle": "Soul Eater",
+      "providerTitles": {
+        "romaji": "Soul Eater",
+        "english": "Soul Eater",
+        "native": "ソウルイーター"
+      },
+      "synonyms": [
+        "אכלן הנשמות ",
+        "סול איטר",
+        "Пожирач душ"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx3588-fSMggQoFSbUI.png",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx3588-fSMggQoFSbUI.png"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-012",
+      "displayTitle": "Black Clover",
+      "format": "SERIES",
+      "anilistId": 97940,
+      "matchedTitle": "Black Clover",
+      "providerTitles": {
+        "romaji": "Black Clover",
+        "english": "Black Clover",
+        "native": "ブラッククローバー"
+      },
+      "synonyms": [
+        "תלתן שחור",
+        "แบล็กโคลเวอร์",
+        "Чёрный клевер"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx97940-fyh8o7gNbha0.png",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx97940-fyh8o7gNbha0.png"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-013",
+      "displayTitle": "DanMachi",
+      "format": "SERIES",
+      "anilistId": 20920,
+      "matchedTitle": "Danmachi",
+      "providerTitles": {
+        "romaji": "Dungeon ni Deai wo Motomeru no wa Machigatteiru Darou ka",
+        "english": "Is It Wrong to Try to Pick Up Girls in a Dungeon?",
+        "native": "ダンジョンに出会いを求めるのは間違っているだろうか"
+      },
+      "synonyms": [
+        "Danmachi",
+        "Dungeon ni Deai o Motomeru no wa Machigatte Iru Darouka: Familia Myth",
+        "DanMachi: É Errado Tentar Pegar Garotas numa Masmorra?",
+        "DanMachi: Família Myth",
+        "Danmachi: ¿Qué Tiene de Malo Intentar Ligar en una Mazmorra?",
+        "在地下城寻求邂逅是否搞错了什么",
+        "فارسة أحلامي",
+        "มันผิดรึไงถ้าใจอยากจะพบรักในดันเจี้ยน",
+        "DanMachi - È sbagliato cercare di incontrare ragazze in un Dungeon?",
+        "ダンまち"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20920-MTREwZOG4BAD.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20920-MTREwZOG4BAD.jpg"
+      },
+      "decision": "unique-exact-synonym-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-015",
+      "displayTitle": "Kimetsu no Yaiba",
+      "format": "SERIES",
+      "anilistId": 101922,
+      "matchedTitle": "Kimetsu no Yaiba",
+      "providerTitles": {
+        "romaji": "Kimetsu no Yaiba",
+        "english": "Demon Slayer: Kimetsu no Yaiba",
+        "native": "鬼滅の刃"
+      },
+      "synonyms": [
+        "KnY",
+        "Kimetsu no Yaiba: Kyoudai no Kizuna",
+        "Demon Slayer: Kimetsu no Yaiba: Bonds of Siblings",
+        "鬼滅の刃-兄妹の絆-",
+        "鬼灭之刃",
+        "הלהב קוטל השדים",
+        "قاتل الشياطين",
+        "ดาบพิฆาตอสูร",
+        "Miecz zabójcy demonów – Kimetsu no Yaiba",
+        " Guardians de la nit: Kimetsu no Yaiba",
+        "İblis Keser",
+        "ΚΥΝΗΓΟΣ ΔΑΙΜΟΝΩΝ: KIMETSU NO YAIBA",
+        "Zabiják démonů",
+        "شیطان کش",
+        "귀멸의 칼날",
+        "Истребитель демонов",
+        "Клинок, рассекающий демонов"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101922-WBsBl0ClmgYL.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101922-WBsBl0ClmgYL.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-016",
+      "displayTitle": "Ballroom e Youkoso",
+      "format": "SERIES",
+      "anilistId": 98005,
+      "matchedTitle": "Ballroom e Youkoso",
+      "providerTitles": {
+        "romaji": "Ballroom e Youkoso",
+        "english": "Welcome to the Ballroom",
+        "native": "ボールルームへようこそ"
+      },
+      "synonyms": [],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx98005-kwoBQIEeXa8J.png",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx98005-kwoBQIEeXa8J.png"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-017",
+      "displayTitle": "Akatsuki no Yona",
+      "format": "SERIES",
+      "anilistId": 20770,
+      "matchedTitle": "Akatsuki no Yona",
+      "providerTitles": {
+        "romaji": "Akatsuki no Yona",
+        "english": "Yona of the Dawn",
+        "native": "暁のヨナ"
+      },
+      "synonyms": [
+        "AkaYona",
+        "Йона на заре",
+        "Ёна на заре",
+        "Рассвет Йоны",
+        "Yona, princesse de l'aube"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20770-brCDvhTXlums.png",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20770-brCDvhTXlums.png"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-019",
+      "displayTitle": "Trinity Seven",
+      "format": "SERIES",
+      "anilistId": 20631,
+      "matchedTitle": "Trinity Seven",
+      "providerTitles": {
+        "romaji": "Trinity Seven",
+        "english": "TRINITY SEVEN",
+        "native": "トリニティセブン"
+      },
+      "synonyms": [
+        "Trinity Seven: 7-nin no Mahoutsukai",
+        "Trinity Seven: Shichinin no Mahoutsukai"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20631-LdCiy3goitcT.png",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20631-LdCiy3goitcT.png"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-020",
+      "displayTitle": "Afro Samurai",
+      "format": "SERIES",
+      "anilistId": 1292,
+      "matchedTitle": "Afro Samurai",
+      "providerTitles": {
+        "romaji": "Afro Samurai",
+        "english": "Afro Samurai",
+        "native": "アフロサムライ"
+      },
+      "synonyms": [],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1292-FcyYgq7Ly34H.png",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx1292-FcyYgq7Ly34H.png"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-021",
+      "displayTitle": "Katekyo Hitman Reborn!",
+      "format": "SERIES",
+      "anilistId": 1604,
+      "matchedTitle": "Katekyo Hitman Reborn!",
+      "providerTitles": {
+        "romaji": "Katekyou Hitman REBORN!",
+        "english": "REBORN!",
+        "native": "家庭教師ヒットマンREBORN!"
+      },
+      "synonyms": [
+        "Katekyo Hitman Reborn!",
+        "ครูพิเศษจอมป่วน รีบอร์น!",
+        "Gia sư HITMAN REBORN! "
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1604-W2q38L4OCGLI.png",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx1604-W2q38L4OCGLI.png"
+      },
+      "decision": "unique-exact-synonym-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-022",
+      "displayTitle": "D.Gray-man",
+      "format": "SERIES",
+      "anilistId": 1482,
+      "matchedTitle": "D.Gray-man",
+      "providerTitles": {
+        "romaji": "D.Gray-man",
+        "english": "D.Gray-man",
+        "native": "ディー・グレイマン"
+      },
+      "synonyms": [
+        "D. Gray-man",
+        "D. Grey-man"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1482-6jc8ZVSmHuLo.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx1482-6jc8ZVSmHuLo.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-023",
+      "displayTitle": "Beelzebub",
+      "format": "SERIES",
+      "anilistId": 9513,
+      "matchedTitle": "Beelzebub",
+      "providerTitles": {
+        "romaji": "Beelzebub",
+        "english": "Beelzebub",
+        "native": "べるぜバブ"
+      },
+      "synonyms": [],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/nx9513-is6YiSgKbyQX.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/nx9513-is6YiSgKbyQX.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-024",
+      "displayTitle": "Ao no Exorcist",
+      "format": "SERIES",
+      "anilistId": 9919,
+      "matchedTitle": "Ao no Exorcist",
+      "providerTitles": {
+        "romaji": "Ao no Exorcist",
+        "english": "Blue Exorcist",
+        "native": "青の祓魔師"
+      },
+      "synonyms": [
+        "Ao no Futsumashi",
+        "اللهب الأزرق",
+        "Ο Γαλάζιος Εξορκιστής "
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx9919-nXS7JOZrWHfS.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx9919-nXS7JOZrWHfS.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-025",
+      "displayTitle": "Deadman Wonderland",
+      "format": "SERIES",
+      "anilistId": 6880,
+      "matchedTitle": "Deadman Wonderland",
+      "providerTitles": {
+        "romaji": "Deadman Wonderland",
+        "english": "Deadman Wonderland",
+        "native": "デッドマン・ワンダーランド"
+      },
+      "synonyms": [],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx6880-qZ1jIqIYpST2.png",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx6880-qZ1jIqIYpST2.png"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-026",
+      "displayTitle": "Mirai Nikki",
+      "format": "SERIES",
+      "anilistId": 10620,
+      "matchedTitle": "Mirai Nikki",
+      "providerTitles": {
+        "romaji": "Mirai Nikki",
+        "english": "The Future Diary",
+        "native": "未来日記"
+      },
+      "synonyms": [
+        "未来日记",
+        "יומן העתיד"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx10620-dUZeNej0W4QN.png",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx10620-dUZeNej0W4QN.png"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-028",
+      "displayTitle": "Sword Art Online",
+      "format": "SERIES",
+      "anilistId": 11757,
+      "matchedTitle": "Sword Art Online",
+      "providerTitles": {
+        "romaji": "Sword Art Online",
+        "english": "Sword Art Online",
+        "native": "ソードアート・オンライン"
+      },
+      "synonyms": [
+        "S.A.O",
+        "SAO",
+        "אומנות החרב אונליין",
+        "刀剑神域",
+        "ซอร์ดอาร์ตออนไลน์",
+        "Мастера меча онлайн"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11757-SxYDUzdr9rh2.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx11757-SxYDUzdr9rh2.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-030",
+      "displayTitle": "Zetsuen no Tempest",
+      "format": "SERIES",
+      "anilistId": 14075,
+      "matchedTitle": "Zetsuen no Tempest",
+      "providerTitles": {
+        "romaji": "Zetsuen no Tempest",
+        "english": "Blast of Tempest",
+        "native": "絶園のテンペスト"
+      },
+      "synonyms": [
+        "Zetsuen no Tempest: The Civilization Blaster",
+        "絶園のテンペスト ~THE CIVILIZATION BLASTER~",
+        "Penghancuran Peradaban"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx14075-EIJcGXq5hd9O.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx14075-EIJcGXq5hd9O.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-031",
+      "displayTitle": "Blood Lad",
+      "format": "SERIES",
+      "anilistId": 11633,
+      "matchedTitle": "Blood Lad",
+      "providerTitles": {
+        "romaji": "Blood Lad",
+        "english": "Blood Lad",
+        "native": "ブラッドラッド"
+      },
+      "synonyms": [],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11633-vIjtabJq64Xt.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx11633-vIjtabJq64Xt.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-032",
+      "displayTitle": "Noragami",
+      "format": "SERIES",
+      "anilistId": 20447,
+      "matchedTitle": "Noragami",
+      "providerTitles": {
+        "romaji": "Noragami",
+        "english": "Noragami",
+        "native": "ノラガミ"
+      },
+      "synonyms": [
+        "Stray God",
+        "野良神",
+        "โนรางามิ เทวดาขาจร ภาค 1",
+        "Бездомный бог"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20447-EoQXeygHaVCK.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20447-EoQXeygHaVCK.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-033",
+      "displayTitle": "Magi: The Labyrinth of Magic",
+      "format": "SERIES",
+      "anilistId": 14513,
+      "matchedTitle": "Magi: The labyrinth of magic",
+      "providerTitles": {
+        "romaji": "Magi: The labyrinth of magic",
+        "english": "Magi: The Labyrinth of Magic",
+        "native": "マギ The labyrinth of magic"
+      },
+      "synonyms": [],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx14513-HuUdrFFYftA7.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx14513-HuUdrFFYftA7.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-034",
+      "displayTitle": "Magi: Sinbad no Bouken",
+      "format": "SERIES",
+      "anilistId": 21394,
+      "matchedTitle": "Magi: Sinbad no Bouken",
+      "providerTitles": {
+        "romaji": "Magi: Sinbad no Bouken",
+        "english": "Magi: Adventure of Sinbad",
+        "native": "マギ シンドバッドの冒険"
+      },
+      "synonyms": [
+        "מאגי: הרפתקאותיו של סינבד"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21394-yauvzIHGAoZv.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21394-yauvzIHGAoZv.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-035",
+      "displayTitle": "Tokyo Ghoul",
+      "format": "SERIES",
+      "anilistId": 20605,
+      "matchedTitle": "Tokyo Ghoul",
+      "providerTitles": {
+        "romaji": "Tokyo Ghoul",
+        "english": "Tokyo Ghoul",
+        "native": "東京喰種 トーキョーグール"
+      },
+      "synonyms": [
+        "Tokyo Kushu",
+        "שדי טוקיו",
+        "东京食种",
+        "طوكيو غول",
+        "Токийский гуль"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b20605-k665mVkSug8D.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b20605-k665mVkSug8D.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-037",
+      "displayTitle": "Owari no Seraph",
+      "format": "SERIES",
+      "anilistId": 20829,
+      "matchedTitle": "Owari no Seraph",
+      "providerTitles": {
+        "romaji": "Owari no Seraph",
+        "english": "Seraph of the End: Vampire Reign",
+        "native": "終わりのセラフ"
+      },
+      "synonyms": [
+        "OwaSera",
+        "Seraph of the End: El Reino de los Vampiros",
+        "เทวทูตแห่งโลกมืด"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20829-pgsXVjrfyI5V.png",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20829-pgsXVjrfyI5V.png"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-038",
+      "displayTitle": "Ansatsu Kyoushitsu",
+      "format": "SERIES",
+      "anilistId": 20755,
+      "matchedTitle": "Ansatsu Kyoushitsu",
+      "providerTitles": {
+        "romaji": "Ansatsu Kyoushitsu",
+        "english": "Assassination Classroom",
+        "native": "暗殺教室"
+      },
+      "synonyms": [
+        "כיתת ההתנקשות",
+        "فصل الاغتيال",
+        "Klasa skrytobójców",
+        "Lớp học ám sát"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20755-dWrhs569YGUO.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20755-dWrhs569YGUO.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-039",
+      "displayTitle": "Big Order",
+      "format": "SERIES",
+      "anilistId": 21445,
+      "matchedTitle": "Big Order",
+      "providerTitles": {
+        "romaji": "Big Order",
+        "english": "Big Order",
+        "native": "ビッグオーダー"
+      },
+      "synonyms": [],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21445-zXBAdDpNylRR.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21445-zXBAdDpNylRR.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-040",
+      "displayTitle": "Bungou Stray Dogs",
+      "format": "SERIES",
+      "anilistId": 21311,
+      "matchedTitle": "Bungou Stray Dogs",
+      "providerTitles": {
+        "romaji": "Bungou Stray Dogs",
+        "english": "Bungo Stray Dogs",
+        "native": "文豪ストレイドッグス"
+      },
+      "synonyms": [
+        "BSD",
+        "Văn hào lưu lạc",
+        "คณะประพันธกรจรจัด",
+        "כלבי ספרות נודדים"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21311-hAXyT8Yoh6G9.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21311-hAXyT8Yoh6G9.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-041",
+      "displayTitle": "Nanatsu no Taizai",
+      "format": "SERIES",
+      "anilistId": 20789,
+      "matchedTitle": "Nanatsu no Taizai",
+      "providerTitles": {
+        "romaji": "Nanatsu no Taizai",
+        "english": "The Seven Deadly Sins",
+        "native": "七つの大罪"
+      },
+      "synonyms": [
+        "七大罪",
+        "ศึกตำนาน 7 อัศวิน",
+        "7DS",
+        "Семь смертных грехов"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20789-Ma5ouSYPkru9.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20789-Ma5ouSYPkru9.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-043",
+      "displayTitle": "Mob Psycho 100",
+      "format": "SERIES",
+      "anilistId": 21507,
+      "matchedTitle": "Mob Psycho 100",
+      "providerTitles": {
+        "romaji": "Mob Psycho 100",
+        "english": "Mob Psycho 100",
+        "native": "モブサイコ100"
+      },
+      "synonyms": [
+        "מוב פסיכו 100",
+        "ม็อบไซโค 100 คนพลังจิต",
+        "Моб Психо 100"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21507-6YUSbh2m0N1p.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21507-6YUSbh2m0N1p.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-044",
+      "displayTitle": "Servamp",
+      "format": "SERIES",
+      "anilistId": 21269,
+      "matchedTitle": "SERVAMP",
+      "providerTitles": {
+        "romaji": "SERVAMP",
+        "english": "SERVAMP",
+        "native": "SERVAMP"
+      },
+      "synonyms": [
+        "サーヴァンプ"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21269-NU0MR6HcefqO.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21269-NU0MR6HcefqO.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-045",
+      "displayTitle": "Strike the Blood",
+      "format": "SERIES",
+      "anilistId": 18277,
+      "matchedTitle": "Strike the Blood",
+      "providerTitles": {
+        "romaji": "Strike the Blood",
+        "english": "Strike the Blood",
+        "native": "ストライク・ザ・ブラッド"
+      },
+      "synonyms": [
+        "ราชันย์โลหิตรัตติกาล"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx18277-Vwm314Nr6vsg.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx18277-Vwm314Nr6vsg.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-046",
+      "displayTitle": "Killing Bites",
+      "format": "SERIES",
+      "anilistId": 98389,
+      "matchedTitle": "Killing Bites",
+      "providerTitles": {
+        "romaji": "Killing Bites",
+        "english": "Killing Bites",
+        "native": "キリングバイツ"
+      },
+      "synonyms": [
+        "Mordidas Mortais"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/nx98389-xDRFlDQwu2I9.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/nx98389-xDRFlDQwu2I9.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-047",
+      "displayTitle": "Kekkai Sensen",
+      "format": "SERIES",
+      "anilistId": 20727,
+      "matchedTitle": "Kekkai Sensen",
+      "providerTitles": {
+        "romaji": "Kekkai Sensen",
+        "english": "Blood Blockade Battlefront",
+        "native": "血界戦線"
+      },
+      "synonyms": [],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20727-jgVnxLCHAKqZ.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20727-jgVnxLCHAKqZ.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-048",
+      "displayTitle": "Goblin Slayer",
+      "format": "SERIES",
+      "anilistId": 101165,
+      "matchedTitle": "Goblin Slayer",
+      "providerTitles": {
+        "romaji": "Goblin Slayer",
+        "english": "GOBLIN SLAYER",
+        "native": "ゴブリンスレイヤー"
+      },
+      "synonyms": [
+        "ก็อบลิน สเลเยอร์"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101165-v5NwPXWPFDuD.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101165-v5NwPXWPFDuD.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-049",
+      "displayTitle": "Tenrou: Sirius the Jaeger",
+      "format": "SERIES",
+      "anilistId": 101361,
+      "matchedTitle": "Tenrou: Sirius the Jaeger",
+      "providerTitles": {
+        "romaji": "Tenrou: Sirius the Jaeger",
+        "english": "Sirius the Jaeger",
+        "native": "天狼 Sirius the Jaeger"
+      },
+      "synonyms": [
+        "Sirius"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/nx101361-q4sHpCRgkhYQ.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/nx101361-q4sHpCRgkhYQ.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-050",
+      "displayTitle": "Wolf's Rain",
+      "format": "SERIES",
+      "anilistId": 202,
+      "matchedTitle": "Wolf's Rain",
+      "providerTitles": {
+        "romaji": "Wolf's Rain",
+        "english": "Wolf's Rain",
+        "native": "ウルフズレイン"
+      },
+      "synonyms": [
+        "Wolf Rain",
+        "Wolfs Rain"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx202-w2OLL3j8WmDm.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx202-w2OLL3j8WmDm.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-051",
+      "displayTitle": "Tate no Yuusha no Nariagari",
+      "format": "SERIES",
+      "anilistId": 99263,
+      "matchedTitle": "Tate no Yuusha no Nariagari",
+      "providerTitles": {
+        "romaji": "Tate no Yuusha no Nariagari",
+        "english": "The Rising of the Shield Hero",
+        "native": "盾の勇者の成り上がり"
+      },
+      "synonyms": [
+        "盾之勇者成名录",
+        "ผู้กล้าโล่ผงาด",
+        "Восхождение героя щита"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx99263-LcazQwdlWzMy.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx99263-LcazQwdlWzMy.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-052",
+      "displayTitle": "Enen no Shouboutai",
+      "format": "SERIES",
+      "anilistId": 105310,
+      "matchedTitle": "Enen no Shouboutai",
+      "providerTitles": {
+        "romaji": "Enen no Shouboutai",
+        "english": "Fire Force",
+        "native": "炎炎ノ消防隊"
+      },
+      "synonyms": [
+        "หน่วยผจญคนไฟลุก",
+        "כוח האש",
+        "Полум'яні вогнеборці",
+        "Пламенный отряд"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx105310-2PKUvoaA6fTn.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx105310-2PKUvoaA6fTn.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-053",
+      "displayTitle": "Kuroko no Basket",
+      "format": "SERIES",
+      "anilistId": 11771,
+      "matchedTitle": "Kuroko no Basket",
+      "providerTitles": {
+        "romaji": "Kuroko no Basket",
+        "english": "Kuroko's Basketball",
+        "native": "黒子のバスケ"
+      },
+      "synonyms": [
+        "Kuroko no Basuke",
+        "The Basketball Which Kuroko Plays",
+        "הכדורסל של קורוקו",
+        "Баскетбол Куроко",
+        "Το Μπάσκετ του Κουρόκο"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11771-uvr44RAwRxPw.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx11771-uvr44RAwRxPw.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-054",
+      "displayTitle": "No Game No Life",
+      "format": "SERIES",
+      "anilistId": 19815,
+      "matchedTitle": "No Game No Life",
+      "providerTitles": {
+        "romaji": "No Game No Life",
+        "english": "No Game, No Life",
+        "native": "ノーゲーム・ノーライフ"
+      },
+      "synonyms": [
+        "NGNL",
+        "NO GAME NO LIFE游戏人生",
+        "游戏人生",
+        "โนเกม โนไลฟ์",
+        "遊戲人生",
+        "NO GAME NO LIFE 遊戲人生",
+        "nogenora ",
+        "ノゲノラ"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b19815-sEOQ9yQaPKlk.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b19815-sEOQ9yQaPKlk.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-055",
+      "displayTitle": "Haikyuu!",
+      "format": "SERIES",
+      "anilistId": 20464,
+      "matchedTitle": "Haikyuu!!",
+      "providerTitles": {
+        "romaji": "Haikyuu!!",
+        "english": "HAIKYU!!",
+        "native": "ハイキュー!!"
+      },
+      "synonyms": [
+        "High Kyuu!!",
+        "HAIKYÛ !!",
+        "排球少年！！",
+        "Haikyu!! L'asso del volley",
+        "ไฮคิว!! คู่ตบฟ้าประทาน"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20464-ooZUyBe4ptp9.png",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20464-ooZUyBe4ptp9.png"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-056",
+      "displayTitle": "Tensei shitara Slime Datta Ken",
+      "format": "SERIES",
+      "anilistId": 101280,
+      "matchedTitle": "Tensei Shitara Slime Datta Ken",
+      "providerTitles": {
+        "romaji": "Tensei Shitara Slime Datta Ken",
+        "english": "That Time I Got Reincarnated as a Slime",
+        "native": "転生したらスライムだった件"
+      },
+      "synonyms": [
+        "転スラ",
+        "TenSura",
+        "Vita da Slime",
+        "Moi, quand je me réincarne en Slime",
+        "关于我转生变成史莱姆这档事",
+        "เกิดใหม่ทั้งทีก็เป็นสไลม์ไปซะแล้ว",
+        "Meine Wiedergeburt als Schleim in einer anderen Welt",
+        "О моём перерождении в слизь",
+        "TTIGRAAS",
+        "Lúc đó tôi đã chuyển sinh thành Slime",
+        "Bereinkarnasi Malah Menjadi Slime",
+        "Odrodzony jako galareta"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101280-tDxCVJm714nt.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101280-tDxCVJm714nt.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-057",
+      "displayTitle": "Kangoku Gakuen",
+      "format": "SERIES",
+      "anilistId": 20807,
+      "matchedTitle": "Kangoku Gakuen",
+      "providerTitles": {
+        "romaji": "Prison School",
+        "english": "Prison School",
+        "native": "監獄学園〈プリズンスクール〉"
+      },
+      "synonyms": [
+        "โรงเรียนคุกนรก",
+        "Kangoku Gakuen"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20807-8nFoO0AUdGsy.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20807-8nFoO0AUdGsy.jpg"
+      },
+      "decision": "unique-exact-synonym-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-058",
+      "displayTitle": "Aho Girl",
+      "format": "SERIES",
+      "anilistId": 98251,
+      "matchedTitle": "Aho-Girl",
+      "providerTitles": {
+        "romaji": "Aho-Girl",
+        "english": "AHO-GIRL",
+        "native": "アホガール"
+      },
+      "synonyms": [
+        "Ahogaru: Clueless Girl"
+      ],
+      "anilistFormat": "TV_SHORT",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b98251-6miVBNYEXzaF.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b98251-6miVBNYEXzaF.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-059",
+      "displayTitle": "Kono Subarashii Sekai ni Shukufuku wo!",
+      "format": "SERIES",
+      "anilistId": 21202,
+      "matchedTitle": "Kono Subarashii Sekai ni Shukufuku wo!",
+      "providerTitles": {
+        "romaji": "Kono Subarashii Sekai ni Shukufuku wo!",
+        "english": "KONOSUBA -God's blessing on this wonderful world!",
+        "native": "この素晴らしい世界に祝福を！"
+      },
+      "synonyms": [
+        "Konosuba",
+        "Kono Subarashii Sekai ni Syukufuku wo!",
+        "Konosuba - As Bençãos de Deus Neste Mundo Maravilhoso",
+        "为美好的世界献上祝福！",
+        "ขอให้โชคดีมีชัยในโลกแฟนตาซี!",
+        "Konosuba : Sois béni monde merveilleux !",
+        "Да благословят боги сей расчудесный мир!",
+        "Konosuba: Un mundo maravilloso!",
+        " Konosuba: ¡Bendito sea este maravilloso mundo!"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21202-mPOr80AEjUcZ.png",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21202-mPOr80AEjUcZ.png"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-060",
+      "displayTitle": "Kaze ga Tsuyoku Fuiteiru",
+      "format": "SERIES",
+      "anilistId": 101903,
+      "matchedTitle": "Kaze ga Tsuyoku Fuiteiru",
+      "providerTitles": {
+        "romaji": "Kaze ga Tsuyoku Fuiteiru",
+        "english": "Run with the Wind",
+        "native": "風が強く吹いている"
+      },
+      "synonyms": [
+        "KazeTsuyo",
+        "В ногу с ветром"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101903-ncgPJbbA5Nou.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101903-ncgPJbbA5Nou.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-061",
+      "displayTitle": "Megalo Box",
+      "format": "SERIES",
+      "anilistId": 100298,
+      "matchedTitle": "Megalo Box",
+      "providerTitles": {
+        "romaji": "Megalo Box",
+        "english": "Megalobox",
+        "native": "メガロボクス"
+      },
+      "synonyms": [],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b100298-A5VQUcw7ZC64.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b100298-A5VQUcw7ZC64.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-062",
+      "displayTitle": "Yakusoku no Neverland",
+      "format": "SERIES",
+      "anilistId": 101759,
+      "matchedTitle": "Yakusoku no Neverland",
+      "providerTitles": {
+        "romaji": "Yakusoku no Neverland",
+        "english": "The Promised Neverland",
+        "native": "約束のネバーランド"
+      },
+      "synonyms": [
+        "YakuNeba",
+        "TPN",
+        "نيفرلاند الموعودة",
+        "约定的梦幻岛",
+        "พันธสัญญาเนเวอร์แลนด์",
+        "約定的夢幻島"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101759-8UR7r9MNVpz2.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101759-8UR7r9MNVpz2.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-063",
+      "displayTitle": "Hinomaru Zumou",
+      "format": "SERIES",
+      "anilistId": 100990,
+      "matchedTitle": "Hinomaru-Zumou",
+      "providerTitles": {
+        "romaji": "Hinomaru-Zumou",
+        "english": "Hinomaru Sumo",
+        "native": "火ノ丸相撲"
+      },
+      "synonyms": [
+        "ฮิโนะมารุ ซูโม่กะเปี๊ยกฟัดโลก"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/nx100990-NJ5mqZkYlW6y.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/nx100990-NJ5mqZkYlW6y.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-064",
+      "displayTitle": "Shokugeki no Souma",
+      "format": "SERIES",
+      "anilistId": 20923,
+      "matchedTitle": "Shokugeki no Souma",
+      "providerTitles": {
+        "romaji": "Shokugeki no Souma",
+        "english": "Food Wars!",
+        "native": "食戟のソーマ"
+      },
+      "synonyms": [
+        "لا سلام على طعام",
+        "Food Wars! The First Plate",
+        "食戟之灵",
+        "ยอดนักปรุงโซมะ"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20923-pNT38pjW3RFH.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20923-pNT38pjW3RFH.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-065",
+      "displayTitle": "Mahoutsukai no Yome",
+      "format": "SERIES",
+      "anilistId": 98436,
+      "matchedTitle": "Mahoutsukai no Yome",
+      "providerTitles": {
+        "romaji": "Mahoutsukai no Yome",
+        "english": "The Ancient Magus' Bride",
+        "native": "魔法使いの嫁"
+      },
+      "synonyms": [
+        "Mahou Tsukai no Yome",
+        "Mahoyome",
+        "Невеста чародея",
+        "เจ้าสาวผมแดงกับจอมเวทอสูร"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx98436-n7sK6POCd0XV.png",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx98436-n7sK6POCd0XV.png"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-066",
+      "displayTitle": "Tsurezure Children",
+      "format": "SERIES",
+      "anilistId": 98291,
+      "matchedTitle": "Tsurezure Children",
+      "providerTitles": {
+        "romaji": "Tsurezure Children",
+        "english": "Tsuredure Children",
+        "native": "徒然チルドレン"
+      },
+      "synonyms": [
+        "Tsure x dure children",
+        "Признания"
+      ],
+      "anilistFormat": "TV_SHORT",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx98291-LY6txxZTX8We.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx98291-LY6txxZTX8We.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-067",
+      "displayTitle": "Koe no Katachi",
+      "format": "MOVIE",
+      "anilistId": 20954,
+      "matchedTitle": "Koe no Katachi",
+      "providerTitles": {
+        "romaji": "Koe no Katachi",
+        "english": "A Silent Voice",
+        "native": "聲の形"
+      },
+      "synonyms": [
+        "The Shape of Voice",
+        "A Voz do Silêncio",
+        "A Forma da Voz",
+        "La Forma della Voce",
+        "צורתו של קול",
+        "声之形",
+        "الحزن الصامت",
+        "Una voz silenciosa",
+        "La Forme de la voix",
+        "Форма голоса",
+        "Форма голосу",
+        "Tylus balsas",
+        "Balss forma",
+        "Дауыс пішіні",
+        "Sakit səs",
+        "รักไร้เสียง",
+        "Dáng hình thanh âm"
+      ],
+      "anilistFormat": "MOVIE",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20954-sYRfE5jQRtSB.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20954-sYRfE5jQRtSB.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-068",
+      "displayTitle": "Anohana",
+      "format": "SERIES",
+      "anilistId": 9989,
+      "matchedTitle": "AnoHana",
+      "providerTitles": {
+        "romaji": "Ano Hi Mita Hana no Namae wo Bokutachi wa Mada Shiranai.",
+        "english": "Anohana: The Flower We Saw That Day",
+        "native": "あの日見た花の名前を僕達はまだ知らない。"
+      },
+      "synonyms": [
+        "AnoHana",
+        "We Still Don't Know the Name of the Flower We Saw That Day.",
+        "אנוהאנה: הפרח שראינו ביום ההוא",
+        "อาโนะฮานะ ดอกไม้ ความทรงจำ และมิตรภาพ",
+        "あの花",
+        "AnoHana: ancora non conosciamo il nome del fiore che abbiamo visto quel giorno",
+        "Đóa hoa đã thấy ngày ấy chúng mình vẫn chưa biết tên"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx9989-hImMg6kCMm6I.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx9989-hImMg6kCMm6I.jpg"
+      },
+      "decision": "unique-exact-synonym-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-069",
+      "displayTitle": "Domestic na Kanojo",
+      "format": "SERIES",
+      "anilistId": 103139,
+      "matchedTitle": "Domestic na Kanojo",
+      "providerTitles": {
+        "romaji": "Domestic na Kanojo",
+        "english": "Domestic Girlfriend",
+        "native": "ドメスティックな彼女"
+      },
+      "synonyms": [
+        "DomeKano",
+        "บทเรียนรักเส้นทางหัวใจ"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/nx103139-2TfvRyGTE1qp.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/nx103139-2TfvRyGTE1qp.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-070",
+      "displayTitle": "Koi to Uso",
+      "format": "SERIES",
+      "anilistId": 98320,
+      "matchedTitle": "Koi to Uso",
+      "providerTitles": {
+        "romaji": "Koi to Uso",
+        "english": "LOVE and LIES",
+        "native": "恋と嘘"
+      },
+      "synonyms": [
+        "Love & Lies",
+        "จะรักหรือจะหลอก"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx98320-VwCcTBeEs08J.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx98320-VwCcTBeEs08J.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-072",
+      "displayTitle": "Fuuka",
+      "format": "SERIES",
+      "anilistId": 21887,
+      "matchedTitle": "Fuuka",
+      "providerTitles": {
+        "romaji": "Fuuka",
+        "english": "Fuuka",
+        "native": "風夏"
+      },
+      "synonyms": [],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21887-CAq64M7WMgY5.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21887-CAq64M7WMgY5.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-073",
+      "displayTitle": "Kiznaiver",
+      "format": "SERIES",
+      "anilistId": 21421,
+      "matchedTitle": "Kiznaiver",
+      "providerTitles": {
+        "romaji": "Kiznaiver",
+        "english": "Kiznaiver",
+        "native": "キズナイーバー"
+      },
+      "synonyms": [],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21421-5y8ryXsMB7aJ.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21421-5y8ryXsMB7aJ.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-074",
+      "displayTitle": "Re:Zero kara Hajimeru Isekai Seikatsu",
+      "format": "SERIES",
+      "anilistId": 21355,
+      "matchedTitle": "Re:Zero kara Hajimeru Isekai Seikatsu",
+      "providerTitles": {
+        "romaji": "Re:Zero kara Hajimeru Isekai Seikatsu",
+        "english": "Re:ZERO -Starting Life in Another World-",
+        "native": "Re:ゼロから始める異世界生活"
+      },
+      "synonyms": [
+        "Re: Life in a different world from zero",
+        "ReZero",
+        "Re Zero",
+        "Re：从零开始的异世界生活",
+        "Re:Zero รีเซทชีวิต ฝ่าวิกฤตต่างโลก",
+        "Re:Zero — жизнь с нуля в другом мире",
+        "Re:Zero Empezar de cero en un mundo diferente",
+        "Re:Zero – Bắt đầu lại ở thế giới khác"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21355-wRVUrGxpvIQQ.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21355-wRVUrGxpvIQQ.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-075",
+      "displayTitle": "Akagami no Shirayuki-hime",
+      "format": "SERIES",
+      "anilistId": 21058,
+      "matchedTitle": "Akagami no Shirayuki-hime",
+      "providerTitles": {
+        "romaji": "Akagami no Shirayuki-hime",
+        "english": "Snow White with the Red Hair",
+        "native": "赤髪の白雪姫"
+      },
+      "synonyms": [
+        "Shirayuki aux cheveux rouges",
+        "สโนว์ไวท์ผมแดง",
+        "Красноволосая Белоснежка",
+        "Красноволосая принцесса Белоснежка",
+        "Die rothaarige Schneeprinzessin",
+        "Blancanieves pelirroja",
+        "Shirayuki: Śnieżka o czerwonych włosach"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21058-GRqasG1xk3bD.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21058-GRqasG1xk3bD.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-076",
+      "displayTitle": "Kimi no Na wa",
+      "format": "MOVIE",
+      "anilistId": 21519,
+      "matchedTitle": "Kimi no Na wa.",
+      "providerTitles": {
+        "romaji": "Kimi no Na wa.",
+        "english": "Your Name.",
+        "native": "君の名は。"
+      },
+      "synonyms": [
+        "Your Name. - Gestern, heute und für immer",
+        "Mi a Neved?",
+        "你的名字。",
+        "너의 이름은.",
+        "Tu nombre",
+        "Твоё имя",
+        "หลับตาฝันถึงชื่อเธอ",
+        "Il tuo nome",
+        "השם שלך.",
+        "Twoje imię",
+        "Tên cậu là gì",
+        "Tvoje meno.",
+        "Tvoje jméno."
+      ],
+      "anilistFormat": "MOVIE",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21519-SUo3ZQuCbYhJ.png",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21519-SUo3ZQuCbYhJ.png"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-085",
+      "displayTitle": "Dorohedoro",
+      "format": "SERIES",
+      "anilistId": 105228,
+      "matchedTitle": "Dorohedoro",
+      "providerTitles": {
+        "romaji": "Dorohedoro",
+        "english": "Dorohedoro",
+        "native": "ドロヘドロ"
+      },
+      "synonyms": [
+        "دوروهيدورو",
+        "สาปพันธุ์อสูร",
+        "Дорохедоро"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx105228-I4xr84QS9Pvk.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx105228-I4xr84QS9Pvk.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-086",
+      "displayTitle": "The God of High School",
+      "format": "SERIES",
+      "anilistId": 116006,
+      "matchedTitle": "THE GOD OF HIGH SCHOOL",
+      "providerTitles": {
+        "romaji": "THE GOD OF HIGH SCHOOL",
+        "english": "The God of High School",
+        "native": "THE GOD OF HIGH SCHOOL ゴッド・オブ・ハイスクール"
+      },
+      "synonyms": [
+        "GoH",
+        "갓 오브 하이스쿨",
+        "Бог старшей школы"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx116006-Wt8JSA1ZQxlM.png",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx116006-Wt8JSA1ZQxlM.png"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-087",
+      "displayTitle": "Baki",
+      "format": "SERIES",
+      "anilistId": 97888,
+      "matchedTitle": "Baki",
+      "providerTitles": {
+        "romaji": "Baki",
+        "english": "BAKI",
+        "native": "バキ"
+      },
+      "synonyms": [
+        "Baki - O Campeão",
+        "Баки",
+        "Μπάκι"
+      ],
+      "anilistFormat": "ONA",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx97888-tdZ1r7qN1DRs.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx97888-tdZ1r7qN1DRs.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-088",
+      "displayTitle": "Kengan Ashura",
+      "format": "SERIES",
+      "anilistId": 100891,
+      "matchedTitle": "Kengan Ashura",
+      "providerTitles": {
+        "romaji": "Kengan Ashura",
+        "english": "KENGAN ASHURA Part I",
+        "native": "ケンガンアシュラ"
+      },
+      "synonyms": [
+        "КЕНҐАН АСУРА",
+        "Кэнган Асура"
+      ],
+      "anilistFormat": "ONA",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx100891-vPfnfkzizYFe.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx100891-vPfnfkzizYFe.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-089",
+      "displayTitle": "Vinland Saga",
+      "format": "SERIES",
+      "anilistId": 101348,
+      "matchedTitle": "VINLAND SAGA",
+      "providerTitles": {
+        "romaji": "VINLAND SAGA",
+        "english": "Vinland Saga",
+        "native": "ヴィンランド・サガ"
+      },
+      "synonyms": [
+        "סאגת וינלנד",
+        "فينلاند ساغا",
+        "สงครามคนทมิฬ",
+        "Сага о Винланде"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101348-2fhDFPCuMNiz.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101348-2fhDFPCuMNiz.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-090",
+      "displayTitle": "Kanojo, Okarishimasu",
+      "format": "SERIES",
+      "anilistId": 113813,
+      "matchedTitle": "Kanojo, Okarishimasu",
+      "providerTitles": {
+        "romaji": "Kanojo, Okarishimasu",
+        "english": "Rent-a-Girlfriend",
+        "native": "彼女、お借りします"
+      },
+      "synonyms": [
+        "I'd like to Borrow a Girlfriend",
+        "Kanokari",
+        "สะดุดรักยัยแฟนเช่า",
+        "Pacar Sewaan"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx113813-SnljeXpU3Pw7.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx113813-SnljeXpU3Pw7.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-091",
+      "displayTitle": "Kabaneri of the Iron Fortress",
+      "format": "SERIES",
+      "anilistId": 21196,
+      "matchedTitle": "Kabaneri of the Iron Fortress",
+      "providerTitles": {
+        "romaji": "Koutetsujou no Kabaneri",
+        "english": "Kabaneri of the Iron Fortress",
+        "native": "甲鉄城のカバネリ"
+      },
+      "synonyms": [
+        "Kabaneri de la Fortaleza de Hierro"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21196-2PfPfIDrxKki.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21196-2PfPfIDrxKki.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-092",
+      "displayTitle": "Mushoku Tensei: Jobless Reincarnation",
+      "format": "SERIES",
+      "anilistId": 108465,
+      "matchedTitle": "Mushoku Tensei: Jobless Reincarnation",
+      "providerTitles": {
+        "romaji": "Mushoku Tensei: Isekai Ittara Honki Dasu",
+        "english": "Mushoku Tensei: Jobless Reincarnation",
+        "native": "無職転生 ～異世界行ったら本気だす～"
+      },
+      "synonyms": [
+        "Jobless Reincarnation: I Will Seriously Try If I Go To Another World",
+        "无职转生 ~到了异世界就拿出真本事~",
+        "เกิดชาตินี้พี่ต้องเทพ",
+        "Thất nghiệp chuyển sinh"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx108465-1ANspF1EWyFx.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx108465-1ANspF1EWyFx.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-093",
+      "displayTitle": "Plunderer",
+      "format": "SERIES",
+      "anilistId": 101168,
+      "matchedTitle": "Plunderer",
+      "providerTitles": {
+        "romaji": "Plunderer",
+        "english": "Plunderer",
+        "native": "プランダラ"
+      },
+      "synonyms": [],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101168-LY3XA61byAVo.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101168-LY3XA61byAVo.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-094",
+      "displayTitle": "Appare-Ranman!",
+      "format": "SERIES",
+      "anilistId": 112444,
+      "matchedTitle": "Appare-Ranman!",
+      "providerTitles": {
+        "romaji": "Appare-Ranman!",
+        "english": "APPARE-RANMAN!",
+        "native": "天晴爛漫！"
+      },
+      "synonyms": [
+        "Appare Ranman!"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx112444-S7bhKskrAqSI.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx112444-S7bhKskrAqSI.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-096",
+      "displayTitle": "SK8 the Infinity",
+      "format": "SERIES",
+      "anilistId": 124153,
+      "matchedTitle": "SK8 the Infinity",
+      "providerTitles": {
+        "romaji": "SK∞",
+        "english": "SK8 the Infinity",
+        "native": "SK∞ エスケーエイト"
+      },
+      "synonyms": [
+        "SK Eight",
+        "เอสเคเอท สเกตบอร์ดล้างเมือง",
+        "Hội Thanh Niên Lướt Ván SK∞",
+        "Ski Tak Terbatas SK∞"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx124153-uEBI764OSavB.png",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx124153-uEBI764OSavB.png"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-097",
+      "displayTitle": "Fumetsu no Anata e",
+      "format": "SERIES",
+      "anilistId": 114535,
+      "matchedTitle": "Fumetsu no Anata e",
+      "providerTitles": {
+        "romaji": "Fumetsu no Anata e",
+        "english": "To Your Eternity",
+        "native": "不滅のあなたへ"
+      },
+      "synonyms": [
+        "To You, the Immortal",
+        "Uma vida imortal",
+        "致不灭的你",
+        "A te, l'immortale",
+        "Ku twej wieczności",
+        "불멸의 그대에게",
+        "Untukmu yang Abadi",
+        "Gửi em, người bất tử",
+        "แด่เธอผู้เป็นนิรันดร์"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx114535-y3NnjexcqKG1.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx114535-y3NnjexcqKG1.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-098",
+      "displayTitle": "Saihate no Paladin",
+      "format": "SERIES",
+      "anilistId": 132473,
+      "matchedTitle": "Saihate no Paladin",
+      "providerTitles": {
+        "romaji": "Saihate no Paladin",
+        "english": "The Faraway Paladin",
+        "native": "最果てのパラディン"
+      },
+      "synonyms": [
+        "พาลาดิน ยอดอัศวินจากแดนไกล"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx132473-L64hP24nJyEV.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx132473-L64hP24nJyEV.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-099",
+      "displayTitle": "Katsute Kami Datta Kemono-tachi e",
+      "format": "SERIES",
+      "anilistId": 107672,
+      "matchedTitle": "Katsute Kami Datta Kemono-tachi e",
+      "providerTitles": {
+        "romaji": "Katsute Kami Datta Kemono-tachi e",
+        "english": "To the Abandoned Sacred Beasts",
+        "native": "かつて神だった獣たちへ"
+      },
+      "synonyms": [],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx107672-HBpAeSGSTFlt.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx107672-HBpAeSGSTFlt.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-100",
+      "displayTitle": "Vivy: Fluorite Eye's Song",
+      "format": "SERIES",
+      "anilistId": 128546,
+      "matchedTitle": "Vivy: Fluorite Eye’s Song",
+      "providerTitles": {
+        "romaji": "Vivy: Fluorite Eye’s Song",
+        "english": "Vivy -Fluorite Eye's Song-",
+        "native": "Vivy -Fluorite Eye’s Song-"
+      },
+      "synonyms": [
+        "ヴィヴィ -フローライトアイズソング-",
+        "วีวี่ บทเพลงจักรกลกู้ศตวรรษ"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx128546-UIwyhuhjxmL0.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx128546-UIwyhuhjxmL0.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-101",
+      "displayTitle": "Arifureta: From Commonplace to World's Strongest",
+      "format": "SERIES",
+      "anilistId": 100668,
+      "matchedTitle": "Arifureta: From Commonplace to World's Strongest",
+      "providerTitles": {
+        "romaji": "Arifureta Shokugyou de Sekai Saikyou",
+        "english": "Arifureta: From Commonplace to World's Strongest",
+        "native": "ありふれた職業で世界最強"
+      },
+      "synonyms": [
+        "平凡职业造就世界最强",
+        "อาชีพกระจอกแล้วทำไม ยังไงข้าก็เทพ"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx100668-DvOn5bMOt4cy.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx100668-DvOn5bMOt4cy.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-102",
+      "displayTitle": "Sono Bisque Doll wa Koi wo Suru",
+      "format": "SERIES",
+      "anilistId": 132405,
+      "matchedTitle": "Sono Bisque Doll wa Koi wo Suru",
+      "providerTitles": {
+        "romaji": "Sono Bisque Doll wa Koi wo Suru",
+        "english": "My Dress-Up Darling",
+        "native": "その着せ替え人形は恋をする"
+      },
+      "synonyms": [
+        "Sono Kisekae Ningyou wa Koi wo suru",
+        "หนุ่มเย็บผ้ากับสาวนักคอสเพลย์",
+        "その着せ替え人形（ビスク・ドール）は恋をする",
+        "kisekoi",
+        "Si Boneka Rias Sedang Jatuh Cinta",
+        "Projekt: cosplay",
+        "Любовь с иголочки",
+        "着せ恋",
+        "Oyuncak Bebek Sevgilim",
+        "Nàng Búp Bê Thử Đồ Biết Yêu"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx132405-qP7FQYGmNI3d.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx132405-qP7FQYGmNI3d.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-104",
+      "displayTitle": "Gleipnir",
+      "format": "SERIES",
+      "anilistId": 108241,
+      "matchedTitle": "Gleipnir",
+      "providerTitles": {
+        "romaji": "Gleipnir",
+        "english": "Gleipnir",
+        "native": "グレイプニル"
+      },
+      "synonyms": [
+        "格莱普尼尔"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx108241-Mc28QvkdUkfp.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx108241-Mc28QvkdUkfp.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-105",
+      "displayTitle": "Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e",
+      "format": "SERIES",
+      "anilistId": 98659,
+      "matchedTitle": "Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e",
+      "providerTitles": {
+        "romaji": "Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e",
+        "english": "Classroom of the Elite",
+        "native": "ようこそ実力至上主義の教室へ"
+      },
+      "synonyms": [
+        "Youjitsu",
+        "You-Zitsu",
+        "ขอต้อนรับสู่ห้องเรียนนิยม (เฉพาะ) ยอดคน",
+        "Cote",
+        "歡迎來到實力至上主義的教室",
+        "Добро пожаловать в класс для особо одарённых",
+        "فصل النخبة",
+        "Chào mừng đến với lớp học đề cao thực lực",
+        "Chào mừng tới lớp học biết tuốt"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx98659-WNyPLIZDpGGY.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx98659-WNyPLIZDpGGY.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-106",
+      "displayTitle": "SWORD GAI The Animation",
+      "format": "SERIES",
+      "anilistId": 20875,
+      "matchedTitle": "Sword Gai The Animation",
+      "providerTitles": {
+        "romaji": "Sword Gai The Animation",
+        "english": "SWORDGAI The Animation",
+        "native": "ソードガイ The Animation"
+      },
+      "synonyms": [
+        "غاي ذو السيف",
+        "หัตถ์ศาสตราผ่าโลกันต์"
+      ],
+      "anilistFormat": "ONA",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/nx20875-aPXVfFJ7eYxz.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/nx20875-aPXVfFJ7eYxz.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-107",
+      "displayTitle": "Tower of God",
+      "format": "SERIES",
+      "anilistId": 115230,
+      "matchedTitle": "Tower of God",
+      "providerTitles": {
+        "romaji": "Kami no Tou: Tower of God",
+        "english": "Tower of God",
+        "native": "神之塔 -Tower of God-"
+      },
+      "synonyms": [
+        "タワーオブ・ゴッド",
+        "신의 탑",
+        "Sinui Tap",
+        "Kami no Tou",
+        "TOG",
+        "Башня Бога"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx115230-QHOdSN7yt8ab.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx115230-QHOdSN7yt8ab.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-108",
+      "displayTitle": "Juuni Taisen",
+      "format": "SERIES",
+      "anilistId": 98443,
+      "matchedTitle": "Juuni Taisen",
+      "providerTitles": {
+        "romaji": "Juuni Taisen",
+        "english": "JUNI TAISEN：ZODIAC WAR",
+        "native": "十二大戦"
+      },
+      "synonyms": [],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/nx98443-1d7qImgzb6Dj.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/nx98443-1d7qImgzb6Dj.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-109",
+      "displayTitle": "Parasyte -the maxim-",
+      "format": "SERIES",
+      "anilistId": 20623,
+      "matchedTitle": "Parasyte -the maxim-",
+      "providerTitles": {
+        "romaji": "Kiseijuu: Sei no Kakuritsu",
+        "english": "Parasyte -the maxim-",
+        "native": "寄生獣 セイの格率"
+      },
+      "synonyms": [
+        "Kiseiju - L'ospite indesiderato",
+        "Parasite : La Maxime",
+        "Паразит: Учение о жизни",
+        "Pasożyt"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20623-dUARfggnNDOe.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20623-dUARfggnNDOe.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-110",
+      "displayTitle": "Komi Can't Communicate",
+      "format": "SERIES",
+      "anilistId": 133965,
+      "matchedTitle": "Komi Can’t Communicate",
+      "providerTitles": {
+        "romaji": "Komi-san wa, Komyushou desu.",
+        "english": "Komi Can’t Communicate",
+        "native": "古見さんは、コミュ症です。"
+      },
+      "synonyms": [
+        "Comi san ha Comyusho desu",
+        "مشكلة كومي",
+        "Komi-san wa, Comyushou desu.",
+        "โฉมงามพูดไม่เก่งกับผองเพื่อนไม่เต็มเต็ง",
+        "Komi cherche ses mots",
+        "Komi không thể giao tiếp",
+        "Komi-san no puede comunicarse",
+        "У Коми проблемы с общением",
+        "Η Κόμι Δεν Επικοινωνεί",
+        "Комі не вміє спілкуватися",
+        "המשאלה של קומי"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx133965-9TZBS4m4yvED.png",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx133965-9TZBS4m4yvED.png"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-113",
+      "displayTitle": "Jigokuraku",
+      "format": "SERIES",
+      "anilistId": 128893,
+      "matchedTitle": "Jigokuraku",
+      "providerTitles": {
+        "romaji": "Jigokuraku",
+        "english": "Hell’s Paradise",
+        "native": "地獄楽"
+      },
+      "synonyms": [
+        "Hell’s Paradise: Jigokuraku",
+        "สุขาวดีอเวจี",
+        "Адский рай"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx128893-Gc2t8b8M0mVu.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx128893-Gc2t8b8M0mVu.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-114",
+      "displayTitle": "Tengoku Daimakyo",
+      "format": "SERIES",
+      "anilistId": 155783,
+      "matchedTitle": "Tengoku Daimakyo",
+      "providerTitles": {
+        "romaji": "Tengoku Daimakyou",
+        "english": "Tengoku Daimakyo",
+        "native": "天国大魔境"
+      },
+      "synonyms": [
+        "Heavenly Delusion",
+        "Tengoku-Daimakyo: Ilusão Celestial",
+        "ถ้ำปีศาจแดนสวรรค์"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx155783-YosKbsmZzuDE.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx155783-YosKbsmZzuDE.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-115",
+      "displayTitle": "Made in Abyss",
+      "format": "SERIES",
+      "anilistId": 97986,
+      "matchedTitle": "Made in Abyss",
+      "providerTitles": {
+        "romaji": "Made in Abyss",
+        "english": "Made in Abyss",
+        "native": "メイドインアビス"
+      },
+      "synonyms": [
+        "صنع في الهاوية",
+        "Созданный в Бездне",
+        "ผ่าเหวนรก",
+        "นักบุกเบิกหลุมยักษ์",
+        "Đến từ Abyss"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx97986-TQ7dCgbS3y5s.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx97986-TQ7dCgbS3y5s.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-116",
+      "displayTitle": "Children of the Whales",
+      "format": "SERIES",
+      "anilistId": 98449,
+      "matchedTitle": "Children of the Whales",
+      "providerTitles": {
+        "romaji": "Kujira no Kora wa Sajou ni Utau",
+        "english": "Children of the Whales",
+        "native": "クジラの子らは砂上に歌う"
+      },
+      "synonyms": [
+        "KujiSuna",
+        "Die Walkinder",
+        "Hijos de las Ballenas",
+        "أبناء الحيتان",
+        "ลำนำของเหล่าลูกปลาวาฬ",
+        "Kujira no Kora - Filhos das Baleias",
+        "Les Enfants de la Baleine"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx98449-CxVQsAWFPpMa.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx98449-CxVQsAWFPpMa.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-118",
+      "displayTitle": "Gangsta.",
+      "format": "SERIES",
+      "anilistId": 20773,
+      "matchedTitle": "GANGSTA.",
+      "providerTitles": {
+        "romaji": "GANGSTA.",
+        "english": "GANGSTA.",
+        "native": "GANGSTA."
+      },
+      "synonyms": [
+        "ギャングスタ"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20773-yfJQMyHqZyJr.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20773-yfJQMyHqZyJr.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-119",
+      "displayTitle": "Kaiju No. 8",
+      "format": "SERIES",
+      "anilistId": 153288,
+      "matchedTitle": "Kaiju No. 8",
+      "providerTitles": {
+        "romaji": "Kaijuu 8-gou",
+        "english": "Kaiju No. 8",
+        "native": "怪獣８号"
+      },
+      "synonyms": [
+        "Monster #8",
+        "8Kaijuu",
+        "KAIJU No. EIGHT",
+        "Kaiju N°8",
+        "괴수 8호"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx153288-25FBfFJzEQ5O.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx153288-25FBfFJzEQ5O.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-120",
+      "displayTitle": "Wind Breaker",
+      "format": "SERIES",
+      "anilistId": 163270,
+      "matchedTitle": "WIND BREAKER",
+      "providerTitles": {
+        "romaji": "WIND BREAKER",
+        "english": "WIND BREAKER",
+        "native": "WIND BREAKER"
+      },
+      "synonyms": [
+        "WB",
+        "ウィンブレ",
+        "WBK",
+        "ウィンドブレイカー"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx163270-wboZJp0ybwVK.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx163270-wboZJp0ybwVK.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-121",
+      "displayTitle": "Bartender: Glass of God",
+      "format": "SERIES",
+      "anilistId": 155890,
+      "matchedTitle": "BARTENDER Glass of God",
+      "providerTitles": {
+        "romaji": "Bartender: Kami no Glass",
+        "english": "BARTENDER Glass of God",
+        "native": "バーテンダー 神のグラス"
+      },
+      "synonyms": [
+        "Bartender (New Anime)",
+        "Бармен: божественный стакан"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b155890-PN3wsgVDofhB.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b155890-PN3wsgVDofhB.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-122",
+      "displayTitle": "Kenka Dokugaku",
+      "format": "SERIES",
+      "anilistId": 174653,
+      "matchedTitle": "Kenka Dokugaku",
+      "providerTitles": {
+        "romaji": "Kenka Dokugaku",
+        "english": "Viral Hit",
+        "native": "喧嘩独学"
+      },
+      "synonyms": [
+        "싸움독학",
+        "Ssaumdokak",
+        "Viral Hit: How to Fight"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx174653-OsnK4BuENjUT.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx174653-OsnK4BuENjUT.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-125",
+      "displayTitle": "Nige Jouzu no Wakagimi",
+      "format": "SERIES",
+      "anilistId": 162896,
+      "matchedTitle": "Nige Jouzu no Wakagimi",
+      "providerTitles": {
+        "romaji": "Nige Jouzu no Wakagimi",
+        "english": "The Elusive Samurai",
+        "native": "逃げ上手の若君"
+      },
+      "synonyms": [
+        "Nigewaka",
+        "นายน้อยจอมโกยก้าวสู่เส้นทางแห่งวีรบุรุษ",
+        "Héroe fugitivo",
+        "Беглый самурай"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx162896-hSMTVceb50GY.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx162896-hSMTVceb50GY.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-126",
+      "displayTitle": "Sousou no Frieren",
+      "format": "SERIES",
+      "anilistId": 154587,
+      "matchedTitle": "Sousou no Frieren",
+      "providerTitles": {
+        "romaji": "Sousou no Frieren",
+        "english": "Frieren: Beyond Journey’s End",
+        "native": "葬送のフリーレン"
+      },
+      "synonyms": [
+        "Frieren at the Funeral",
+        "장송의 프리렌",
+        "Frieren - Oltre la Fine del Viaggio",
+        "คำอธิษฐานในวันที่จากลา Frieren",
+        "Frieren e a Jornada para o Além",
+        "Frieren – Nach dem Ende der Reise",
+        "葬送的芙莉蓮",
+        "Frieren: Más allá del final del viaje",
+        "Frieren en el funeral",
+        "Sōsō no Furīren",
+        "Frieren. U kresu drogi",
+        "Frieren - Pháp sư tiễn táng",
+        "Фрирен, провожающая в последний путь",
+        "فريرن: ما وراء نهاية الرحلة",
+        "Frieren: Tras finalizar el viaje"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx154587-qQTzQnEJJ3oB.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx154587-qQTzQnEJJ3oB.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-128",
+      "displayTitle": "Solo Leveling",
+      "format": "SERIES",
+      "anilistId": 151807,
+      "matchedTitle": "Solo Leveling",
+      "providerTitles": {
+        "romaji": "Ore dake Level Up na Ken",
+        "english": "Solo Leveling",
+        "native": "俺だけレベルアップな件"
+      },
+      "synonyms": [
+        "나 혼자만 레벨업",
+        "Na Honjaman Level Up",
+        "Solo Leveling: Поднятие уровня в одиночку"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx151807-it355ZgzquUd.png",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx151807-it355ZgzquUd.png"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-129",
+      "displayTitle": "Yomi no Tsugai",
+      "format": "SERIES",
+      "anilistId": 195600,
+      "matchedTitle": "Yomi no Tsugai",
+      "providerTitles": {
+        "romaji": "Yomi no Tsugai",
+        "english": "Daemons of the Shadow Realm",
+        "native": "黄泉のツガイ"
+      },
+      "synonyms": [
+        "ヨミツガ",
+        "YomiTsuga",
+        "Pasangan dari Alam Baka",
+        "ยมลแห่งยมโลก",
+        "Yomi no Tsugai - Daemons do Reino das Sombras",
+        "Espíritus del Inframundo",
+        "Цугаи загробного мира",
+        "Kontraduety z zaświatów",
+        "Цуґаї потойбіччя",
+        "黃泉使者"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx195600-moI0UFArtOme.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx195600-moI0UFArtOme.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-130",
+      "displayTitle": "Darwin Jihen",
+      "format": "SERIES",
+      "anilistId": 177679,
+      "matchedTitle": "Darwin Jihen",
+      "providerTitles": {
+        "romaji": "Darwin Jihen",
+        "english": "The Darwin Incident",
+        "native": "ダーウィン事変"
+      },
+      "synonyms": [
+        "Incydent Darwina",
+        "ดาร์วิน พันธุ์อุบัติใหม่",
+        "El incidente Darwin"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx177679-BgsgE0fQk3qN.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx177679-BgsgE0fQk3qN.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-131",
+      "displayTitle": "Dead Account",
+      "format": "SERIES",
+      "anilistId": 187901,
+      "matchedTitle": "Dead Account",
+      "providerTitles": {
+        "romaji": "Dead Account",
+        "english": "Dead Account",
+        "native": "デッドアカウント"
+      },
+      "synonyms": [
+        "デドアカ",
+        "เดดแอ็กเคานต์ พิฆาตบัญชีมรณะ"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx187901-T91HmZAaNwOF.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx187901-T91HmZAaNwOF.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-133",
+      "displayTitle": "Hikaru ga Shinda Natsu",
+      "format": "SERIES",
+      "anilistId": 177689,
+      "matchedTitle": "Hikaru ga Shinda Natsu",
+      "providerTitles": {
+        "romaji": "Hikaru ga Shinda Natsu",
+        "english": "The Summer Hikaru Died",
+        "native": "光が死んだ夏"
+      },
+      "synonyms": [
+        "Lato, kiedy umarł Hikaru",
+        "O Verão em que Hikaru Morreu",
+        "صيف وفاة هيكارو",
+        "光死去的夏天",
+        "光逝去的夏天",
+        "Der Sommer, in dem Hikaru starb",
+        "L'estate in cui Hikaru è morto",
+        "히카루가 죽은 여름",
+        "El verano en que Hikaru murió",
+        "หน้าร้อนที่ฮิคารุจากไป",
+        "Лето, когда погас свет",
+        "Léto, kdy umřel Hikaru"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx177689-d0mB5nYgdnhi.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx177689-d0mB5nYgdnhi.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-134",
+      "displayTitle": "100 Meters",
+      "format": "MOVIE",
+      "anilistId": 177687,
+      "matchedTitle": "100 METERS",
+      "providerTitles": {
+        "romaji": "Hyakuemu.",
+        "english": "100 METERS",
+        "native": "ひゃくえむ。"
+      },
+      "synonyms": [
+        "100M",
+        "A Corrida dos 100 Metros",
+        "100 metros lisos",
+        "100 Mètres"
+      ],
+      "anilistFormat": "MOVIE",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx177687-T4SrtVjrmW01.png",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx177687-T4SrtVjrmW01.png"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-135",
+      "displayTitle": "Gachiakuta",
+      "format": "SERIES",
+      "anilistId": 178025,
+      "matchedTitle": "Gachiakuta",
+      "providerTitles": {
+        "romaji": "Gachiakuta",
+        "english": "Gachiakuta",
+        "native": "ガチアクタ"
+      },
+      "synonyms": [
+        "Гачиакута"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx178025-cWJKEsZynkil.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx178025-cWJKEsZynkil.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-136",
+      "displayTitle": "Ninja Kamui",
+      "format": "SERIES",
+      "anilistId": 151639,
+      "matchedTitle": "Ninja Kamui",
+      "providerTitles": {
+        "romaji": "Ninja Kamui",
+        "english": "Ninja Kamui",
+        "native": "Ninja Kamui"
+      },
+      "synonyms": [],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx151639-7KqJ7BgaM9Mx.png",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx151639-7KqJ7BgaM9Mx.png"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-137",
+      "displayTitle": "Scissor Seven",
+      "format": "SERIES",
+      "anilistId": 107912,
+      "matchedTitle": "Scissor Seven",
+      "providerTitles": {
+        "romaji": "Cike Wu Liuqi",
+        "english": "Scissor Seven",
+        "native": "刺客伍六七"
+      },
+      "synonyms": [
+        "Cike WuLiuqi",
+        "Ci Ke Wu Liu Qi",
+        "Assassin Seven",
+        "刺客伍六七 第一季",
+        "Killer Seven",
+        "Scissor 7",
+        "Киллер с ножницами"
+      ],
+      "anilistFormat": "ONA",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx107912-pLrOL1AzEIEt.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx107912-pLrOL1AzEIEt.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-138",
+      "displayTitle": "The Eminence in Shadow",
+      "format": "SERIES",
+      "anilistId": 130298,
+      "matchedTitle": "The Eminence in Shadow",
+      "providerTitles": {
+        "romaji": "Kage no Jitsuryokusha ni Naritakute!",
+        "english": "The Eminence in Shadow",
+        "native": "陰の実力者になりたくて！"
+      },
+      "synonyms": [
+        "To Be a Power in the Shadows!",
+        "ชีวิตไม่ต้องเด่น ขอแค่เป็นเทพในเงา",
+        "Un giorno sarò l'eminenza grigia",
+        "TEIS",
+        "Кардинал теней"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx130298-YMdcKHytpWNH.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx130298-YMdcKHytpWNH.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-139",
+      "displayTitle": "Cowboy Bebop",
+      "format": "SERIES",
+      "anilistId": 1,
+      "matchedTitle": "Cowboy Bebop",
+      "providerTitles": {
+        "romaji": "Cowboy Bebop",
+        "english": "Cowboy Bebop",
+        "native": "カウボーイビバップ"
+      },
+      "synonyms": [
+        "카우보이 비밥",
+        "קאובוי ביבופ",
+        "คาวบอย บีบ๊อป",
+        "Ковбой Бибоп",
+        "Καουμπόηδες του Διαστήματος",
+        "Kowboj Bebop"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1-GCsPm7waJ4kS.png",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx1-GCsPm7waJ4kS.png"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-140",
+      "displayTitle": "Jujutsu Kaisen",
+      "format": "SERIES",
+      "anilistId": 113415,
+      "matchedTitle": "Jujutsu Kaisen",
+      "providerTitles": {
+        "romaji": "Jujutsu Kaisen",
+        "english": "JUJUTSU KAISEN",
+        "native": "呪術廻戦"
+      },
+      "synonyms": [
+        "JJK",
+        "Sorcery Fight",
+        "咒术回战",
+        "주술회전",
+        "มหาเวทย์ผนึกมาร",
+        "جوجوتسو كايسن",
+        "Магическая битва",
+        "咒術迴戰",
+        "Chú Thuật Hồi Chiến"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx113415-LHBAeoZDIsnF.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx113415-LHBAeoZDIsnF.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    },
+    {
+      "animeId": "personal-141",
+      "displayTitle": "Hunter x Hunter",
+      "format": "SERIES",
+      "anilistId": 136,
+      "matchedTitle": "Hunter x Hunter",
+      "providerTitles": {
+        "romaji": "HUNTER×HUNTER",
+        "english": "Hunter x Hunter",
+        "native": "HUNTER×HUNTER"
+      },
+      "synonyms": [
+        "ハンターxハンター",
+        "HxH",
+        "全职猎人",
+        "القناص"
+      ],
+      "anilistFormat": "TV",
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx136-gj0bbCpDNrKG.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx136-gj0bbCpDNrKG.jpg"
+      },
+      "decision": "unique-primary-title-and-format",
+      "reviewed": false
+    }
+  ]
+}

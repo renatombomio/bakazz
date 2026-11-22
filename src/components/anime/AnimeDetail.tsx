@@ -1,14 +1,23 @@
+import { streamingAvailability } from "../../data/streaming-providers";
+import { getRenAniListId } from "../../lib/api/ren-anime-identities";
+import { getDisplayTitle, getNativeTitle } from "../../lib/anime/display-title";
 import { useEffect, useState } from "react";
 import type { LibraryEntry } from "../../types/personal";
 import { getLibrary } from "../../data/library";
 import { getPersonalFranchiseEntries } from "../../data/franchise";
 import PersonalLibraryActions from "../personal-library/PersonalLibraryActions";
 import { fetchFallbackPoster, selectBestAnimeCandidate } from "../../lib/api/poster-fallback";
-import { useT, type Lang } from "../../i18n";
+import { fetchFallbackAnime } from "../../lib/api/anime-fallback";
+import { useT, type Lang, type TranslationKey } from "../../i18n";
+import AnimeComments from "./AnimeComments";
+import ShareAnime from "./ShareAnime";
+import CharacterCarousel from "./CharacterCarousel";
+import AnimeTop from "./AnimeTop";
 
 interface Media {
-  id: number;
-  title?: { romaji?: string|null; english?: string|null };
+  id: number | string;
+  idMal?: number | null;
+  title?: { romaji?: string|null; english?: string|null; native?: string|null };
   description?: string|null;
   genres?: string[];
   startDate?: { year?: number|null; month?: number|null; day?: number|null }|null;
@@ -16,17 +25,20 @@ interface Media {
   status?: string|null;
   episodes?: number|null;
   duration?: number|null;
+  averageScore?: number|null;
+  seasonYear?: number|null;
   studios?: { nodes?: { name:string }[] };
   coverImage?: { extraLarge?: string|null; large?: string|null };
   bannerImage?: string|null;
   trailer?: { id?: string|null; site?: string|null; thumbnail?: string|null }|null;
-  recommendations?: { nodes?: { mediaRecommendation?: { id:number; title?: { romaji?:string|null; english?:string|null }; coverImage?: { extraLarge?:string|null; large?:string|null }; format?:string|null; startDate?: { year?:number|null }|null }|null }[] }|null;
+  characters?: { edges?: { role?: string|null; node?: { id:number; name?: { full?:string|null }; image?: { large?:string|null } }|null }[] }|null;
+  recommendations?: { nodes?: { mediaRecommendation?: { id:number; title?: { romaji?:string|null; english?:string|null; native?:string|null }; coverImage?: { extraLarge?:string|null; large?:string|null }; format?:string|null; startDate?: { year?:number|null }|null }|null }[] }|null;
   relations?: { edges?: { relationType?: string|null; node?: { id:number; type?:string|null; format?:string|null; title?: { romaji?:string|null; english?:string|null }; coverImage?: { extraLarge?:string|null; large?:string|null } } }[] }|null;
 }
 
 const ENDPOINT="https://graphql.anilist.co";
-const FRANCHISE_CACHE_PREFIX="renanime:franchise:v1:";
-const TRANSLATION_PREFIX="renanime:translation:en-es:v1:";
+const FRANCHISE_CACHE_PREFIX="bakazz:franchise:v1:";
+const TRANSLATION_PREFIX="bakazz:translation:en-es:v1:";
 const FRANCHISE_MEDIA_ALIASES: Record<string, number> = {
   "movie-063": 178788,
 };
@@ -92,122 +104,46 @@ async function translateToSpanish(text:string){
 
 function getSeasonCount(media: Media|null){
   if(!media || media.format==="MOVIE") return null;
-  const relatedTv=(media.relations?.edges??[])
-    .filter((edge)=>edge.relationType==="PREQUEL"||edge.relationType==="SEQUEL")
-    .filter((edge)=>edge.node?.format==="TV")
-    .map((edge)=>edge.node?.id)
-    .filter((id): id is number => typeof id==="number");
+  const relatedTv=(media.relations?.edges??[]).filter(edge=>edge.relationType==="PREQUEL"||edge.relationType==="SEQUEL").filter(edge=>edge.node?.format==="TV").map(edge=>edge.node?.id).filter((id):id is number=>typeof id==="number");
   return Math.max(1,new Set(relatedTv).size+1);
 }
 
-async function findAnime(entry: LibraryEntry): Promise<Media|null> {
-  const numericId=Number(entry.animeId);
-  const mediaId=FRANCHISE_MEDIA_ALIASES[entry.animeId] ?? (
-    Number.isInteger(numericId) && numericId > 0 ? numericId : undefined
-  );
-
-  const query=mediaId
-    ? `query DetailById($id:Int!){
-        Media(id:$id,type:ANIME){
-          id
-          title{romaji english native}
-          description(asHtml:false)
-          genres
-          startDate{year month day}
-          format
-          status
-          episodes
-          duration
-          studios(isMain:true){nodes{name}}
-          coverImage{extraLarge large}
-          bannerImage
-          trailer{id site thumbnail}
-          relations{
-            edges{
-              relationType
-              node{
-                id
-                type
-                format
-                title{romaji english native}
-                coverImage{extraLarge large}
-              }
-            }
-          }
-          recommendations(sort:RATING_DESC,page:1,perPage:12){
-            nodes{
-              mediaRecommendation{
-                id
-                title{romaji english native}
-                coverImage{extraLarge large}
-                format
-                startDate{year}
-              }
-            }
-          }
-        }
-      }`
-    : `query DetailBySearch($search:String!){
-        Page(page:1,perPage:1){
-          media(search:$search,type:ANIME,sort:SEARCH_MATCH){
-            id
-            title{romaji english native}
-            description(asHtml:false)
-            genres
-            startDate{year month day}
-            format
-            status
-            episodes
-            duration
-            studios(isMain:true){nodes{name}}
-            coverImage{extraLarge large}
-            bannerImage
-            trailer{id site thumbnail}
-            relations{
-              edges{
-                relationType
-                node{
-                  id
-                  type
-                  format
-                  title{romaji english native}
-                  coverImage{extraLarge large}
-                }
-              }
-            }
-            recommendations(sort:RATING_DESC,page:1,perPage:12){
-              nodes{
-                mediaRecommendation{
-                  id
-                  title{romaji english native}
-                  coverImage{extraLarge large}
-                  format
-                  startDate{year}
-                }
-              }
-            }
-          }
-        }
-      }`;
-
+const DETAIL_CACHE_PREFIX="bakazz:anime-detail:v2:";
+const DETAIL_CACHE_TTL=7*24*60*60*1000;
+const DETAIL_STALE_TTL=30*24*60*60*1000;
+const detailPending=new Map<string,Promise<Media|null>>();
+function readDetailCache(key:string):{media:Media;age:number}|null{try{const raw=localStorage.getItem(DETAIL_CACHE_PREFIX+key);if(!raw)return null;const parsed=JSON.parse(raw);if(!parsed?.media||!parsed?.savedAt||Date.now()-parsed.savedAt>DETAIL_STALE_TTL)return null;return {media:parsed.media as Media,age:Date.now()-parsed.savedAt};}catch{return null;}}
+function writeDetailCache(key:string,media:Media){if(typeof media.id!=="number")return;try{localStorage.setItem(DETAIL_CACHE_PREFIX+key,JSON.stringify({media,savedAt:Date.now()}));}catch{}}
+async function fetchAniListWithRetry(query:string,variables:Record<string,unknown>,attempts=3):Promise<any>{
+ let lastError:unknown;
+ for(let attempt=0;attempt<attempts;attempt++){
+  const controller=new AbortController();const timeout=window.setTimeout(()=>controller.abort(),10000);
   try{
-    const response=await fetch(ENDPOINT,{
-      method:"POST",
-      headers:{"Content-Type":"application/json",Accept:"application/json"},
-      body:JSON.stringify(
-        mediaId
-          ? {query,variables:{id:mediaId}}
-          : {query,variables:{search:entry.title}}
-      ),
-    });
-    if(!response.ok) return null;
-    const payload=await response.json();
-    return mediaId
-      ? (payload.data?.Media ?? null)
-      : (payload.data?.Page?.media?.[0] ?? null);
-  }catch{
-    return null;
-  }
+   const response=await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({query,variables}),signal:controller.signal});
+   if(response.status===429||response.status>=500){const retryAfter=Number(response.headers.get("Retry-After"));if(attempt<attempts-1){await new Promise(resolve=>window.setTimeout(resolve,Math.min(8000,Math.max(retryAfter*1000||0,900*(attempt+1)))));continue;}throw new Error("ANILIST_TEMPORARILY_UNAVAILABLE");}
+   if(!response.ok)throw new Error("ANILIST_HTTP_"+response.status);
+   const payload=await response.json();if(payload.errors?.length)throw new Error("ANILIST_GRAPHQL_ERROR");return payload.data;
+  }catch(error){lastError=error;if(attempt<attempts-1)await new Promise(resolve=>window.setTimeout(resolve,700*(attempt+1)));}
+  finally{window.clearTimeout(timeout);}
+ }
+ throw lastError??new Error("ANILIST_UNAVAILABLE");
+}
+async function resolveAnime(entry:LibraryEntry):Promise<Media|null>{
+ const numericId=Number(entry.animeId);const mediaId=getRenAniListId(entry.animeId)??FRANCHISE_MEDIA_ALIASES[entry.animeId]??(Number.isInteger(numericId)&&numericId>0?numericId:undefined);
+ const fields="id idMal title{romaji english native} description(asHtml:false) genres startDate{year month day} format status episodes duration averageScore seasonYear studios(isMain:true){nodes{name}} coverImage{extraLarge large} bannerImage trailer{id site thumbnail} characters(page:1,perPage:12,sort:ROLE){edges{role node{id name{full} image{large}}}} relations{edges{relationType node{id type format title{romaji english native} coverImage{extraLarge large}}}} recommendations(sort:RATING_DESC,page:1,perPage:12){nodes{mediaRecommendation{id title{romaji english native} coverImage{extraLarge large} format startDate{year}}}}";
+ const query=mediaId?"query DetailById($id:Int!){Media(id:$id,type:ANIME){"+fields+"}}":"query DetailBySearch($search:String!){Page(page:1,perPage:10){media(search:$search,type:ANIME,sort:SEARCH_MATCH){"+fields+"}}}";
+ const data=await fetchAniListWithRetry(query,mediaId?{id:mediaId}:{search:entry.title});
+ return (mediaId?data?.Media??null:selectBestAnimeCandidate(data?.Page?.media??[],entry.title,entry.format)) as Media|null;
+}
+async function findAnime(entry:LibraryEntry):Promise<Media|null>{
+ const key=entry.animeId;const cached=readDetailCache(key);if(cached&&cached.age<=DETAIL_CACHE_TTL)return cached.media;
+ const existing=detailPending.get(key);if(existing)return existing;
+ const task=(async()=>{
+  try{const media=await resolveAnime(entry);if(media){writeDetailCache(key,media);return media;}}catch{}
+  const fallback=await fetchFallbackAnime(entry.title,entry.format);
+  if(fallback?.idMal){try{const mapped=await fetchAniListWithRetry("query DetailByMalId($idMal:Int!){Media(idMal:$idMal,type:ANIME){id idMal title{romaji english native} description(asHtml:false) genres startDate{year month day} format status episodes duration averageScore seasonYear studios(isMain:true){nodes{name}} coverImage{extraLarge large} bannerImage trailer{id site thumbnail}}}",{idMal:fallback.idMal},2);if(mapped?.Media){const resolved={...fallback,...mapped.Media};writeDetailCache(key,resolved);return resolved as Media;}}catch{}}
+  if(cached)return cached.media;return fallback as Media|null;
+ })().finally(()=>detailPending.delete(key));detailPending.set(key,task);return task;
 }
 
 async function findAnimeBatch(entries: LibraryEntry[]): Promise<Record<string, Media|null>> {
@@ -234,7 +170,7 @@ async function findAnimeBatch(entries: LibraryEntry[]): Promise<Record<string, M
   // Resolve explicit AniList IDs separately. Mixing direct Media fields with
   // aliased Page fields made AniList reject the whole batch with HTTP 400.
   for (const entry of unresolved) {
-    const directId = FRANCHISE_MEDIA_ALIASES[entry.animeId];
+    const directId = getRenAniListId(entry.animeId) ?? FRANCHISE_MEDIA_ALIASES[entry.animeId];
     if (!directId) continue;
 
     const query = `query FranchiseMediaById($id:Int!){Media(id:$id,type:ANIME){id title{romaji english native} synonyms description(asHtml:false) genres startDate{year month day} format status episodes duration studios(isMain:true){nodes{name}} coverImage{extraLarge large} bannerImage trailer{id site thumbnail}}}`;
@@ -252,6 +188,14 @@ async function findAnimeBatch(entries: LibraryEntry[]): Promise<Record<string, M
         try { sessionStorage.setItem(FRANCHISE_CACHE_PREFIX + entry.animeId, JSON.stringify(media)); } catch {}
       }
     } catch {}
+
+    if (!result[entry.animeId]) {
+      const fallback = await fetchFallbackAnime(entry.title, entry.format);
+      if (fallback) {
+        result[entry.animeId] = fallback;
+        try { sessionStorage.setItem(FRANCHISE_CACHE_PREFIX + entry.animeId, JSON.stringify(fallback)); } catch {}
+      }
+    }
   }
 
   const searchEntries = unresolved.filter((entry) => !FRANCHISE_MEDIA_ALIASES[entry.animeId]);
@@ -286,18 +230,14 @@ async function findAnimeBatch(entries: LibraryEntry[]): Promise<Record<string, M
       for (const [index, entry] of batch.entries()) {
         const candidates = payload.data?.["a" + index]?.media ?? [];
         const media = selectBestAnimeCandidate(candidates, entry.title, entry.format);
-        if (media?.coverImage?.extraLarge || media?.coverImage?.large) {
+        if (!media) {
+          result[entry.animeId] = await fetchFallbackAnime(entry.title, entry.format);
+        } else if (media.coverImage?.extraLarge || media.coverImage?.large) {
           result[entry.animeId] = media;
         } else {
-          const poster = await fetchFallbackPoster(entry.title, entry.format);
+          const poster = await fetchFallbackPoster(entry.title, entry.format, { skipAniList: true });
           result[entry.animeId] = poster
-            ? {
-                ...(media ?? {}),
-                id: media?.id ?? 0,
-                title: media?.title ?? { romaji: entry.title, english: entry.title },
-                format: media?.format ?? entry.format,
-                coverImage: { extraLarge: poster, large: poster },
-              }
+            ? { ...media, coverImage: { extraLarge: poster, large: poster } }
             : media;
         }
 
@@ -319,42 +259,126 @@ function date(value:Media["startDate"],lang:Lang="es"){
   return new Date(value.year,value.month-1,value.day).toLocaleDateString(lang==="en"?"en-GB":"es-ES",{day:"numeric",month:"long",year:"numeric"});
 }
 
-function format(value:string|null|undefined,lang:Lang){if(value==="MOVIE")return lang==="en"?"Movie":"Película";if(value==="TV")return lang==="en"?"Series":"Serie";return value||"Anime";}
+const FORMAT_TRANSLATIONS: Record<string, TranslationKey> = {
+  TV: "detail.formatTV",
+  TV_SHORT: "detail.formatTVShort",
+  MOVIE: "detail.formatMovie",
+  OVA: "detail.formatOVA",
+  ONA: "detail.formatONA",
+  SPECIAL: "detail.formatSpecial",
+  MUSIC: "detail.formatMusic",
+};
+
+function format(value:string|null|undefined,t:(key:TranslationKey)=>string){
+  if(!value) return "Anime";
+  const key=FORMAT_TRANSLATIONS[value];
+  return key ? t(key) : t("detail.unknownFormat");
+}
 
 export default function AnimeDetail({entry,lang="es"}:{entry:LibraryEntry;lang?:Lang}){
  const t=useT(lang);
- const[media,setMedia]=useState<Media|null>(null),[loading,setLoading]=useState(true),[translatedSynopsis,setTranslatedSynopsis]=useState(""),[translating,setTranslating]=useState(false),[franchiseMedia,setFranchiseMedia]=useState<Record<string,Media|null>>({});
+ const[media,setMedia]=useState<Media|null>(null),[loading,setLoading]=useState(true),[translatedSynopsis,setTranslatedSynopsis]=useState(""),[translating,setTranslating]=useState(false),[franchiseMedia,setFranchiseMedia]=useState<Record<string,Media|null>>({}),[likeCount,setLikeCount]=useState(0),[liked,setLiked]=useState(false),[likeBusy,setLikeBusy]=useState(false),[likeNotice,setLikeNotice]=useState("");
  const cleanSynopsis=media?.description?cleanDescription(media.description):"";
  const hasSynopsis=cleanSynopsis.replace(/[\s\\n\\r]+/g,"").length>0;
+ const streamingEntry = streamingAvailability[entry.animeId]
+  ? entry.animeId
+  : Object.keys(streamingAvailability).find((libraryId) => Number(getRenAniListId(libraryId)) === Number(entry.animeId));
+ const streaming = streamingEntry ? streamingAvailability[streamingEntry] : undefined;
  const franchiseEntries=getPersonalFranchiseEntries(entry,getLibrary());
  useEffect(()=>{
   let cancelled=false;
+  setLoading(true);
+  setMedia(null);
+  setTranslatedSynopsis("");
+  setFranchiseMedia({});
   findAnime(entry).then(value=>{
     if(cancelled)return;
     setMedia(value);
+  }).catch(()=>{
+    if(!cancelled)setMedia(null);
   }).finally(()=>{if(!cancelled)setLoading(false)});
+
+  // Franchise data is supplementary: defer it so it cannot compete with
+  // the main detail request, comments, and character data on first paint.
   const franchiseCandidates=franchiseEntries.filter(candidate=>candidate.animeId!==entry.animeId);
+  let franchiseTimer: number | undefined;
   if(franchiseCandidates.length){
-   findAnimeBatch(franchiseCandidates).then(results=>{
-    if(cancelled)return;
-    setFranchiseMedia(results);
-   });
-  }else{
-   setFranchiseMedia({});
+   franchiseTimer=window.setTimeout(()=>{
+    findAnimeBatch(franchiseCandidates).then(results=>{
+     if(!cancelled)setFranchiseMedia(results);
+    });
+   },1200);
   }
-  return()=>{cancelled=true};
+  return()=>{
+   cancelled=true;
+   if(franchiseTimer!==undefined)window.clearTimeout(franchiseTimer);
+  };
  },[entry.animeId]);
+ useEffect(()=>{
+  if(typeof media?.id !== "number") return;
+  let cancelled=false;
+  fetch("/api/anime/likes?ids="+media.id,{credentials:"same-origin",cache:"no-store"})
+   .then(response=>response.ok?response.json():null)
+   .then(payload=>{
+    if(cancelled||!payload?.likes?.[media.id]) return;
+    setLikeCount(payload.likes[media.id].count||0);
+    setLiked(Boolean(payload.likes[media.id].liked));
+   }).catch(()=>{});
+  return()=>{cancelled=true};
+ },[media?.id]);
+ const toggleLike=async()=>{
+  if(typeof media?.id !== "number"||likeBusy) return;
+  setLikeBusy(true); setLikeNotice("");
+  try{
+   const response=await fetch("/api/anime/likes",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({animeId:media.id})});
+   const payload=await response.json().catch(()=>({}));
+   if(response.status===401){setLikeNotice(lang==="en"?"Sign in to like this anime.":"Inicia sesión para dar like.");return;}
+   if(!response.ok||!payload.ok) throw new Error("like_failed");
+   setLiked(Boolean(payload.liked)); setLikeCount(Number(payload.count)||0);
+  }catch{
+   setLikeNotice(lang==="en"?"Could not update your like. Try again.":"No se pudo actualizar el like. Inténtalo de nuevo.");
+  }finally{setLikeBusy(false)}
+ };
  const translateSynopsis=async()=>{if(lang==="en"||!media?.description||translating)return;setTranslating(true);const value=await translateToSpanish(media.description);setTranslatedSynopsis(value);setTranslating(false)};
- const title=FRANCHISE_MEDIA_ALIASES[entry.animeId]?entry.title:(lang==="en"?(media?.title?.english||media?.title?.romaji||entry.title):(media?.title?.romaji||media?.title?.english||entry.title));
+ const title=getDisplayTitle(media?.title,entry.title);
+ const nativeTitle=getNativeTitle(media?.title);
  const poster=media?.coverImage?.extraLarge||media?.coverImage?.large;
- const banner=media?.bannerImage||poster;
+ const banner=media?.bannerImage||null;
  const personal=entry.state;
  const relations=(media?.relations?.edges??[]).filter(edge=>edge?.node?.type==="ANIME"&&edge.node.id!==media?.id);
  return <div className="anime-detail">
   <style>{`
-    .anime-detail:not(.anime-detail--ghibli) .anime-detail-synopsis-wrap{max-width:42rem;margin-top:1.35rem;padding:1rem 1.15rem 1.1rem;border:1px solid rgba(245,242,236,.18);border-radius:14px;background:rgba(9,9,9,.42);box-shadow:0 12px 34px rgba(0,0,0,.16);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
-    .anime-detail:not(.anime-detail--ghibli) .anime-detail-synopsis{margin:0;color:var(--color-paper-50)}
-    .anime-detail:not(.anime-detail--ghibli) .anime-detail-translate{border-color:rgba(245,242,236,.28);background:rgba(245,242,236,.06);color:var(--color-paper-200)}
+    .anime-detail .anime-detail-synopsis-wrap{max-width:42rem;margin-top:1.35rem;padding:1rem 0 1.1rem;border:0;border-radius:0;background:transparent;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+    .anime-detail .anime-detail-synopsis{margin:0;color:var(--color-paper-50)}
+    .anime-detail .anime-detail-translate{border-color:rgba(245,242,236,.28);background:rgba(245,242,236,.06);color:var(--color-paper-200)}
+    .anime-detail-poster{position:relative}\n    .anime-detail-native-title{margin:.35rem 0 0;color:var(--color-muted-400);font-family:"Hiragino Sans","Noto Sans JP",sans-serif;font-size:.82rem;line-height:1.4;letter-spacing:.04em}
+    .anime-detail-like{position:absolute;right:.55rem;bottom:.55rem;z-index:3;display:inline-flex;align-items:center;gap:.35rem;padding:.45rem .6rem;border:1px solid rgba(255,255,255,.22);border-radius:999px;background:rgba(0,0,0,.72);color:#fff;font:inherit;font-size:.72rem;backdrop-filter:blur(8px);cursor:pointer}
+    .anime-detail-like svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .anime-detail-like.is-liked{color:#ff4f91;border-color:rgba(255,79,145,.5)}
+    .anime-detail-like.is-liked svg{fill:currentColor}
+    .anime-detail-like:disabled{opacity:.55;cursor:wait}
+    .anime-detail-like-notice{margin:.45rem 0 0;color:#f3a3bd;font-size:.72rem}
+    .anime-detail-characters{grid-column:1/-1;width:100%;min-width:0;margin-top:1.45rem}
+    /* Shared content rail: keep trailer, characters and comments aligned. */
+    .anime-detail > .anime-detail-trailer,
+    .anime-detail > .anime-detail-characters,
+    .anime-detail > .anime-comments {
+      box-sizing: border-box;
+      width: min(calc(100% - 2rem), 58rem);
+      max-width: 58rem;
+      min-width: 0;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .anime-detail > .anime-detail-trailer { margin-top: 1.5rem; }
+    .anime-detail > .anime-detail-characters { margin-top: 1.45rem; }
+    .anime-detail > .anime-comments { margin-top: 2rem; }
+    .anime-detail-characters-track{display:flex;gap:.7rem;overflow-x:auto;padding:.2rem 0 .7rem;scroll-snap-type:x mandatory;scrollbar-width:thin;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+    .anime-detail-character{flex:0 0 104px;min-width:0;scroll-snap-align:start}
+    .anime-detail-character-image{aspect-ratio:3/4;overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:9px;background:#171717}
+    .anime-detail-character-image img{display:block;width:100%;height:100%;object-fit:cover}
+    .anime-detail-character-name{display:block;margin-top:.45rem;color:var(--color-paper-100);font-size:.7rem;line-height:1.25;font-weight:600}
+    .anime-detail-character-role{display:block;margin-top:.2rem;color:var(--color-muted-400);font-size:.55rem;text-transform:uppercase;letter-spacing:.06em}
     .anime-detail-recommendations{grid-column:1 / -1;margin-top:2rem;width:100%;min-width:0}
     .anime-detail-recommendations-head{margin-bottom:.8rem}
     .anime-detail-recommendations-track{display:flex;gap:.7rem;min-height:0;overflow-x:auto;padding:.15rem 0 .65rem;scroll-snap-type:x mandatory;scrollbar-width:thin;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
@@ -364,65 +388,39 @@ export default function AnimeDetail({entry,lang="es"}:{entry:LibraryEntry;lang?:
     .anime-detail-recommendation:hover .anime-detail-recommendation-poster img{transform:scale(1.035)}
     .anime-detail-recommendation-title{display:block;margin-top:.48rem;font-size:.72rem;line-height:1.25;font-weight:500}
     .anime-detail-recommendation-meta{display:block;margin-top:.22rem;font-family:var(--font-meta);font-size:.5rem;letter-spacing:.06em;text-transform:uppercase;opacity:.58}
-    @media(max-width:760px){.anime-detail:not(.anime-detail--ghibli) .anime-detail-synopsis-wrap{margin-top:1rem;padding:.85rem .9rem .95rem;border-radius:12px}.anime-detail-recommendations{grid-column:1 / -1;width:100%;margin-top:1.35rem}.anime-detail-recommendations-track{width:100%;max-width:none}.anime-detail-recommendation{flex:0 0 104px}.anime-detail-recommendation-title{font-size:.68rem}}
+    @media(max-width:760px){.anime-detail .anime-detail-synopsis-wrap{margin-top:1rem;padding:.85rem .9rem .95rem;border-radius:12px}.anime-detail-recommendations{grid-column:1 / -1;width:100%;margin-top:1.35rem}.anime-detail-recommendations-track{width:100%;max-width:none}.anime-detail-recommendation{flex:0 0 104px}.anime-detail-recommendation-title{font-size:.68rem}}
   `}</style>
-  <section className="anime-detail-hero" style={banner?{backgroundImage:`linear-gradient(90deg,rgba(9,9,9,.98) 0%,rgba(9,9,9,.78) 43%,rgba(9,9,9,.35) 72%,rgba(9,9,9,.72) 100%),linear-gradient(0deg,rgba(9,9,9,.98),transparent 42%),url("${banner}")`}:undefined}>
-   <div className="anime-detail-inner">
-    <div className="anime-detail-layout">
-      <div className="anime-detail-poster-column">
-      <div className="anime-detail-poster">{poster?<img src={poster} alt={title}/>:<div className="anime-detail-placeholder">RENANIME</div>}</div>
-       {media?.id && <div className="anime-detail-library-actions"><PersonalLibraryActions animeId={media.id} lang={lang} /></div>}
-      </div>
-      <div className="anime-detail-copy">
-       <div className="anime-detail-copy-main">
-       {personal.favorite&&<span className="anime-detail-eyebrow">{t("detail.favorite")}</span>}
-       <h1>{title}</h1>
-       <div className="anime-detail-meta">
-  <span className="anime-detail-meta-type"><strong>{format(entry.format||media?.format,lang)}</strong></span>
-  <span><small>{t("detail.release")}</small><strong>{date(media?.startDate,lang)}</strong></span>
-  {media?.format!=="MOVIE"&&media?.episodes&&<span><small>{t("detail.episodes")}</small><strong>{media.episodes}</strong></span>}
-  {media?.duration&&<span><small>{media?.format==="MOVIE"?t("detail.duration"):t("detail.durationEpisode")}</small><strong>{media.duration} min</strong></span>}
-  {media?.format!=="MOVIE"&&getSeasonCount(media)&&<span><small>{t("detail.seasons")}</small><strong>{getSeasonCount(media)}</strong></span>}
-</div>
-       {media?.genres?.length&&<div className="anime-detail-genres">{media.genres.slice(0,5).map((genre)=><span key={genre}>{genre}</span>)}</div>}
-       </div>
-      </div>
-       <div className="anime-detail-synopsis-wrap">
-        <span className="anime-detail-label">{t("detail.synopsis")}</span>
-        <p className="anime-detail-synopsis">{loading?t("detail.loading"):(lang==="es"&&translatedSynopsis)||cleanSynopsis||t("detail.noSynopsis")}</p>
-        {lang==="es"&&hasSynopsis&&media?.description&&<button type="button" className="anime-detail-translate" onClick={translateSynopsis} disabled={translating}>{translating?t("detail.translating"):translatedSynopsis?t("detail.translated"):t("detail.translate")}</button>}
-       </div>
-       {media?.trailer?.id&&media.trailer.site==="youtube"&&<section className="anime-detail-trailer">
+  <AnimeTop
+   title={title} bannerImage={banner} poster={poster}
+   score={media?.averageScore != null ? media.averageScore/10 : null}
+   year={media?.seasonYear ?? media?.startDate?.year ?? null}
+   formatLabel={media?.format ? format(media.format,t) : null}
+   episodes={media?.episodes} duration={media?.duration}
+   likes={likeCount} liked={liked} likeBusy={likeBusy} likeNotice={likeNotice}
+   onLike={toggleLike}
+   share={typeof media?.id === "number" ? <ShareAnime title={title} animeId={media.id} lang={lang} /> : null}
+   libraryActions={media?.id ? <PersonalLibraryActions animeId={entry.animeId} lang={lang} /> : null}
+   availability={streaming?.providers.length ? <div className="anime-detail-streaming-providers">
+    {streaming.providers.map((provider) => <a key={provider.key} className={`anime-detail-provider provider-${provider.key}`} href={provider.url} target="_blank" rel="noopener noreferrer" aria-label={provider.name} title={provider.name}>
+     {provider.key === "netflix" && <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 2h4l6 15V2h4v20h-4L9 7v15H5z" fill="currentColor"/></svg>}
+     {provider.key === "prime" && <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 16.5c5.2 3.4 12.1 3.3 17.5-.6M17.3 13.7l3.6 2.2-2.4 3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+     {provider.key === "disney" && <span className="anime-detail-disney-wordmark">Disney<span>+</span></span>}
+     {provider.key === "crunchyroll" && <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" strokeWidth="2.5"/><path d="M15.8 7.4a5.4 5.4 0 1 0 1.1 7.7 4.4 4.4 0 1 1-1.1-7.7Z" fill="currentColor"/></svg>}
+    </a>)}
+   </div> : null}
+   genres={media?.genres ?? []}
+   synopsis={<>
+    <p className="anime-detail-synopsis">{loading?t("detail.loading"):(lang==="es"&&translatedSynopsis)||cleanSynopsis||t("detail.noSynopsis")}</p>
+    {lang==="es"&&hasSynopsis&&media?.description&&<button type="button" className="anime-detail-translate" onClick={translateSynopsis} disabled={translating}>{translating?t("detail.translating"):translatedSynopsis?t("detail.translated"):t("detail.translate")}</button>}
+   </>}
+   labels={{like:lang==="en"?"Like anime":"Me gusta este anime",availableOn:t("detail.availableOn"),genres:t("detail.genres"),synopsis:t("detail.synopsis"),episodes:t("detail.episodes")}}
+  />
+         {media?.trailer?.id&&media.trailer.site==="youtube"&&<section className="anime-detail-trailer">
         <span className="anime-detail-label">{t("detail.trailer")}</span>
         <div className="anime-detail-video"><iframe src={"https://www.youtube.com/embed/"+media.trailer.id+"?rel=0"} title={(lang==="en"?"Trailer for ":"Tráiler de ")+title} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen /></div>
        </section>}
-       {(() => {
-        const seen = new Set<number>();
-        const items = (media?.recommendations?.nodes ?? [])
-          .map((node) => node.mediaRecommendation)
-          .filter((item): item is NonNullable<typeof item> => Boolean(item))
-          .filter((item) => item.id !== media?.id && !seen.has(item.id) && seen.add(item.id))
-          .slice(0, 8);
-        return items.length ? <section className="anime-detail-recommendations" aria-label={t("detail.recommendations")}>
-          <div className="anime-detail-recommendations-head">
-            <span className="anime-detail-label">{t("detail.recommendedNext")}</span>
-          </div>
-          <div className="anime-detail-recommendations-track">
-            {items.map((item) => {
-              const recTitle=lang==="en"?(item.title?.english||item.title?.romaji||t("detail.noTitle")):(item.title?.romaji||item.title?.english||t("detail.noTitle"));
-              const recImage=item.coverImage?.extraLarge||item.coverImage?.large;
-              return <a className="anime-detail-recommendation" href={(lang==="en"?"/en":"") + "/anime/" + item.id} key={item.id}>
-                <div className="anime-detail-recommendation-poster">{recImage&&<img src={recImage} alt={recTitle} loading="lazy" />}</div>
-                <span className="anime-detail-recommendation-title">{recTitle}</span>
-                <span className="anime-detail-recommendation-meta">{item.format==="MOVIE"?t("detail.film"):t("detail.series")}{item.startDate?.year?" · "+item.startDate.year:""}</span>
-              </a>;
-            })}
-          </div>
-        </section> : null;
-       })()}
-    </div>
-   </div>
-  </section>
+       {typeof media?.id === "number" && <CharacterCarousel animeId={media.id} lang={lang} />}
+       {typeof media?.id === "number" && <AnimeComments animeId={media.id} lang={lang} />}
   <section className="anime-detail-info">
    <div><span className="anime-detail-label">{t("detail.information")}</span><strong>{media?.studios?.nodes?.map(s=>s.name).join(" · ")||t("detail.studioUnavailable")}</strong></div>
    <div><span className="anime-detail-label">{t("detail.myStatus")}</span><strong>{personal.status==="WATCHED"?t("detail.watched"):personal.status==="PENDING"?t("detail.wantToWatch"):t("detail.archive")}</strong></div>
@@ -433,7 +431,7 @@ export default function AnimeDetail({entry,lang="es"}:{entry:LibraryEntry;lang?:
     {franchiseEntries.filter((candidate)=>candidate.animeId!==entry.animeId).map((candidate,index)=>{
       const item=franchiseMedia[candidate.animeId];
       const image=item?.coverImage?.extraLarge||item?.coverImage?.large;
-      const candidateTitle=FRANCHISE_MEDIA_ALIASES[candidate.animeId]?candidate.title:(lang==="en"?(item?.title?.english||item?.title?.romaji||candidate.title):(item?.title?.romaji||item?.title?.english||candidate.title));
+      const candidateTitle=FRANCHISE_MEDIA_ALIASES[candidate.animeId]?candidate.title:(getDisplayTitle(item?.title,candidate.title));
       return <a className="anime-detail-franchise-card" href={(lang==="en"?"/en":"") + "/anime/"+candidate.animeId} key={candidate.animeId}>
        <div className="anime-detail-franchise-poster">{image?<img src={image} alt=""/>:<div/>}</div>
        <div className="anime-detail-franchise-copy"><strong>{candidateTitle}</strong><span>{candidate.format==="MOVIE"||item?.format==="MOVIE"?(lang==="en"?"Film":"Película"):(lang==="en"?"Series":"Serie")} · {candidate.state.status==="WATCHED"?(lang==="en"?"Watched":"Vista"):(lang==="en"?"Pending":"Pendiente")}</span></div>
@@ -450,7 +448,7 @@ export default function AnimeDetail({entry,lang="es"}:{entry:LibraryEntry;lang?:
       const label=relation.relationType==="SEQUEL"?t("detail.sequel"):relation.relationType==="PREQUEL"?t("detail.prequel"):relation.relationType==="SIDE_STORY"?t("detail.sideStory"):relation.relationType==="SPIN_OFF"?t("detail.spinOff"):relation.relationType==="ALTERNATIVE"?t("detail.alternative"):relation.relationType==="PARENT"?t("detail.main"):relation.relationType==="ADAPTATION"?t("detail.adaptation"):t("detail.relatedLabel");
       return <a className="anime-detail-related-card" href={(lang==="en"?"/en":"") + "/anime/" + node.id} key={node.id+"-"+index}>
         <div className="anime-detail-related-poster">{node.coverImage?.extraLarge||node.coverImage?.large?<img src={node.coverImage.extraLarge||node.coverImage.large||""} alt=""/>:<div/>}</div>
-        <div className="anime-detail-related-copy"><strong>{(lang==="en"?(node.title?.english||node.title?.romaji):(node.title?.romaji||node.title?.english))||t("detail.noTitle")}</strong><span>{label} · {node.format==="MOVIE"?t("detail.film"):node.format==="OVA"?"OVA":node.format==="SPECIAL"?t("detail.special"):t("detail.series")}</span></div>
+        <div className="anime-detail-related-copy"><strong>{getDisplayTitle(node.title)||t("detail.noTitle")}</strong><span>{label} · {node.format==="MOVIE"?t("detail.film"):node.format==="OVA"?"OVA":node.format==="SPECIAL"?t("detail.special"):t("detail.series")}</span></div>
       </a>;
     })}
    </div>

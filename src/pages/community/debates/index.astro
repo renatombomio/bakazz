@@ -1,0 +1,438 @@
+---
+export const prerender = false;
+import Layout from "../../../layouts/Layout.astro";
+import Navbar from "../../../components/layout/Navbar.astro";
+import DebateComposerBar from "../../../components/community/DebateComposerBar.astro";
+import { createSupabaseSsrClient } from "../../../lib/supabase-ssr";
+
+const en = Astro.locals.lang === "en";
+const base = en ? "/en" : "";
+const url = new URL(Astro.request.url);
+const sort = ["for-you","newest","likes","comments"].includes(url.searchParams.get("sort") ?? "") ? url.searchParams.get("sort")! : "for-you";
+const category = ["all","anime","characters","theories","comparisons","manga","general"].includes(url.searchParams.get("category") ?? "") ? url.searchParams.get("category")! : "all";
+const labels:Record<string,string> = en
+  ? {all:"All",anime:"Anime",characters:"Characters",theories:"Theories",comparisons:"Comparisons",manga:"Manga",general:"General"}
+  : {all:"Todos",anime:"Anime",characters:"Personajes",theories:"Teorías",comparisons:"Comparaciones",manga:"Manga",general:"General"};
+const sortLabels:Record<string,string> = en
+  ? {"for-you":"For you",newest:"Recent",likes:"Popular",comments:"Most discussed"}
+  : {"for-you":"Para ti",newest:"Recientes",likes:"Populares",comments:"Más comentados"};
+const supabase = createSupabaseSsrClient(Astro.request, Astro.cookies);
+const {data:auth} = await supabase.auth.getUser();
+const {data:viewer} = auth.user ? await supabase.from("profiles").select("avatar_url,aka").eq("id",auth.user.id).maybeSingle() : {data:null};
+const {data,error} = await supabase.from("community_debates")
+  .select("id,author_id,title,body,category,image_path,image_status,created_at,profiles!inner(aka,avatar_url,is_private)")
+  .eq("status","published").eq("profiles.is_private",false).order("created_at",{ascending:false}).limit(60);
+const rows=(data??[]).filter((x:any)=>category==="all"||x.category===category);
+const ids=rows.map((x:any)=>x.id);
+const [likes,comments,mine]=ids.length?await Promise.all([
+  supabase.from("community_debate_likes").select("debate_id").in("debate_id",ids),
+  supabase.from("community_debate_comments").select("debate_id").eq("status","visible").in("debate_id",ids),
+  auth.user?supabase.from("community_debate_likes").select("debate_id").eq("user_id",auth.user.id).in("debate_id",ids):Promise.resolve({data:[]})
+]):[{data:[]},{data:[]},{data:[]}];
+const stats=new Map(ids.map((id:string)=>[id,{likes:0,comments:0,liked:false}]));
+for(const x of likes.data??[])stats.get(x.debate_id)!.likes++;
+for(const x of comments.data??[])stats.get(x.debate_id)!.comments++;
+for(const x of mine.data??[])stats.get(x.debate_id)!.liked=true;
+const ordered=[...rows].sort((a:any,b:any)=>{
+  if(sort==="likes")return stats.get(b.id)!.likes-stats.get(a.id)!.likes;
+  if(sort==="comments")return stats.get(b.id)!.comments-stats.get(a.id)!.comments;
+  return new Date(b.created_at).getTime()-new Date(a.created_at).getTime();
+});
+const relativeTime=(value:string)=>{
+ const minutes=Math.max(0,Math.floor((Date.now()-new Date(value).getTime())/60000));
+ if(en){if(minutes<1)return "now";if(minutes<60)return minutes+" m";const hours=Math.floor(minutes/60);if(hours<24)return hours+" h";const days=Math.floor(hours/24);return days+" d";}
+ if(minutes<1)return "ahora";if(minutes<60)return minutes+" min";const hours=Math.floor(minutes/60);if(hours<24)return hours+" h";return Math.floor(hours/24)+" d";
+};
+const publicImage=(path:string|null,status:string|null)=>{
+ if(!path||status!=="approved")return null;
+ return supabase.storage.from("debate-images").getPublicUrl(path).data.publicUrl;
+};
+---
+<Layout title={en ? "Debates — BAKAZZ" : "Debates — BAKAZZ"}>
+<Navbar />
+<main id="main-content" class="debates">
+  <header class="debates-head">
+    <h1>Debates</h1>
+    <button class="search-toggle" id="search-toggle" type="button" aria-label={en?"Search debates":"Buscar debates"} aria-expanded="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg>
+    </button>
+  </header>
+  <label class="feed-search" id="feed-search" hidden>
+    <span class="sr-only">{en?"Search debates":"Buscar debates"}</span>
+    <input id="feed-search-input" type="search" placeholder={en?"Search debates…":"Buscar debates…"} autocomplete="off"/>
+  </label>
+
+  <div class="create-row">
+    <DebateComposerBar lang={en?"en":"es"} avatarUrl={viewer?.avatar_url??null}/>
+  </div>
+
+  <nav class="sort" aria-label={en?"Sort debates":"Ordenar debates"}>
+    {Object.entries(sortLabels).map(([key,label])=><a class:list={{active:sort===key}} href={base+"/community/debates/?sort="+key+"&category="+category}>{label}</a>)}
+  </nav>
+  <nav class="cats" aria-label={en?"Debate categories":"Categorías de debate"}>
+    {Object.entries(labels).map(([key,label])=><a class:list={{active:category===key}} href={base+"/community/debates/?sort="+sort+"&category="+key}>{label}</a>)}
+  </nav>
+
+  {error ? <p class="empty">{en?"Debates are temporarily unavailable.":"Los debates no están disponibles temporalmente."}</p> :
+  ordered.length ? <section class="feed" id="debate-feed">
+    {ordered.map((debate:any)=>{
+      const profile=Array.isArray(debate.profiles)?debate.profiles[0]:debate.profiles;
+      const statsForPost=stats.get(debate.id)!;
+      const imageUrl=publicImage(debate.image_path,debate.image_status);
+      return <article class="post" data-search={[debate.title,debate.body,debate.category,profile?.aka].filter(Boolean).join(" ").toLowerCase()}>
+        <div class="hd">
+          <a class="author" href={base+"/u/"+encodeURIComponent(profile?.aka??"")+"/"}>
+            <img class="av" src={profile?.avatar_url||"/images/profile-avatar-placeholder.svg"} alt="" loading="lazy"/>
+            <span>@{profile?.aka}</span>
+          </a>
+          <time datetime={debate.created_at}>{relativeTime(debate.created_at)}</time>
+          <div class="post-menu-wrap">
+            <button class="more" type="button" aria-label={en?"Post options":"Opciones de publicación"} aria-expanded="false" data-menu-toggle>⋯</button>
+            <div class="post-menu" hidden>
+              <button type="button" data-copy-link>{en?"Copy link":"Copiar enlace"}</button>
+              {auth.user?.id===debate.author_id
+                ? <button type="button" class="danger" data-delete-post>{en?"Delete post":"Eliminar publicación"}</button>
+                : <button type="button" data-report-post>{en?"Report post":"Denunciar publicación"}</button>}
+            </div>
+          </div>
+        </div>
+        <div class="post-content">
+          <a class="body" href={base+"/community/debates/"+debate.id+"/"}>
+            <h2>{debate.title}</h2>
+            {debate.body&&<p class="tx">{debate.body}</p>}
+          </a>
+          {imageUrl&&<a class="image-link" href={base+"/community/debates/"+debate.id+"/"} aria-label={en?"Open debate":"Abrir debate"}><img class="img" src={imageUrl} alt={debate.title} loading="lazy"/></a>}
+          <div class="tags">
+            <span class="tag">{labels[debate.category]||labels.general}</span>
+          </div>
+        </div>
+        <div class="acts">
+          <button class:list={["act","like-button",statsForPost.liked&&"liked"]} type="button" data-debate-id={debate.id} data-liked={String(statsForPost.liked)} aria-pressed={String(statsForPost.liked)} aria-label={en?"Like debate":"Me gusta"}>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.2-8.8 11-8.8 11S3.2 14 3.2 8.8a4.5 4.5 0 0 1 8.8-1.1 4.5 4.5 0 0 1 8.8 1.1Z"/></svg><span>{statsForPost.likes}</span>
+          </button>
+          <a class="act comment-link" href={base+"/community/debates/"+debate.id+"/"} aria-label={en?"Open comments":"Abrir comentarios"}>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l-1-4.5A7.5 7.5 0 1 1 20 11.5Z"/></svg><span>{statsForPost.comments}</span>
+          </a>
+          <button class="act share" type="button" data-share-url={base+"/community/debates/"+debate.id+"/"} aria-label={en?"Share debate":"Compartir debate"}>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M4 14v6h16v-6"/></svg>
+          </button>
+        </div>
+      </article>;
+    })}
+  </section> : <p class="empty">{en?"No debates yet. Start the first one.":"Todavía no hay debates. Inicia el primero."}</p>}
+  <p id="search-empty" class="empty" hidden>{en?"No debates match your search.":"No hay debates que coincidan con tu búsqueda."}</p>
+</main>
+<dialog class="report-dialog" id="report-dialog"><form id="report-form"><h2>{en?"Report this post":"Denunciar publicación"}</h2><label for="report-reason">{en?"Reason":"Motivo"}</label><select id="report-reason" name="reason" required><option value="spam">Spam</option><option value="harassment">{en?"Harassment or bullying":"Acoso o intimidación"}</option><option value="hate_speech">{en?"Hate speech":"Discurso de odio"}</option><option value="sexual_content">{en?"Sexual content":"Contenido sexual"}</option><option value="obscene_image">{en?"Inappropriate image":"Imagen inapropiada"}</option><option value="violence">{en?"Violence":"Violencia"}</option><option value="impersonation">{en?"Impersonation":"Suplantación"}</option><option value="other">{en?"Other":"Otro"}</option></select><label for="report-details">{en?"Additional details (optional)":"Detalles adicionales (opcional)"}</label><textarea id="report-details" name="details" maxlength="1000" rows="3"></textarea><p id="report-error" role="alert" hidden></p><div class="report-actions"><button type="button" id="report-cancel">{en?"Cancel":"Cancelar"}</button><button type="submit">{en?"Send report":"Enviar denuncia"}</button></div></form></dialog><p class="feed-toast" id="feed-toast" role="status" aria-live="polite" hidden></p>
+
+<dialog class="composer-sheet" id="composer-sheet">
+  <section class="sheet-panel">
+    <form id="debate-form" enctype="multipart/form-data">
+      <div class="sheet-grab" aria-hidden="true"></div>
+      <div class="sheet-top">
+        <button class="cancel" type="button" id="cancel-composer">{en?"Cancel":"Cancelar"}</button>
+        <button class="publish" type="submit" disabled>{en?"Publish":"Publicar"}</button>
+      </div>
+      {auth.user ? <>
+        <div class="composer-content">
+          <img class="av composer-avatar" src={viewer?.avatar_url||"/images/profile-avatar-placeholder.svg"} alt=""/>
+          <div class="composer-fields">
+            <textarea name="title" id="debate-title" minlength="8" maxlength="120" required rows="1" autofocus placeholder={en?"What would you like to debate?":"¿Qué quieres debatir?"}></textarea>
+            <textarea name="body" id="debate-body" maxlength="500" rows="1" placeholder={en?"Add your argument (optional)":"Añade tu argumento (opcional)"}></textarea><span class="body-count" id="body-count" hidden></span>
+            <div class="image-preview" id="image-preview" hidden><img id="preview-img" alt=""/><button type="button" id="remove-image" aria-label={en?"Remove image":"Quitar imagen"}>×</button></div>
+
+            <div class="anime-field">
+              <label class="anime-label" for="anime-title">{en?"RELATED ANIME · OPTIONAL":"ANIME RELACIONADO · OPCIONAL"}</label>
+              <div class="anime-control">
+                <input type="text" name="animeTitle" id="anime-title" maxlength="120" placeholder={en?"Choose an anime":"Selecciona un anime"}/>
+                <button type="button" id="remove-anime" aria-label={en?"Remove related anime":"Quitar anime relacionado"} hidden>×</button>
+              </div>
+              <input type="hidden" name="animeId" id="anime-id" value=""/>
+            </div>
+            <div class="cats composer-cats" role="group" aria-label={en?"Choose a category":"Elige una categoría"}>
+              {Object.entries(labels).filter(([key])=>key!=="all").map(([key,label],index)=><button type="button" class:list={["cat-choice",index===0&&"active"]} data-category={key}>{label}</button>)}
+              <input type="hidden" name="category" id="debate-category" value="anime"/>
+            </div>
+            <div class="composer-bottom">
+              <label class="image-picker" for="debate-image" aria-label={en?"Add image":"Añadir imagen"}>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></svg>
+              </label>
+              <input id="debate-image" name="image" type="file" accept="image/jpeg,image/png,image/webp,image/avif" hidden/>
+              <span id="title-count">0 / 120</span>
+            </div>
+            <p class="form-error" id="form-error" role="alert" hidden></p>
+          </div>
+        </div>
+      </> : <div class="login-prompt">{en?"Sign in to publish a debate.":"Inicia sesión para publicar un debate."} <a href={base+"/login/"}>{en?"Sign in":"Iniciar sesión"}</a></div>}
+    </form>
+  </section>
+</dialog>
+</Layout>
+
+<script>
+const en=document.documentElement.lang.toLowerCase().startsWith("en");
+const sheet=document.querySelector<HTMLDialogElement>("#composer-sheet");
+const closeSheet=()=>{if(sheet?.open)sheet.close();document.body.classList.remove("sheet-open");};
+const openSheet=()=>{if(sheet&&!sheet.open){sheet.showModal();document.body.classList.add("sheet-open");requestAnimationFrame(()=>document.querySelector<HTMLTextAreaElement>("#debate-title")?.focus({preventScroll:true}));}};
+document.querySelector(".create-row .compose")?.addEventListener("click",(event)=>{event.preventDefault();openSheet();});
+document.querySelector("#cancel-composer")?.addEventListener("click",closeSheet);
+sheet?.addEventListener("click",(event)=>{if(event.target===sheet)closeSheet();});
+sheet?.addEventListener("close",()=>document.body.classList.remove("sheet-open"));
+if(new URLSearchParams(window.location.search).get("compose")==="1"){openSheet();const clean=new URL(window.location.href);clean.searchParams.delete("compose");history.replaceState({}, "", clean);}
+sheet?.addEventListener("click",(event)=>{if(event.target===sheet)closeSheet();});
+const categoryInput=document.querySelector<HTMLInputElement>("#debate-category");
+document.querySelectorAll<HTMLButtonElement>("[data-category]").forEach(button=>button.addEventListener("click",()=>{
+ document.querySelectorAll("[data-category]").forEach(x=>x.classList.remove("active"));button.classList.add("active");if(categoryInput)categoryInput.value=button.dataset.category||"general";
+}));
+const imageInput=document.querySelector<HTMLInputElement>("#debate-image");
+const preview=document.querySelector<HTMLElement>("#image-preview");
+const previewImage=document.querySelector<HTMLImageElement>("#preview-img");
+const imageZoomField=document.createElement("input");
+imageZoomField.type="hidden";imageZoomField.name="imageZoom";imageZoomField.value="1";
+const imagePositionField=document.createElement("input");
+imagePositionField.type="hidden";imagePositionField.name="imagePositionY";imagePositionField.value="50";
+document.querySelector<HTMLFormElement>("#debate-form")?.append(imageZoomField,imagePositionField);
+let previewUrl:string|undefined;
+let previewDimensions:{width:number;height:number}|null=null;
+let imageZoom=1;
+let imagePositionY=50;
+const activePointers=new Map<number,{x:number;y:number}>();
+let gestureStart:{zoom:number;position:number;y:number;distance:number;centerY:number}|null=null;
+const clamp=(value:number,min:number,max:number)=>Math.min(max,Math.max(min,value));
+const fitImagePreview=()=>{
+ if(!preview||!previewDimensions)return;
+ const width=preview.parentElement?.clientWidth??320;
+ const height=width*previewDimensions.height/previewDimensions.width;
+ preview.style.width="100%";
+ preview.style.height=Math.round(height)+"px";
+};
+const updateImageAdjustments=()=>{
+ if(!previewImage||!preview)return;
+ const maxTravel=(imageZoom-1)*preview.clientHeight/2;
+ const translateY=((50-imagePositionY)/50)*maxTravel;
+ previewImage.style.transform="translate3d(0,"+translateY+"px,0) scale("+imageZoom+")";
+ imageZoomField.value=String(imageZoom);
+ imagePositionField.value=String(imagePositionY);
+};
+const resetImageAdjustments=()=>{imageZoom=1;imagePositionY=50;updateImageAdjustments();};
+const pointerDistance=(points:{x:number;y:number}[])=>Math.hypot(points[0].x-points[1].x,points[0].y-points[1].y);
+const pointerCenterY=(points:{x:number;y:number}[])=> (points[0].y+points[1].y)/2;
+preview?.addEventListener("pointerdown",(event)=>{
+ if((event.target as HTMLElement).closest("button")||!previewImage||!previewDimensions)return;
+ event.preventDefault();
+ preview.setPointerCapture(event.pointerId);
+ activePointers.set(event.pointerId,{x:event.clientX,y:event.clientY});
+ const points=[...activePointers.values()];
+ gestureStart={zoom:imageZoom,position:imagePositionY,y:event.clientY,distance:points.length>1?pointerDistance(points):0,centerY:points.length>1?pointerCenterY(points):event.clientY};
+});
+preview?.addEventListener("pointermove",(event)=>{
+ if(!activePointers.has(event.pointerId)||!gestureStart||!preview)return;
+ activePointers.set(event.pointerId,{x:event.clientX,y:event.clientY});
+ const points=[...activePointers.values()];
+ if(points.length>=2&&gestureStart.distance>0){
+  const distance=pointerDistance(points);
+  imageZoom=clamp(gestureStart.zoom*(distance/gestureStart.distance),1,2.5);
+  const centerDelta=pointerCenterY(points)-gestureStart.centerY;
+  const maxTravel=Math.max(1,(imageZoom-1)*preview.clientHeight/2);
+  imagePositionY=clamp(gestureStart.position-(centerDelta/maxTravel)*50,0,100);
+ }else if(points.length===1){
+  const delta=event.clientY-gestureStart.y;
+  const maxTravel=Math.max(1,(imageZoom-1)*preview.clientHeight/2);
+  imagePositionY=clamp(gestureStart.position-(delta/maxTravel)*50,0,100);
+ }
+ updateImageAdjustments();
+});
+const finishImageGesture=(event:PointerEvent)=>{
+ activePointers.delete(event.pointerId);
+ if(activePointers.size===0)gestureStart=null;
+ else{
+  const points=[...activePointers.values()];
+  gestureStart={zoom:imageZoom,position:imagePositionY,y:points[0].y,distance:points.length>1?pointerDistance(points):0,centerY:points.length>1?pointerCenterY(points):points[0].y};
+ }
+};
+preview?.addEventListener("pointerup",finishImageGesture);
+preview?.addEventListener("pointercancel",finishImageGesture);
+preview?.addEventListener("lostpointercapture",finishImageGesture);
+window.addEventListener("resize",fitImagePreview);
+imageInput?.addEventListener("change",()=>{
+ const file=imageInput.files?.[0];if(!file)return;
+ if(file.size>5*1024*1024||!["image/jpeg","image/png","image/webp","image/avif"].includes(file.type)){imageInput.value="";return;}
+ if(previewUrl)URL.revokeObjectURL(previewUrl);previewUrl=URL.createObjectURL(file);
+ if(previewImage){
+  previewImage.onload=()=>{
+   previewDimensions={width:previewImage.naturalWidth,height:previewImage.naturalHeight};
+   fitImagePreview();
+   resetImageAdjustments();
+  };
+  previewImage.src=previewUrl;
+ }
+ if(preview)preview.hidden=false;
+});
+document.querySelector("#remove-image")?.addEventListener("click",()=>{
+ if(previewUrl)URL.revokeObjectURL(previewUrl);previewUrl=undefined;if(imageInput)imageInput.value="";
+ if(preview){preview.hidden=true;preview.style.width="";preview.style.height="";}
+ if(previewImage){previewImage.removeAttribute("src");previewImage.style.transform="";}
+ previewDimensions=null;activePointers.clear();resetImageAdjustments();
+});
+const titleInput=document.querySelector<HTMLTextAreaElement>("#debate-title");
+const bodyInput=document.querySelector<HTMLTextAreaElement>("#debate-body");
+const titleCount=document.querySelector<HTMLElement>("#title-count");
+const publishButton=document.querySelector<HTMLButtonElement>(".publish");
+const autoGrow=(field:HTMLTextAreaElement,minHeight:number)=>{
+ field.style.height="auto";
+ field.style.height=Math.max(minHeight,field.scrollHeight)+"px";
+};
+const updateTitleState=()=>{
+ if(!titleInput)return;
+ autoGrow(titleInput,24);
+ if(titleCount)titleCount.textContent=titleInput.value.length+" / 120";
+ if(publishButton)publishButton.disabled=titleInput.value.trim().length<8||titleInput.value.trim().length>120;
+};
+const bodyCount=document.querySelector<HTMLElement>("#body-count");
+const updateBodyState=()=>{if(bodyInput)autoGrow(bodyInput,22);if(bodyCount){const length=bodyInput?.value.length??0;bodyCount.textContent=length+" / 500";bodyCount.hidden=length<=400;}};
+titleInput?.addEventListener("input",updateTitleState);
+bodyInput?.addEventListener("input",updateBodyState);
+updateTitleState();
+updateBodyState();
+const animeInput=document.querySelector<HTMLInputElement>("#anime-title");
+const removeAnime=document.querySelector<HTMLButtonElement>("#remove-anime");
+const updateAnimeState=()=>{if(removeAnime)removeAnime.hidden=!animeInput?.value.trim();};
+animeInput?.addEventListener("input",updateAnimeState);
+removeAnime?.addEventListener("click",()=>{if(animeInput)animeInput.value="";const animeId=document.querySelector<HTMLInputElement>("#anime-id");if(animeId)animeId.value="";updateAnimeState();animeInput?.focus();});
+const form=document.querySelector<HTMLFormElement>("#debate-form");
+const error=document.querySelector<HTMLElement>("#form-error");
+form?.addEventListener("submit",async(event)=>{
+ event.preventDefault();if(!form.reportValidity())return;
+ const submit=form.querySelector<HTMLButtonElement>(".publish");if(submit){submit.disabled=true;submit.textContent="…";}
+ if(error)error.hidden=true;
+ try{
+  const response=await fetch("/api/community/debates",{method:"POST",credentials:"same-origin",body:new FormData(form)});
+  const result=await response.json();
+  if(!response.ok||!result.ok){if(result.error==="IMAGE_UPLOAD_FAILED")throw new Error("IMAGE_UPLOAD_FAILED");throw new Error(result.error||"CREATE_FAILED");}
+  window.location.reload();
+ }catch(err){
+  if(error){error.textContent=err instanceof Error&&err.message==="IMAGE_UPLOAD_FAILED"?(en?"Could not upload the image. Try again.":"No se pudo subir la imagen. Inténtalo de nuevo."):(en?"Could not publish the debate. Try again.":"No se pudo publicar el debate. Inténtalo de nuevo.");error.hidden=false;}
+  if(submit){submit.textContent=en?"Publish":"Publicar";submit.disabled=!titleInput||titleInput.value.trim().length<8;}
+ }
+});
+const toast=document.querySelector<HTMLElement>("#feed-toast");
+let toastTimer:number|undefined;
+const showToast=(message:string)=>{if(!toast)return;toast.textContent=message;toast.hidden=false;window.clearTimeout(toastTimer);toastTimer=window.setTimeout(()=>{toast.hidden=true;},2600);};
+const closePostMenus=()=>document.querySelectorAll<HTMLElement>(".post-menu").forEach(menu=>{menu.hidden=true;menu.parentElement?.querySelector("[data-menu-toggle]")?.setAttribute("aria-expanded","false");});
+document.querySelectorAll<HTMLButtonElement>("[data-menu-toggle]").forEach(button=>button.addEventListener("click",event=>{event.stopPropagation();const menu=button.parentElement?.querySelector<HTMLElement>(".post-menu");const opening=!!menu?.hidden;closePostMenus();if(menu){menu.hidden=!opening;button.setAttribute("aria-expanded",String(opening));}}));
+document.addEventListener("click",closePostMenus);
+document.querySelectorAll<HTMLButtonElement>("[data-copy-link]").forEach(button=>button.addEventListener("click",async()=>{const link=button.closest<HTMLElement>(".post")?.querySelector<HTMLAnchorElement>(".body")?.href;if(!link)return;try{await navigator.clipboard.writeText(link);showToast(en?"Link copied":"Enlace copiado");}catch{showToast(en?"Could not copy the link":"No se pudo copiar el enlace");}closePostMenus();}));
+document.querySelectorAll<HTMLButtonElement>("[data-delete-post]").forEach(button=>button.addEventListener("click",async()=>{const post=button.closest<HTMLElement>(".post");const id=post?.querySelector<HTMLButtonElement>(".like-button")?.dataset.debateId;if(!id||!post)return;closePostMenus();if(!window.confirm(en?"Delete this debate permanently?":"¿Eliminar esta publicación definitivamente?"))return;button.disabled=true;try{const response=await fetch("/api/community/debates/"+id,{method:"DELETE",credentials:"same-origin"});const result=await response.json();if(!response.ok||!result.ok)throw new Error(result.error||"DELETE_FAILED");post.remove();showToast(en?"Post deleted":"Publicación eliminada");}catch{button.disabled=false;showToast(en?"Could not delete this post":"No se pudo eliminar la publicación");}}));
+const reportDialog=document.querySelector<HTMLDialogElement>("#report-dialog"),reportForm=document.querySelector<HTMLFormElement>("#report-form");let reportDebateId="";
+document.querySelectorAll<HTMLButtonElement>("[data-report-post]").forEach(button=>button.addEventListener("click",()=>{reportDebateId=button.closest<HTMLElement>(".post")?.querySelector<HTMLButtonElement>(".like-button")?.dataset.debateId||"";closePostMenus();if(reportDebateId)reportDialog?.showModal();}));
+document.querySelector("#report-cancel")?.addEventListener("click",()=>reportDialog?.close());
+reportDialog?.addEventListener("click",event=>{if(event.target===reportDialog)reportDialog.close();});
+reportForm?.addEventListener("submit",async event=>{event.preventDefault();if(!reportDebateId)return;const submit=reportForm.querySelector<HTMLButtonElement>('button[type="submit"]'),error=document.querySelector<HTMLElement>("#report-error");if(submit)submit.disabled=true;if(error)error.hidden=true;const payload={reason:reportForm.querySelector<HTMLSelectElement>("#report-reason")?.value||"other",details:reportForm.querySelector<HTMLTextAreaElement>("#report-details")?.value||""};try{const response=await fetch("/api/community/debates/"+reportDebateId+"/report",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});const result=await response.json();if(!response.ok||!result.ok)throw new Error(result.error||"REPORT_FAILED");reportDialog?.close();reportForm.reset();showToast(en?"Report sent to the moderation team":"Denuncia enviada al equipo de moderación");}catch(err){if(error){error.textContent=err instanceof Error&&err.message==="AUTH_REQUIRED"?(en?"Sign in to report a post":"Inicia sesión para denunciar una publicación"):(en?"Could not send the report. Try again.":"No se pudo enviar la denuncia. Inténtalo de nuevo.");error.hidden=false;}}finally{if(submit)submit.disabled=false;}});
+document.querySelectorAll<HTMLButtonElement>(".like-button").forEach(button=>button.addEventListener("click",async()=>{if(button.disabled)return;const id=button.dataset.debateId;if(!id)return;const wasLiked=button.dataset.liked==="true";button.disabled=true;try{const response=await fetch("/api/community/debates/"+id+"/like",{method:wasLiked?"DELETE":"POST",credentials:"same-origin"});const result=await response.json();if(!response.ok||!result.ok){if(response.status===401){showToast(en?"Sign in to like debates":"Inicia sesión para dar me gusta");return;}throw new Error(result.error||"LIKE_FAILED");}button.dataset.liked=String(result.liked);button.classList.toggle("liked",result.liked);button.setAttribute("aria-pressed",String(result.liked));const count=button.querySelector("span");if(count)count.textContent=String(result.count);}catch{showToast(en?"Could not update your like":"No se pudo actualizar el me gusta");}finally{button.disabled=false;}}));
+document.querySelectorAll<HTMLButtonElement>(".share").forEach(button=>button.addEventListener("click",async()=>{const url=new URL(button.dataset.shareUrl||"",window.location.origin).toString();try{if(navigator.share)await navigator.share({title:document.title,url});else{await navigator.clipboard.writeText(url);showToast(en?"Link copied":"Enlace copiado");}}catch(error){if(error instanceof Error&&error.name!=="AbortError")showToast(en?"Could not share the link":"No se pudo compartir el enlace");}}));
+const searchToggle=document.querySelector<HTMLButtonElement>("#search-toggle");
+const searchPanel=document.querySelector<HTMLElement>("#feed-search");
+const searchInput=document.querySelector<HTMLInputElement>("#feed-search-input");
+searchToggle?.addEventListener("click",()=>{const open=searchPanel?.hidden??true;if(searchPanel)searchPanel.hidden=!open;searchToggle.setAttribute("aria-expanded",String(open));if(open)searchInput?.focus();});
+searchInput?.addEventListener("input",()=>{const query=searchInput.value.trim().toLowerCase();const cards=[...document.querySelectorAll<HTMLElement>(".post")];let count=0;cards.forEach(card=>{const match=!query||(card.dataset.search||"").includes(query);card.hidden=!match;if(match)count++;});const empty=document.querySelector<HTMLElement>("#search-empty");if(empty)empty.hidden=count>0;});
+</script>
+
+<style>
+.debates{width:min(100%,640px);min-height:70vh;margin:0 auto;padding:calc(var(--header-height,64px) + 18px) 0 4rem;color:#f2efe9;background:#09090b}
+.debates-head{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 6px}
+.debates-head h1{margin:0;font-size:26px;font-weight:800;letter-spacing:-.035em;line-height:1.2}
+.search-toggle{display:grid;place-items:center;width:40px;height:40px;border:0;background:transparent;color:#a39fa9}
+.search-toggle svg,.image-picker svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.feed-search{display:block;padding:8px 16px}.feed-search[hidden]{display:none}
+.feed-search input{width:100%;padding:11px 14px;border:1px solid rgba(255,255,255,.1);border-radius:999px;background:#131316;color:#f2efe9;font:inherit;font-size:14px;outline:none}
+.create-row{padding:8px 16px 4px}.create-row :global(.compose){display:flex;align-items:center;gap:8px;width:100%;min-height:58px;margin:0;padding:0;border:0;border-radius:0;background:transparent;overflow:visible}.create-row :global(.compose>.av){display:block;width:38px;height:38px;flex:0 0 38px;border-radius:50%;object-fit:cover}.create-row :global(.compose-field){display:flex;align-items:center;gap:10px;flex:1;min-width:0;height:52px;padding:6px 7px 6px 14px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:#131316}.create-row :global(.compose .in){flex:1;min-width:0;font-size:13px;color:#a39fa9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.create-row :global(.compose .go){display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;border-radius:50%;background:var(--color-accent);color:#fff}.create-row :global(.compose .go svg){display:block;width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+.sort,.cats{display:flex;align-items:center;gap:8px;padding:12px 16px 4px;flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}.sort::-webkit-scrollbar,.cats::-webkit-scrollbar{display:none}.sort a,.cats a{flex:0 0 auto}
+.sort a,.cats a,.cat-choice{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:0 12px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:#131316;color:#a39fa9;text-decoration:none;font-size:12px;font-weight:650;white-space:nowrap}.cats a{min-height:28px;padding:5px 11px;font-size:12px}
+.sort a.active,.cats a.active,.cat-choice.active{border-color:var(--color-border-accent);background:var(--color-accent-subtle);color:#f2efe9}
+.feed{display:grid;gap:0;padding:8px 0 0}
+.post{min-width:0;padding:18px 16px;border:0;border-bottom:1px solid rgba(255,255,255,.08);border-radius:0;background:transparent}.post:first-child{border-top:1px solid rgba(255,255,255,.08)}
+.hd{display:flex;align-items:center;gap:9px;min-height:38px}
+.author{display:flex;align-items:center;gap:9px;min-width:0;color:#f2efe9;text-decoration:none;font-size:12px;font-weight:750}
+.av{display:block;width:38px;height:38px;flex:0 0 38px;border-radius:50%;object-fit:cover;background:#25252a}
+.hd time{margin-left:auto;color:#77737d;font-size:11px;white-space:nowrap}
+.more{width:36px;height:36px;border:0;background:transparent;color:#77737d;font-size:22px;line-height:1}.more:disabled{opacity:.75;cursor:default}
+.post-content{margin-left:47px;min-width:0}.body{display:block;margin-top:10px;color:inherit;text-decoration:none}
+.body h2{margin:0 0 6px;font-size:17px;font-weight:800;line-height:1.3;letter-spacing:-.02em}
+.tx{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;margin:0;color:#b9b5bf;font-size:13px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+.image-link{display:block;width:100%;max-width:100%;height:220px;margin-top:10px;overflow:hidden;border-radius:11px;background:#09090b}
+.img{display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:cover}
+.post-menu-wrap{position:relative;margin-left:0}
+.more{width:36px;height:36px;border:0;background:transparent;color:#77737d;font-size:22px;line-height:1;cursor:pointer}
+.post-menu{position:absolute;z-index:20;top:34px;right:0;min-width:176px;padding:5px;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:#19191e;box-shadow:0 12px 32px rgba(0,0,0,.45)}
+.post-menu[hidden]{display:none}
+.post-menu button{display:block;width:100%;padding:10px 11px;border:0;border-radius:8px;background:transparent;color:#e8e5eb;text-align:left;font:inherit;font-size:13px;cursor:pointer}
+.post-menu button:hover{background:rgba(255,255,255,.06)}
+.post-menu button.danger{color:#ff6878}
+.act.liked{color:#ff465f}.act.liked svg{fill:#ff465f;stroke:#ff465f}
+.act:disabled{opacity:.55;cursor:wait}
+.report-dialog{width:min(92vw,420px);padding:20px;border:1px solid rgba(255,255,255,.1);border-radius:18px;background:#151519;color:#f2efe9}
+.report-dialog::backdrop{background:rgba(0,0,0,.7)}
+.report-dialog form{display:grid;gap:10px}
+.report-dialog h2{margin:0 0 6px;font-size:18px}
+.report-dialog label{color:#aaa6b0;font-size:12px}
+.report-dialog select,.report-dialog textarea{width:100%;padding:11px 12px;border:1px solid rgba(255,255,255,.12);border-radius:10px;background:#101013;color:#f2efe9;font:inherit;font-size:13px}
+.report-dialog textarea{resize:vertical}
+.report-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
+.report-actions button{padding:9px 13px;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:#222228;color:#f2efe9;font:inherit;font-size:13px}
+.report-actions button[type=submit]{border-color:transparent;background:var(--color-accent);color:#fff}
+.report-actions button:disabled{opacity:.5}
+#report-error{margin:0;color:#ff8795;font-size:12px}#report-error[hidden]{display:none}
+.feed-toast{position:fixed;z-index:80;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%);max-width:calc(100vw - 32px);padding:11px 15px;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:#222228;color:#f2efe9;font-size:12px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.feed-toast[hidden]{display:none}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{padding:5px 11px;border-radius:999px;background:#25252a;color:#a39fa9;font-size:12px;font-weight:650}
+.anime-tag{background:#20252a;color:#a9c4d5}
+.acts{display:flex;align-items:center;gap:22px;margin:3px 0 0 47px;padding-top:0;border-top:0}
+.act{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:40px;min-height:40px;padding:0 4px;border:0;background:transparent;color:#a39fa9;text-decoration:none;font-size:12px}
+.act svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.act.liked{color:var(--color-accent)}.act:disabled{opacity:.62;cursor:not-allowed}.act:disabled svg{opacity:.8}
+.empty{padding:24px 16px;color:#77737d;font-size:13px}
+.composer-sheet{position:fixed;inset:auto 0 0;width:100%;max-width:640px;max-height:min(88dvh,760px);margin:0 auto;padding:0;border:0;border-radius:22px 22px 0 0;background:#101013;color:#f2efe9;overflow:visible}
+.composer-sheet::backdrop{background:rgba(0,0,0,.68)}
+.composer-sheet[open]{animation:sheet-in .22s ease-out}
+.sheet-panel{max-height:min(88dvh,760px);overflow:auto;border:0;border-top:1px solid rgba(255,255,255,.1);border-radius:22px 22px 0 0;background:#101013;padding:10px 16px calc(18px + env(safe-area-inset-bottom))}
+.sheet-grab{width:40px;height:4px;border-radius:2px;background:rgba(255,255,255,.2);margin:0 auto 12px}
+.sheet-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.sheet-top button{min-height:36px;border:0;background:transparent;font:inherit;font-size:14px;font-weight:700;outline:none}.sheet-top button:focus-visible{outline:2px solid var(--color-accent);outline-offset:3px;border-radius:6px}
+.cancel{padding:0;color:#a39fa9}
+.sheet-top .publish{padding:9px 20px;border-radius:999px;background:var(--color-accent);color:#fff;font-size:14px;font-weight:700;line-height:1.2}
+.sheet-top .publish:disabled{opacity:.4;cursor:not-allowed}
+.composer-content{display:flex;align-items:flex-start;gap:12px;padding:0}
+.composer-avatar{width:38px;height:38px;flex:0 0 38px;margin-top:2px}
+.composer-fields{flex:1;min-width:0}
+#debate-title,#debate-body{display:block;width:100%;height:auto;resize:none;overflow:hidden;border:0;outline:0;background:transparent;font:inherit;padding:0;margin:0}
+#debate-title{min-height:24px;color:#f2efe9;font-size:17px;font-weight:700;line-height:1.35}
+#debate-title::placeholder{color:#8d8993}
+#debate-body{min-height:22px;margin-top:2px;color:#b9b5bf;font-size:14.5px;font-weight:400;line-height:1.45}
+#debate-body::placeholder{color:#8d8993}
+.body-count{display:block;margin-top:2px;text-align:right;color:#77737d;font-size:11px;line-height:1.2}.body-count[hidden]{display:none}
+.image-preview{position:relative;width:100%;max-width:100%;margin:6px 0 0;border:1px solid rgba(255,255,255,.1);border-radius:14px;background:#09090b;overflow:hidden;display:block;isolation:isolate;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+.image-preview:active{cursor:grabbing}
+.image-preview[hidden]{display:none}
+.image-preview img{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;max-height:none;border-radius:13px;object-fit:cover;transform-origin:center center;will-change:transform;pointer-events:none;user-select:none;-webkit-user-drag:none}
+.image-preview button{position:absolute;z-index:2;top:7px;right:7px;display:grid;place-items:center;width:28px;height:28px;padding:0;border:0;border-radius:50%;background:rgba(0,0,0,.7);color:#fff;font-size:20px;line-height:1}
+.anime-field{margin-top:12px}
+.anime-label{display:block;margin-bottom:6px;color:#77737d;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.anime-control{display:flex;align-items:center;gap:8px;min-height:42px;padding:0 12px;border:1px solid rgba(255,255,255,.09);border-radius:12px;background:#17171b}
+.anime-control:focus-within{border-color:rgba(255,255,255,.2)}.anime-control input{flex:1;min-width:0;padding:10px 0;border:0;outline:0;background:transparent;color:#cfcbd3;font:inherit;font-size:14px}
+.anime-control input::placeholder{color:#77737d}
+.anime-control button{width:24px;height:24px;padding:0;border:0;background:transparent;color:#a39fa9;font-size:20px;line-height:1}
+.anime-control button[hidden]{display:none}
+.composer-cats{display:flex;flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-top:12px;padding:0 0 2px;gap:6px}
+.composer-cats::-webkit-scrollbar{display:none}
+.cat-choice{flex:0 0 auto;min-height:32px;padding:0 10px;cursor:pointer}
+.composer-bottom{display:flex;align-items:center;gap:6px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.07)}
+.image-picker{display:grid;place-items:center;width:30px;height:30px;padding:0;border:0;border-radius:0;background:transparent;color:var(--color-accent);cursor:pointer}
+.image-picker svg{width:22px;height:22px;stroke:currentColor}
+.composer-bottom>span{margin-left:auto;color:#77737d;font-size:12px}
+.form-error{margin:8px 0 0;color:#ff9da9;font-size:12px;line-height:1.4}
+.form-error[hidden]{display:none}
+.login-prompt{padding:22px 0;color:#a39fa9;font-size:13px}.login-prompt a{color:var(--color-accent)}
+ :global(body.sheet-open){overflow:hidden}
+@keyframes sheet-in{from{transform:translateY(24px);opacity:.7}to{transform:translateY(0);opacity:1}}
+@media(min-width:641px){.debates{padding-top:100px}.composer-sheet{bottom:0;border-radius:20px 20px 0 0}}
+</style>

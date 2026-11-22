@@ -1,13 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { fetchRenMediaByIdentity, hasRenAnimeIdentity } from "../../lib/api/ren-anime-identities";
+import { getDisplayTitle } from "../../lib/anime/display-title";
+import AnimePosterDisplay from "../anime/AnimePosterDisplay";
+import { useMemo } from "react";
 
 interface Entry {
   animeId: string;
   title: string;
-}
-
-interface Media {
-  title?: { romaji?: string | null; english?: string | null };
-  coverImage?: { extraLarge?: string | null; large?: string | null };
 }
 
 interface Props {
@@ -15,123 +13,68 @@ interface Props {
   lang?: "es" | "en";
 }
 
-const PAGE_SIZE = 9;
-const CACHE_PREFIX = "renanime:collection:v3:";
+const HOME_ANIME_COUNT = 25;
+const HOME_SELECTION_SEED = "renanime-home-gallery-v1";
 
-async function fetchMedia(entries: Entry[]): Promise<Record<string, Media | null>> {
-  const result: Record<string, Media | null> = {};
-  const unresolved: Entry[] = [];
-
-  for (const entry of entries) {
-    const key = CACHE_PREFIX + entry.title.toLowerCase();
-    try {
-      const cached = sessionStorage.getItem(key);
-      if (cached) {
-        const media = JSON.parse(cached) as Media | null;
-        if (media?.coverImage?.extraLarge || media?.coverImage?.large) {
-          result[entry.animeId] = media;
-          continue;
-        }
-        sessionStorage.removeItem(key);
-      }
-    } catch {}
-    unresolved.push(entry);
+function stableRandomKey(value: string): number {
+  let hash = 2166136261;
+  for (const character of `${HOME_SELECTION_SEED}:${value}`) {
+    hash ^= character.charCodeAt(0);
+    hash = Math.imul(hash, 16777619);
   }
-
-  for (let offset = 0; offset < unresolved.length; offset += 15) {
-    const chunk = unresolved.slice(offset, offset + 15);
-    const variables: Record<string, string> = {};
-    const fields = chunk.map((entry, index) => {
-      const key = "s" + index;
-      const alias = "a" + index;
-      variables[key] = entry.title;
-      return `${alias}: Page(page: 1, perPage: 1) { media(search: $${key}, type: ANIME, sort: SEARCH_MATCH) { title { romaji english } coverImage { extraLarge large } } }`;
-    }).join("\n");
-    const definitions = chunk.map((_, index) => `$s${index}: String!`).join(", ");
-
-    try {
-      const response = await fetch("https://graphql.anilist.co", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ query: `query HomeGallery(${definitions}) { ${fields} }`, variables }),
-      });
-      if (!response.ok) continue;
-      const payload = await response.json();
-
-      chunk.forEach((entry, index) => {
-        const media = payload.data?.["a" + index]?.media?.[0] ?? null;
-        result[entry.animeId] = media;
-        try {
-          sessionStorage.setItem(CACHE_PREFIX + entry.title.toLowerCase(), JSON.stringify(media));
-        } catch {}
-      });
-    } catch {}
-  }
-
-  return result;
+  return hash >>> 0;
 }
 
 export default function HomeGallery({ entries, lang = "es" }: Props) {
-  const [visible, setVisible] = useState(PAGE_SIZE);
-  const [media, setMedia] = useState<Record<string, Media | null>>({});
-  const [loading, setLoading] = useState(false);
-
-  const page = entries.slice(0, visible);
-  const hasMore = visible < entries.length;
-
-  useEffect(() => {
-    const missing = page.filter((entry) => !(entry.animeId in media));
-    if (!missing.length) return;
-
-    let cancelled = false;
-    setLoading(true);
-    fetchMedia(missing).then((result) => {
-      if (!cancelled) setMedia((current) => ({ ...current, ...result }));
-    }).finally(() => {
-      if (!cancelled) setLoading(false);
-    });
-
-    return () => { cancelled = true; };
-  }, [visible]);
-
-  const loadMore = () => {
-    if (loading || !hasMore) return;
-    setVisible((current) => Math.min(current + PAGE_SIZE, entries.length));
-  };
+  const page = useMemo(
+    () => entries
+      .filter((entry) => hasRenAnimeIdentity(entry.animeId))
+      .sort((a, b) => stableRandomKey(a.animeId) - stableRandomKey(b.animeId))
+      .slice(0, HOME_ANIME_COUNT),
+    [entries],
+  );
+  const media = useMemo(() => fetchRenMediaByIdentity(page), [page]);
+  const columns = [
+    page.filter((_, index) => index % 3 === 0),
+    page.filter((_, index) => index % 3 === 1),
+    page.filter((_, index) => index % 3 === 2),
+  ];
 
   return (
-    <div className="home-gallery">
-      <div className="home-gallery-grid">
-        {page.map((entry, index) => {
-          const item = media[entry.animeId];
-          const image = item?.coverImage?.extraLarge ?? item?.coverImage?.large;
-          return (
-            <a
-              className="home-gallery-card"
-              href={`${lang === "en" ? "/en" : ""}/anime/${entry.animeId}`}
-              aria-label={`${lang === "en" ? "View" : "Ver"} ${lang === "en" ? (item?.title?.english || item?.title?.romaji || entry.title) : (item?.title?.romaji || item?.title?.english || entry.title)}`}
-              key={entry.animeId}
-            >
-              {image ? (
-                <img src={image} alt="" loading={index < 6 ? "eager" : "lazy"} />
-              ) : (
-                <div className="home-gallery-placeholder" aria-hidden="true" />
-              )}
-            </a>
-          );
-        })}
+    <div className="home-anime-marquee" aria-label={lang === "en" ? "Ren’s anime collection" : "Colección de anime de Ren"}>
+      <div className="home-anime-marquee-window">
+        {columns.map((column, columnIndex) => (
+          <div className={`home-anime-marquee-track track-${columnIndex + 1}`} key={columnIndex}>
+            {[...column, ...column].map((entry, index) => {
+              const item = media[entry.animeId];
+              const image = item?.coverImage?.large ?? item?.coverImage?.extraLarge;
+              const isDuplicate = index >= column.length;
+              return (
+                <div className="home-anime-marquee-card" key={`${entry.animeId}-${index}`} aria-hidden={isDuplicate}>
+                  <AnimePosterDisplay
+                    src={`/api/home-poster/${encodeURIComponent(entry.animeId)}`}
+                    title={getDisplayTitle(item?.title, entry.title)}
+                    loading="eager"
+                    fetchPriority={isDuplicate ? "low" : "auto"}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        ))}
       </div>
-      {loading && <div className="home-gallery-loading" aria-hidden="true" />}
-      {hasMore && (
-        <button
-          type="button"
-          className="home-gallery-load-more"
-          onClick={loadMore}
-          disabled={loading}
-        >
-          {loading ? (lang === "en" ? "Loading…" : "Cargando…") : (lang === "en" ? "Load more" : "Cargar más")}
-        </button>
-      )}
+      <style>{`
+        .home-anime-marquee{width:100%;overflow:hidden}
+        .home-anime-marquee-window{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(.55rem,1.5vw,1.25rem);height:clamp(390px,62vw,720px);overflow:hidden;mask-image:linear-gradient(to bottom,transparent,#000 8%,#000 92%,transparent)}
+        .home-anime-marquee-track{--marquee-gap:clamp(.55rem,1.5vw,1.25rem);display:flex;flex-direction:column;gap:var(--marquee-gap);will-change:transform;animation:home-anime-rise 44s linear infinite}
+        .home-anime-marquee-track.track-2{animation-duration:56s;animation-delay:-18s}
+        .home-anime-marquee-track.track-3{animation-duration:49s;animation-delay:-31s}
+        .home-anime-marquee-card{display:block;flex:0 0 auto;overflow:hidden;border-radius:8px;background:#111;aspect-ratio:3/4;pointer-events:none;user-select:none}
+        .home-anime-marquee-card :global(img){display:block;width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
+        @keyframes home-anime-rise{from{transform:translateY(0)}to{transform:translateY(calc(-50% - var(--marquee-gap) / 2))}}
+        @media(max-width:520px){.home-anime-marquee-window{height:440px;gap:.45rem}.home-anime-marquee-track{--marquee-gap:.45rem}}
+        @media(prefers-reduced-motion:reduce){.home-anime-marquee-window{height:auto;mask-image:none;overflow:visible}.home-anime-marquee-track{display:contents;animation:none}.home-anime-marquee-card{width:100%}}
+      `}</style>
     </div>
   );
 }

@@ -1,462 +1,433 @@
-import { useEffect, useState, type FormEvent } from "react";
-import { getLibrary } from "../../data/library";
-import { getPersonalLibrary, hydratePersonalLibrary, subscribeToPersonalLibrary } from "../../data/personal-library";
-import type { PersonalAnimeEntry } from "../../types/personal";
-import { useT, type Lang, type TranslationKey } from "../../i18n";
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { localizedPath, useT, type Lang } from "../../i18n";
+import { AwardsTimeline, CategoryRail, ResultsList, type DisplayMedia } from "./SearchDisplay";
 
 interface Media {
   id: number;
   title?: { romaji?: string | null; english?: string | null };
-  startDate?: { year?: number | null; month?: number | null; day?: number | null } | null;
-  coverImage?: { extraLarge?: string | null; large?: string | null };
+  coverImage?: { extraLarge?: string | null; large?: string | null; color?: string | null };
   format?: string | null;
-  popularity?: number | null;
-  averageScore?: number | null;
+  startDate?: { year?: number | null } | null;
   genres?: string[];
-  tags?: { name: string; rank?: number | null }[];
+  episodes?: number | null;
+  averageScore?: number | null;
 }
+type Status = "FINISHED" | "RELEASING";
+interface Filters { genres: string[]; year: string; status: Status | ""; }
+const EMPTY: Filters = { genres: [], year: "", status: "" };
+const PAGE_SIZE = 24;
 
-type DiscoveryRowId = "discover" | "hidden" | "trending" | "season" | "upcoming" | "topRated";
-const PAGE_SIZE = 12;
-const DISCOVERY_ROWS: { id: DiscoveryRowId; titleKey: TranslationKey; descriptionKey: TranslationKey }[] = [
-  { id: "discover", titleKey: "search.rowDiscover", descriptionKey: "search.rowDiscoverDescription" },
-  { id: "hidden", titleKey: "search.rowHidden", descriptionKey: "search.rowHiddenDescription" },
-  { id: "trending", titleKey: "search.rowTrending", descriptionKey: "search.rowTrendingDescription" },
-  { id: "season", titleKey: "search.rowSeason", descriptionKey: "search.rowSeasonDescription" },
-  { id: "upcoming", titleKey: "search.rowUpcoming", descriptionKey: "search.rowUpcomingDescription" },
-  { id: "topRated", titleKey: "search.rowTopRated", descriptionKey: "search.rowTopRatedDescription" },
-];
-
-const OWNED_TITLES = new Set(
-  getLibrary().map((entry) => normalizeTitle(entry.title)).filter(Boolean),
-);
-
-function normalizeTitle(value: string): string {
-  return value.toLocaleLowerCase("en")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim();
-}
-
-function isOwned(media: Media): boolean {
-  return [media.title?.romaji, media.title?.english]
-    .filter((title): title is string => Boolean(title))
-    .some((title) => OWNED_TITLES.has(normalizeTitle(title)));
-}
-
-function currentSeason(date = new Date()): { season: "WINTER" | "SPRING" | "SUMMER" | "FALL"; year: number } {
-  const month = date.getMonth();
-  const season = month < 3 ? "WINTER" : month < 6 ? "SPRING" : month < 9 ? "SUMMER" : "FALL";
-  return { season, year: date.getFullYear() };
-}
-
-function formatDate(date: Media["startDate"], lang: Lang) {
-  if (!date?.year) return lang === "en" ? "Unknown date" : "Fecha desconocida";
-  if (!date.month || !date.day) return String(date.year);
-  return new Date(date.year, date.month - 1, date.day).toLocaleDateString(
-    lang === "en" ? "en-GB" : "es-ES",
-    { day: "numeric", month: "long", year: "numeric" },
-  );
-}
-
-const MEDIA_FIELDS = "id title { romaji english } startDate { year month day } coverImage { extraLarge large } format popularity averageScore genres tags { name rank }";
-
-async function fetchDiscoveryRows(personalEntries: PersonalAnimeEntry[] = []): Promise<Record<DiscoveryRowId, Media[]>> {
-  const { season, year } = currentSeason();
-  const baseQuery = `
-    query SearchDiscovery($season: MediaSeason!, $year: Int!) {
-      discover: Page(page: 1, perPage: 50) {
-        media(type: ANIME, averageScore_greater: 74, popularity_greater: 20000, popularity_lesser: 150000, sort: SCORE_DESC, isAdult: false) { ${MEDIA_FIELDS} }
-      }
-      hidden: Page(page: 1, perPage: 50) {
-        media(type: ANIME, sort: SCORE_DESC, averageScore_greater: 74, popularity_greater: 500, popularity_lesser: 20000, isAdult: false) { ${MEDIA_FIELDS} }
-      }
-      trending: Page(page: 1, perPage: 50) {
-        media(type: ANIME, sort: TRENDING_DESC, isAdult: false) { ${MEDIA_FIELDS} }
-      }
-      season: Page(page: 1, perPage: 50) {
-        media(type: ANIME, season: $season, seasonYear: $year, sort: POPULARITY_DESC, isAdult: false) { ${MEDIA_FIELDS} }
-      }
-      upcoming: Page(page: 1, perPage: 50) {
-        media(type: ANIME, status: NOT_YET_RELEASED, sort: POPULARITY_DESC, isAdult: false) { ${MEDIA_FIELDS} }
-      }
-      topRated: Page(page: 1, perPage: 50) {
-        media(type: ANIME, sort: SCORE_DESC, isAdult: false) { ${MEDIA_FIELDS} }
-      }
-    }
-  `;
-  const response = await fetch("https://graphql.anilist.co", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Accept: "application/json" },
-    body: JSON.stringify({ query: baseQuery, variables: { season, year } }),
-  });
-  if (!response.ok) throw new Error("Discovery request failed");
-  const payload = await response.json();
-  if (payload.errors?.length) throw new Error("Discovery query failed");
-  const pages = payload.data;
-  if (!pages) throw new Error("Discovery data unavailable");
-
-  const seedEntries = [...personalEntries]
-    .sort((a, b) => Number(b.state.favorite) - Number(a.state.favorite) || Number(b.state.status === "WATCHED") - Number(a.state.status === "WATCHED"))
-    .slice(0, 5);
-  const numericEntries = seedEntries.filter((entry) => /^\d+$/.test(entry.animeId));
-  const customEntries = seedEntries
-    .filter((entry) => !/^\d+$/.test(entry.animeId))
-    .map((entry) => ({ entry, title: getLibrary().find((item) => item.animeId === entry.animeId)?.title }))
-    .filter((item): item is { entry: PersonalAnimeEntry; title: string } => Boolean(item.title));
-  const personalIds = new Set(personalEntries.map((entry) => Number(entry.animeId)).filter(Number.isFinite));
-  const eligible = (items: Media[]) => items.filter((media) =>
-    !personalIds.has(media.id) &&
-    !isOwned(media) &&
-    Boolean(media.coverImage?.extraLarge || media.coverImage?.large) &&
-    Boolean(media.title?.romaji || media.title?.english)
-  );
-  const uniqueById = (items: Media[]) => items.filter(
-    (media, index, list) => list.findIndex((candidate) => candidate.id === media.id) === index,
-  );
-  const withoutPreviouslyShown = (items: Media[], used: Set<number>) =>
-    uniqueById(eligible(items)).filter((media) => !used.has(media.id)).slice(0, 12);
-  const claim = (items: Media[], used: Set<number>, limit = 12) => {
-    const selected = withoutPreviouslyShown(items, used).slice(0, limit);
-    selected.forEach((media) => used.add(media.id));
-    return selected;
+function readFilters(params: URLSearchParams): Filters {
+  const rawGenres = params.get("genre") ?? "";
+  const genres = [...new Set(rawGenres.split(",").map((value) => value.trim()).filter((value) => Boolean(value) && value !== "Hentai" && value !== "Ecchi"))];
+  const year = params.get("year") ?? "";
+  const status = params.get("status") ?? "";
+  return {
+    genres,
+    year: /^\d{4}$/.test(year) || year === "before2020" ? year : "",
+    status: status === "FINISHED" || status === "RELEASING" ? status : "",
   };
-
-  let personalized: Media[] = [];
-  try {
-    const seedIds = numericEntries.map((entry) => Number(entry.animeId));
-    if (customEntries.length) {
-      const titleVariables: Record<string, string> = {};
-      const titleDefinitions = customEntries.map((item, index) => {
-        titleVariables[`seedTitle${index}`] = item.title;
-        return `$seedTitle${index}: String!`;
-      });
-      const titleSearches = customEntries.map((_, index) => `
-        seedSearch${index}: Page(page: 1, perPage: 1) {
-          media(search: $seedTitle${index}, type: ANIME, sort: SEARCH_MATCH, isAdult: false) { id }
-        }
-      `).join("\n");
-      const titleQuery = `
-        query ResolvePersonalSeeds(${titleDefinitions.join(", ")}) {
-          ${titleSearches}
-        }
-      `;
-      const titleResponse = await fetch("https://graphql.anilist.co", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ query: titleQuery, variables: titleVariables }),
-      });
-      if (titleResponse.ok) {
-        const titlePayload = await titleResponse.json();
-        if (!titlePayload.errors?.length && titlePayload.data) {
-          customEntries.forEach((_, index) => {
-            const resolvedId = titlePayload.data[`seedSearch${index}`]?.media?.[0]?.id;
-            if (Number.isInteger(resolvedId)) seedIds.push(resolvedId);
-          });
-        }
-      }
-    }
-
-    if (seedIds.length) {
-      const variables: Record<string, number> = {};
-      const definitions = seedIds.map((id, index) => {
-        variables[`seedId${index}`] = id;
-        return `$seedId${index}: Int!`;
-      });
-      const seeds = seedIds.map((_, index) => `
-        seed${index}: Media(id: $seedId${index}, type: ANIME) {
-          genres
-          tags { name rank }
-          recommendations(page: 1, perPage: 25, sort: RATING_DESC) {
-            nodes { rating mediaRecommendation { ${MEDIA_FIELDS} } }
-          }
-        }
-      `).join("\n");
-      const recommendationQuery = `
-        query PersonalRecommendations(${definitions.join(", ")}) {
-          ${seeds}
-        }
-      `;
-      const recommendationResponse = await fetch("https://graphql.anilist.co", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ query: recommendationQuery, variables }),
-      });
-      if (recommendationResponse.ok) {
-        const recommendationPayload = await recommendationResponse.json();
-        if (!recommendationPayload.errors?.length && recommendationPayload.data) {
-          const seedMedia = seedIds.map((_, index) => recommendationPayload.data[`seed${index}`]).filter(Boolean);
-          const genreCounts = new Map<string, number>();
-          const tagCounts = new Map<string, number>();
-          seedMedia.forEach((seed: { genres?: string[]; tags?: { name: string; rank?: number | null }[] }) => {
-            (seed.genres ?? []).forEach((genre) => genreCounts.set(genre, (genreCounts.get(genre) ?? 0) + 1));
-            (seed.tags ?? []).filter((tag) => (tag.rank ?? 0) >= 60).forEach((tag) => tagCounts.set(tag.name, (tagCounts.get(tag.name) ?? 0) + 1));
-          });
-          const maxGenreCount = Math.max(1, ...genreCounts.values());
-          const maxTagCount = Math.max(1, ...tagCounts.values());
-          personalized = seedMedia.flatMap((seed: { recommendations?: { nodes?: { rating?: number | null; mediaRecommendation?: Media | null }[] } }) => seed.recommendations?.nodes ?? [])
-            .filter((node: { mediaRecommendation?: Media | null }) => Boolean(node.mediaRecommendation))
-            .map((node: { rating?: number | null; mediaRecommendation: Media }) => {
-              const media = node.mediaRecommendation;
-              const genreFit = (media.genres ?? []).reduce((sum, genre) => sum + (genreCounts.get(genre) ?? 0) / maxGenreCount, 0);
-              const tagFit = (media.tags ?? []).filter((tag) => (tag.rank ?? 0) >= 60).reduce((sum, tag) => sum + (tagCounts.get(tag.name) ?? 0) / maxTagCount, 0);
-              return { ...media, recommendationRating: (node.rating ?? 0) + genreFit * 8 + tagFit * 2 };
-            })
-            .sort((a: Media & { recommendationRating: number }, b: Media & { recommendationRating: number }) =>
-              b.recommendationRating - a.recommendationRating || (b.averageScore ?? 0) - (a.averageScore ?? 0));
-        }
-      }
-    }
-  } catch {
-    // Keep the general discovery row available if personalized recommendations fail.
-  }
-  const used = new Set<number>();
-  const discoverSource = personalized.length ? personalized : pages.discover?.media ?? [];
-  const discover = claim(discoverSource.filter((media: Media & { recommendationRating?: number }) =>
-    (media.averageScore ?? 0) >= 75 &&
-    (personalized.length || ((media.popularity ?? 0) > 20000 && (media.popularity ?? 0) < 150000))
-  ), used);
-  const hidden = claim(
-    (pages.hidden?.media ?? []).filter((media: Media) =>
-      (media.averageScore ?? 0) >= 75 &&
-      (media.popularity ?? 0) > 500 &&
-      (media.popularity ?? 0) < 20000
-    ),
-    used,
-  );
-  const trending = claim(pages.trending?.media ?? [], used);
-  const seasonItems = claim(pages.season?.media ?? [], used);
-  const upcoming = claim(
-    (pages.upcoming?.media ?? []).filter((media: Media) => {
-      const date = media.startDate;
-      if (!date?.year) return false;
-      const timestamp = new Date(date.year, (date.month ?? 1) - 1, date.day ?? 1).getTime();
-      return timestamp > Date.now();
-    }),
-    used,
-  );
-  const topRated = claim(
-    (pages.topRated?.media ?? []).filter((media: Media) => (media.averageScore ?? 0) >= 75),
-    used,
-  );
-
-  return { discover, hidden, trending, season: seasonItems, upcoming, topRated };
+}
+function hasSelectedFilters(filters: Filters) {
+  return filters.genres.length > 0 || Boolean(filters.year || filters.status);
+}
+function buildParams(query: string, filters: Filters, page = 1) {
+  const params = new URLSearchParams();
+  if (query.trim().length >= 2) params.set("q", query.trim());
+  if (filters.genres.length) params.set("genre", filters.genres.join(","));
+  if (filters.year) params.set("year", filters.year);
+  if (filters.status) params.set("status", filters.status);
+  if (page > 1) params.set("page", String(page));
+  return params;
 }
 
 export default function SearchView({ lang = "es" }: { lang?: Lang }) {
   const t = useT(lang);
   const [query, setQuery] = useState("");
-  const [submitted, setSubmitted] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [applied, setApplied] = useState<Filters>(EMPTY);
+  const [draft, setDraft] = useState<Filters>(EMPTY);
+  const [initialized, setInitialized] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [genres, setGenres] = useState<string[]>([]);
+  const [years, setYears] = useState<string[]>([]);
   const [results, setResults] = useState<Media[]>([]);
-  const [page, setPage] = useState(1);
-  const [retry, setRetry] = useState(0);
+  const [discoveryResults, setDiscoveryResults] = useState<Media[]>([]);
+  const [gemsResults, setGemsResults] = useState<Media[]>([]);
+  const [awardsResults, setAwardsResults] = useState<Media[]>([]);
+  const [total, setTotal] = useState(0);
   const [hasNext, setHasNext] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [searchError, setSearchError] = useState(false);
-  const [personalEntries, setPersonalEntries] = useState<PersonalAnimeEntry[]>([]);
-  const [personalLibraryReady, setPersonalLibraryReady] = useState(false);
-  const [discovery, setDiscovery] = useState<Record<DiscoveryRowId, Media[]> | null>(null);
-  const [discoveryLoading, setDiscoveryLoading] = useState(true);
-  const [discoveryError, setDiscoveryError] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [count, setCount] = useState<number | null>(null);
+  const [countLoading, setCountLoading] = useState(false);
+  const [countError, setCountError] = useState(false);
+  const [countRetry, setCountRetry] = useState(0);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  const appliedKey = JSON.stringify(applied);
+  const draftKey = JSON.stringify(draft);
+  const hasFilters = hasSelectedFilters(applied);
+  const summary = useMemo(() => {
+    const parts = [...applied.genres];
+    if (applied.year) parts.push(applied.year === "before2020" ? t("search.before2020") : applied.year);
+    if (applied.status) parts.push(applied.status === "FINISHED" ? t("search.finished") : t("search.releasing"));
+    return parts.join(", ");
+  }, [appliedKey, lang]);
 
   useEffect(() => {
-    let cancelled = false;
-    const syncPersonalLibrary = () => setPersonalEntries(getPersonalLibrary());
-    const unsubscribe = subscribeToPersonalLibrary(syncPersonalLibrary);
-    syncPersonalLibrary();
-    void hydratePersonalLibrary().finally(() => {
-      if (!cancelled) {
-        syncPersonalLibrary();
-        setPersonalLibraryReady(true);
-      }
-    });
-    return () => {
-      cancelled = true;
-      unsubscribe();
-    };
+    const params = new URLSearchParams(window.location.search);
+    const initial = readFilters(params);
+    setApplied(initial);
+    setDraft(initial);
+    setQuery(params.get("q") ?? "");
+    setInitialized(true);
   }, []);
 
   useEffect(() => {
-    if (!personalLibraryReady) return;
-    let cancelled = false;
-    setDiscoveryLoading(true);
-    fetchDiscoveryRows(personalEntries)
-      .then((rows) => {
-        if (!cancelled) {
-          setDiscovery(rows);
-          setDiscoveryError(false);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) setDiscoveryError(true);
-      })
-      .finally(() => {
-        if (!cancelled) setDiscoveryLoading(false);
-      });
-    return () => { cancelled = true; };
-  }, [personalLibraryReady, personalEntries]);
+    if (!initialized) return;
+    const params = buildParams(query, applied);
+    const suffix = params.toString();
+    window.history.replaceState({}, "", window.location.pathname + (suffix ? `?${suffix}` : ""));
+  }, [query, appliedKey, initialized]);
 
   useEffect(() => {
-    if (!submitted.trim()) {
-      setResults([]);
-      setHasNext(false);
-      setSearchError(false);
-      setLoading(false);
+    const timeout = window.setTimeout(() => setDebouncedQuery(query.trim()), 400);
+    return () => window.clearTimeout(timeout);
+  }, [query]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    Promise.all([
+      fetch("/api/anime-search?genres=1", { signal: controller.signal }).then((response) => response.json()),
+      fetch("/api/anime-search?years=1", { signal: controller.signal }).then((response) => response.json()),
+    ]).then(([genrePayload, yearPayload]) => {
+      if (genrePayload.success && Array.isArray(genrePayload.genres)) setGenres(genrePayload.genres);
+      if (yearPayload.success && Array.isArray(yearPayload.years)) setYears(yearPayload.years);
+    }).catch(() => {});
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    if (!initialized || debouncedQuery.length > 0 || hasSelectedFilters(applied)) {
+      setDiscoveryResults([]);
+      setGemsResults([]);
+      setAwardsResults([]);
       return;
     }
+    const controller = new AbortController();
     let cancelled = false;
-    setLoading(true);
-    setSearchError(false);
-    fetch("https://graphql.anilist.co", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify({
-        query: "query Search($search:String!,$page:Int!,$perPage:Int!){Page(page:$page,perPage:$perPage){pageInfo{hasNextPage} media(search:$search,type:ANIME,sort:SEARCH_MATCH){id title{romaji english} startDate{year month day} coverImage{extraLarge large} format}}}",
-        variables: { search: submitted, page, perPage: PAGE_SIZE },
-      }),
-    })
-      .then((response) => response.ok ? response.json() : Promise.reject())
-      .then((payload) => {
-        if (payload.errors?.length) throw new Error("AniList GraphQL error");
+    const loadCategory = async (mode: "discovery" | "gems" | "awards") => {
+      const response = await fetch(`/api/anime-search?${mode}=1`, { signal: controller.signal });
+      const payload = await response.json();
+      if (!response.ok || !payload.success) throw new Error(payload.error || `${mode} unavailable`);
+      return Array.isArray(payload.items) ? payload.items as Media[] : [];
+    };
+    Promise.all([loadCategory("discovery"), loadCategory("gems"), loadCategory("awards")])
+      .then(([discovery, gems, awards]) => {
         if (cancelled) return;
-        const media = payload.data?.Page?.media ?? [];
-        setResults((current) => page === 1 ? media : [...current, ...media]);
-        setHasNext(Boolean(payload.data?.Page?.pageInfo?.hasNextPage));
-        setSearchError(false);
+        setDiscoveryResults(discovery);
+        setGemsResults(gems);
+        setAwardsResults(awards);
       })
-      .catch(() => { if (!cancelled) setSearchError(true); })
+      .catch((reason) => {
+        if (!cancelled && reason?.name !== "AbortError") {
+          setDiscoveryResults([]);
+          setGemsResults([]);
+          setAwardsResults([]);
+        }
+      });
+    return () => { cancelled = true; controller.abort(); };
+  }, [initialized, debouncedQuery, appliedKey]);
+
+  useEffect(() => {
+    if (!initialized) return;
+    const controller = new AbortController();
+    let cancelled = false;
+    const filtersActive = hasSelectedFilters(applied);
+    if (debouncedQuery.length === 1) {
+      setResults([]);
+      setTotal(0);
+      setHasNext(false);
+      setError(false);
+      setLoading(false);
+      return () => controller.abort();
+    }
+    setLoading(true);
+    setError(false);
+    const params = filtersActive || debouncedQuery.length >= 2
+      ? buildParams(debouncedQuery, applied)
+      : new URLSearchParams({ popular: "1" });
+    fetch("/api/anime-search?" + params.toString(), { signal: controller.signal })
+      .then(async (response) => {
+        const payload = await response.json();
+        if (!response.ok || !payload.success) throw new Error(payload.error || "Search failed");
+        return payload;
+      })
+      .then((payload) => {
+        if (cancelled) return;
+        setResults(payload.items ?? []);
+        setTotal(payload.total ?? 0);
+        setHasNext(Boolean(payload.hasNextPage));
+      })
+      .catch((reason) => {
+        if (!cancelled && reason?.name !== "AbortError") setError(true);
+      })
       .finally(() => { if (!cancelled) setLoading(false); });
-    return () => { cancelled = true; };
-  }, [submitted, page, retry]);
+    return () => { cancelled = true; controller.abort(); };
+  }, [initialized, debouncedQuery, appliedKey]);
 
-  const submit = (event: FormEvent) => {
-    event.preventDefault();
-    setPage(1);
-    setRetry((current) => current + 1);
-    setResults([]);
-    setHasNext(false);
-    setSearchError(false);
-    setSubmitted(query.trim());
+  useEffect(() => {
+    if (!filtersOpen) return;
+    const controller = new AbortController();
+    setCount(null);
+    setCountError(false);
+    setCountLoading(true);
+    const timeout = window.setTimeout(() => {
+      const params = buildParams(query, draft, 1);
+      if (!params.has("q") && !params.has("genre") && !params.has("year") && !params.has("status")) params.set("popular", "1");
+      fetch("/api/anime-search?" + params.toString(), { signal: controller.signal })
+        .then(async (response) => {
+          const payload = await response.json();
+          if (!response.ok || !payload.success) throw new Error(payload.error || "Count failed");
+          return payload;
+        })
+        .then((payload) => setCount(Number(payload.total ?? 0)))
+        .catch((reason) => { if (reason?.name !== "AbortError") { setCount(null); setCountError(true); } })
+        .finally(() => { if (!controller.signal.aborted) setCountLoading(false); });
+    }, 400);
+    return () => { window.clearTimeout(timeout); controller.abort(); };
+  }, [filtersOpen, draftKey, debouncedQuery, query, countRetry]);
+
+  const closePanel = useCallback(() => {
+    setFiltersOpen(false);
+    triggerRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    if (!filtersOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const focusFirst = () => dialogRef.current?.querySelector<HTMLElement>("button:not([disabled])")?.focus();
+    const frame = window.requestAnimationFrame(focusFirst);
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closePanel();
+        return;
+      }
+      if (event.key !== "Tab" || !dialogRef.current) return;
+      const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>("button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex='-1'])"));
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [filtersOpen, closePanel]);
+
+  const updateGenre = (genre: string) => setDraft((current) => ({
+    ...current,
+    genres: current.genres.includes(genre) ? current.genres.filter((item) => item !== genre) : [...current.genres, genre],
+  }));
+  const updateYear = (year: string) => setDraft((current) => ({ ...current, year: current.year === year ? "" : year }));
+  const updateStatus = (status: Status) => setDraft((current) => ({ ...current, status: current.status === status ? "" : status }));
+  const clearFilters = () => setDraft(EMPTY);
+  const applyFilters = () => {
+    setApplied(draft);
+    setFiltersOpen(false);
+    triggerRef.current?.focus();
+  };
+  const removeFilters = () => {
+    setApplied(EMPTY);
+    setDraft(EMPTY);
   };
 
-  const showDiscovery = !query.trim() && !submitted.trim();
+  const loadMore = async () => {
+    if (!hasNext || loading) return;
+    setLoading(true);
+    try {
+      const params = buildParams(debouncedQuery, applied);
+      if (!debouncedQuery && !hasSelectedFilters(applied)) params.set("popular", "1");
+      params.set("page", String(Math.floor(results.length / PAGE_SIZE) + 1));
+      const response = await fetch("/api/anime-search?" + params.toString());
+      const payload = await response.json();
+      if (!response.ok || !payload.success) throw new Error("Load more failed");
+      setResults((current) => [...current, ...(payload.items ?? [])]);
+      setHasNext(Boolean(payload.hasNextPage));
+    } catch { setError(true); }
+    finally { setLoading(false); }
+  };
 
-  const renderCard = (item: Media, index: number) => {
-    const title = lang === "en"
-      ? (item.title?.english || item.title?.romaji || t("detail.noTitle"))
-      : (item.title?.romaji || item.title?.english || t("detail.noTitle"));
+  const toDisplayItems = (items: Media[]): DisplayMedia[] => items.flatMap((item) => {
+    const title = lang === "en" ? item.title?.english || item.title?.romaji : item.title?.romaji || item.title?.english;
     const image = item.coverImage?.extraLarge || item.coverImage?.large;
-    return (
-      <article className="search-result" key={item.id}>
-        <a className="search-card" href={`${lang === "en" ? "/en" : ""}/anime/${item.id}`} aria-label={title}>
-          <div className="search-poster">
-            {image ? <img src={image} alt="" loading={index < 4 ? "eager" : "lazy"} /> : <div className="search-poster-placeholder">{title}</div>}
-          </div>
-          <div className="search-info">
-            <h3>{title}</h3>
-            <span>{formatDate(item.startDate, lang)} · {item.format === "MOVIE" ? t("detail.film") : item.format ? t("detail.series") : t("detail.unknownFormat")}</span>
-          </div>
-        </a>
-      </article>
-    );
-  };
+    if (!title || !image) return [];
+    const formatKey: Record<string, string> = {
+      TV: "detail.formatTV", TV_SHORT: "detail.formatTVShort", MOVIE: "detail.formatMovie",
+      OVA: "detail.formatOVA", ONA: "detail.formatONA", SPECIAL: "detail.formatSpecial", MUSIC: "detail.formatMusic",
+    };
+    const formatLabel = item.format && formatKey[item.format] ? t(formatKey[item.format] as Parameters<typeof t>[0]) : null;
+    return [{
+      id: item.id, title, href: localizedPath(lang, `/anime/${item.id}/`), image,
+      year: item.startDate?.year ?? null,
+      score: item.averageScore != null ? item.averageScore / 10 : null,
+      color: item.coverImage?.color ?? null, formatLabel,
+      episodes: item.episodes ?? null, genres: item.genres ?? [],
+    }];
+  });
+  const discoveryItems = toDisplayItems(discoveryResults);
+  const popularItems = toDisplayItems(results);
+  const normalizeTitle = (title: string) => title.trim().toLocaleLowerCase("es");
+  const discoveryIds = new Set(discoveryItems.map((item) => item.id));
+  const discoveryTitles = new Set(discoveryItems.map((item) => normalizeTitle(item.title)));
+  const popularUniqueItems = popularItems.filter((item) =>
+    !discoveryIds.has(item.id) && !discoveryTitles.has(normalizeTitle(item.title))
+  );
+  const usedIds = new Set([...discoveryItems, ...popularUniqueItems].map((item) => item.id));
+  const usedTitles = new Set([...discoveryItems, ...popularUniqueItems].map((item) => normalizeTitle(item.title)));
+  const gemsItems = toDisplayItems(gemsResults).filter((item) =>
+    !usedIds.has(item.id) && !usedTitles.has(normalizeTitle(item.title))
+  );
+
+  const buttonLabel = countError
+    ? t("search.error")
+    : count === 0
+    ? t("search.noResults")
+    : countLoading || count === null
+      ? t("search.seeLoading")
+      : t("search.seeCount").replace("{count}", count.toLocaleString(lang === "en" ? "en-GB" : "es-ES"));
 
   return (
     <div className="search-view">
       <style>{`
-        .search-view { width: 100%; }
-        .search-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .6rem; align-items: stretch; margin-bottom: 2.5rem; }
-        .search-form input { min-width: 0; height: 3rem; padding: .75rem .9rem; border: 1px solid var(--color-border-strong); border-radius: 0; background: var(--color-ink-900); color: var(--color-paper-50); font: 400 .9rem/1.2 var(--font-body); outline: none; }
-        .search-form input:focus-visible { border-color: var(--color-paper-50); outline: 2px solid rgba(245,242,236,.25); outline-offset: 2px; }
-        .search-form button, .search-more { min-height: 3rem; padding: .7rem 1rem; border: 1px solid var(--color-border-strong); background: transparent; color: var(--color-paper-50); font: 500 .72rem/1 var(--font-body); cursor: pointer; }
-        .search-form button:hover, .search-more:hover:not(:disabled) { background: var(--color-paper-50); color: var(--color-ink-950); }
-        .search-discovery { display: grid; gap: clamp(2.4rem, 5vw, 4rem); }
-        .search-discovery-row { min-width: 0; }
-        .search-row-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; margin-bottom: 1.15rem; }
-        .search-row-copy { display: grid; gap: .45rem; min-width: 0; }
-        .search-row-heading h2 { margin: 0; color: var(--color-paper-50); font: 400 clamp(1.8rem, 3.3vw, 2.65rem)/.98 var(--font-heading); letter-spacing: -.045em; }
-        .search-row-heading p { max-width: 38rem; margin: 0; color: var(--color-muted-400); font: 400 .85rem/1.5 var(--font-body); }
-        .search-row-track { display: flex; gap: .9rem; overflow-x: auto; padding: .1rem .05rem .8rem; margin: 0 -.05rem; scroll-snap-type: x mandatory; overscroll-behavior-inline: contain; scrollbar-width: none; }
-        .search-row-track::-webkit-scrollbar { display: none; }
-        .search-result { flex: 0 0 clamp(125px, 15vw, 180px); min-width: 0; scroll-snap-align: start; }
-        .search-card { display: block; min-width: 0; color: inherit; text-decoration: none; }
-        .search-poster { aspect-ratio: 2 / 3; overflow: hidden; background: var(--color-ink-900); }
-        .search-poster img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 500ms cubic-bezier(.2,.7,.2,1); }
-        .search-poster-placeholder { display: grid; width: 100%; height: 100%; place-items: center; padding: .8rem; color: var(--color-muted-400); font-size: .75rem; text-align: center; }
-        .search-card:hover .search-poster img { transform: scale(1.035); }
-        .search-info { display: grid; gap: .35rem; padding: .65rem .05rem 0; }
-        .search-info h3 { display: -webkit-box; overflow: hidden; margin: 0; color: var(--color-paper-50); font: 500 .78rem/1.3 var(--font-body); -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-        .search-info span { color: var(--color-muted-400); font: 400 .65rem/1.3 var(--font-body); }
-        .search-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2.5rem 1rem; }
-        .search-grid .search-result { flex: initial; }
-        .search-status { color: var(--color-muted-400); font: 400 .8rem/1.5 var(--font-body); }
-        .search-more { display: block; margin: 2.5rem auto 0; }
-        .search-discovery-status { color: var(--color-muted-400); font: 400 .8rem/1.5 var(--font-body); }
-        @media (max-width: 1100px) { .search-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-        @media (max-width: 760px) {
-          .search-form { margin-bottom: 2rem; }
-          .search-discovery { gap: 2.5rem; }
-          .search-row-heading { margin-bottom: .9rem; }
-          .search-row-heading h2 { font-size: 1.85rem; }
-          .search-row-heading p { font-size: .8rem; }
-          .search-row-track { gap: .7rem; }
-          .search-result { flex-basis: 132px; }
-          .search-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.8rem .7rem; }
-          .search-info { padding-top: .55rem; }
-        }
-        @media (max-width: 520px) {
-          .search-form { grid-template-columns: minmax(0, 1fr) auto; gap: .4rem; }
-          .search-form button { padding-inline: .8rem; }
-          .search-row-heading h2 { font-size: 1.65rem; }
-          .search-row-heading p { font-size: .76rem; }
-          .search-result { flex-basis: 118px; }
+        .search-view { width: 100%; color: #f2efe9; }
+        .search-view h1 { margin: 0 0 1.4rem; font: 800 clamp(2rem,4vw,2.5rem)/1.05 Inter,system-ui,sans-serif; letter-spacing: -.035em; }
+        .search-form { display:flex; align-items:center; gap:.7rem; height:52px; margin:0 0 1.1rem; padding:0 18px; border:0; border-radius:999px; background:#1c1c22; }
+        .search-form:focus-within { outline:2px solid #f472b6; outline-offset:3px; }
+        .search-form svg { flex:0 0 auto; color:#a6a2ad; }
+        .search-form input { flex:1; min-width:0; height:100%; border:0; outline:0; background:transparent; color:#f2efe9; font:400 15px/1.2 Inter,system-ui,sans-serif; }
+        .search-filter-bar { display:flex; align-items:center; gap:10px; min-height:32px; margin:0 0 1.45rem; min-width:0; }
+        .search-filter-trigger { padding:0; border:0; background:none; color:#f2efe9; font:700 15px/1.3 Inter,system-ui,sans-serif; cursor:pointer; }
+        .search-filter-summary { min-width:0; overflow:hidden; color:#c9c5cf; font:500 14px/1.3 Inter,system-ui,sans-serif; text-overflow:ellipsis; white-space:nowrap; }
+        .search-filter-remove { margin-left:auto; flex:0 0 auto; padding:0; border:0; background:none; color:#c9c5cf; font:500 14px/1.3 Inter,system-ui,sans-serif; cursor:pointer; }
+        .search-filter-trigger:focus-visible,.search-filter-remove:focus-visible { outline:2px solid #f472b6; outline-offset:4px; border-radius:4px; }
+        .search-section-title { margin:0 0 1rem; color:#f2efe9; font:700 20px/1.2 Inter,system-ui,sans-serif; }
+        .search-results-count { margin:0 0 1rem; color:#a6a2ad; font:400 14px/1.4 Inter,system-ui,sans-serif; }
+        .search-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px 8px; }
+        .search-result { min-width:0; }
+        .search-card { display:block; min-width:0; color:inherit; text-decoration:none; }
+        .search-poster { aspect-ratio:2/3; overflow:hidden; border-radius:8px; background:#1c1c22; }
+        .search-poster img { display:block; width:100%; height:100%; object-fit:cover; }
+        .search-poster span { display:grid; width:100%; height:100%; place-items:center; padding:8px; color:#a6a2ad; font-size:12px; text-align:center; }
+        .search-card h3 { display:-webkit-box; overflow:hidden; margin:7px 0 0; color:#d8d4de; font:500 12px/1.35 Inter,system-ui,sans-serif; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+        .search-state { margin:1rem 0; color:#a6a2ad; font:400 14px/1.4 Inter,system-ui,sans-serif; }
+        .search-more { display:block; margin:24px auto 0; padding:12px 20px; border:0; border-radius:999px; background:#1c1c22; color:#f2efe9; font:600 14px Inter,system-ui,sans-serif; cursor:pointer; }
+        .sf-back { position:fixed; inset:0; z-index:100; display:flex; align-items:flex-end; justify-content:center; background:rgba(0,0,0,.6); }
+        .sf-sheet { display:flex; flex-direction:column; width:100%; max-height:88svh; padding:10px 16px calc(16px + env(safe-area-inset-bottom)); border-radius:24px 24px 0 0; background:#131316; color:#f2efe9; animation:sf-up .22s ease-out; }
+        .sf-grab { width:40px; height:4px; margin:0 auto 14px; border-radius:2px; background:#3a3a44; }
+        .sf-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
+        .sf-head h2 { margin:0; font:700 18px/1.3 Inter,system-ui,sans-serif; }
+        .sf-clear { padding:0; border:0; background:none; color:#a6a2ad; font:500 14px Inter,system-ui,sans-serif; cursor:pointer; }
+        .sf-body { min-height:0; overflow-y:auto; padding:0 0 6px; overscroll-behavior:contain; }
+        .sf-lab { margin:16px 0 8px; color:#a6a2ad; font:400 14px/1.3 Inter,system-ui,sans-serif; }
+        .sf-chips { display:flex; flex-wrap:wrap; gap:8px; }
+        .sf-chip { padding:8px 14px; border:0; border-radius:999px; background:#1c1c22; color:#d8d4de; font:600 14px/1.25 Inter,system-ui,sans-serif; cursor:pointer; }
+        .sf-chip[aria-pressed="true"] { background:#ec4899; color:#fff; }
+        .sf-chip:focus-visible,.sf-clear:focus-visible,.sf-go:focus-visible { outline:2px solid #f472b6; outline-offset:3px; }
+        .sf-go { flex:0 0 auto; margin-top:14px; padding:15px; border:0; border-radius:999px; background:#ec4899; color:#fff; font:700 15px Inter,system-ui,sans-serif; cursor:pointer; }
+        .sf-go:disabled { background:#2a2a31; color:#8d8993; cursor:default; }
+        @keyframes sf-up { from { transform:translateY(24px); opacity:0; } to { transform:none; opacity:1; } }
+        @media (prefers-reduced-motion:reduce) { .sf-sheet { animation:none; } }
+        @media (min-width:768px) {
+          .sf-back { align-items:center; padding:24px; }
+          .sf-sheet { width:min(100%,560px); max-height:88svh; padding:18px 24px 22px; border-radius:24px; }
+          .sf-grab { display:none; }
         }
       `}</style>
-      <form className="search-form" onSubmit={submit}>
+      <h1>{t("search.pageTitle")}</h1>
+      <form className="search-form" onSubmit={(event: FormEvent) => event.preventDefault()}>
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.8" cy="10.8" r="6.3" /><path d="m15.5 15.5 4 4" /></svg>
         <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("search.placeholder")} aria-label={t("search.label")} />
-        <button type="submit">{t("search.submit")}</button>
       </form>
-
-      {showDiscovery && (
-        <div className="search-discovery">
-          {discoveryLoading && <p className="search-discovery-status" role="status" aria-live="polite">{t("search.discoveryLoading")}</p>}
-          {discoveryError && !discoveryLoading && <p className="search-discovery-status" role="status">{t("search.discoveryError")}</p>}
-          {discovery && DISCOVERY_ROWS.map((row) => {
-            const items = discovery[row.id] ?? [];
-            if (!items.length) return null;
-            return (
-              <section className="search-discovery-row" key={row.id} aria-labelledby={`search-row-${row.id}`}>
-                <header className="search-row-heading">
-                  <div className="search-row-copy">
-                    <h2 id={`search-row-${row.id}`}>{t(row.titleKey)}</h2>
-                    <p>{t(row.descriptionKey)}</p>
-                  </div>
-                </header>
-                <div className="search-row-track" aria-label={t(row.titleKey)}>
-                  {items.map(renderCard)}
-                </div>
-              </section>
-            );
-          })}
-        </div>
-      )}
-
-      {loading && <p className="search-status" role="status" aria-live="polite">{t("search.loading")}</p>}
-      {!loading && searchError && <p className="search-status" role="alert">{t("search.error")}</p>}
-      {!loading && !searchError && submitted && !results.length && <p className="search-status" role="status" aria-live="polite">{t("search.empty").split("{query}").join(submitted)}</p>}
-      {results.length > 0 && (
+      <div className="search-filter-bar">
+        <button ref={triggerRef} type="button" className="search-filter-trigger" aria-label={t("search.filters")} aria-haspopup="dialog" aria-expanded={filtersOpen} onClick={() => { setDraft(applied); setFiltersOpen(true); }}>{t("search.filters")}</button>
+        {hasFilters && <span className="search-filter-summary">{summary}</span>}
+        {hasFilters && <button type="button" className="search-filter-remove" aria-label={t("search.removeFilters")} onClick={removeFilters}>{t("search.removeFilters")}</button>}
+      </div>
+      {loading && <p className="search-state" role="status">{t("search.loading")}</p>}
+      {error && <p className="search-state" role="alert">{t("search.error")}</p>}
+      {!loading && !error && !query.trim() && !hasFilters && (
         <>
-          <div className="search-grid" aria-busy={loading}>{results.map(renderCard)}</div>
-          {(hasNext || searchError) && (
-            <button className="search-more" type="button" onClick={() => searchError ? setRetry((current) => current + 1) : setPage((current) => current + 1)} disabled={loading}>
-              {loading ? t("search.loading") : searchError ? t("search.retry") : t("search.more")}
-            </button>
-          )}
+        <CategoryRail
+          title={t("search.newDiscoveries")}
+          subtitle={t("search.newDiscoveriesDescription")}
+          items={discoveryItems}
+        />
+        <CategoryRail
+          title={t("search.mostViewed")}
+          subtitle={t("search.mostViewedDescription")}
+          items={popularUniqueItems}
+          showScore={false}
+        />
+        <CategoryRail
+          title={t("search.hiddenGems")}
+          subtitle={t("search.hiddenGemsDescription")}
+          items={gemsItems}
+          showScore={true}
+        />
+        <AwardsTimeline
+          title={t("search.awardsTitle")}
+          subtitle={t("search.awardsDescription")}
+          editions={[
+            { year: 2026, label: t("search.awardLabel"), anime: { ...toDisplayItems(awardsResults.filter((item) => item.id === 182896))[0], title: "My Hero Academia FINAL SEASON" } },
+            { year: 2025, label: t("search.awardLabel"), anime: { ...toDisplayItems(awardsResults.filter((item) => item.id === 151807))[0], title: "Solo Leveling" } },
+            { year: 2024, label: t("search.awardLabel"), anime: { ...toDisplayItems(awardsResults.filter((item) => item.id === 145064))[0], title: "JUJUTSU KAISEN Season 2" } },
+            { year: 2023, label: t("search.awardLabel"), anime: { ...toDisplayItems(awardsResults.filter((item) => item.id === 120377))[0], title: "Cyberpunk: Edgerunners" } },
+            { year: 2022, label: t("search.awardLabel"), anime: { ...toDisplayItems(awardsResults.filter((item) => item.id === 110277))[0], title: "Attack on Titan Final Season Part 1" } },
+          ].filter((edition) => edition.anime.id)}
+        />
         </>
       )}
-      {searchError && results.length === 0 && (
-        <button className="search-more" type="button" onClick={() => setRetry((current) => current + 1)} disabled={loading}>{t("search.retry")}</button>
+      {!loading && !error && (query.trim() || hasFilters) && (
+        <ResultsList
+          items={toDisplayItems(results)}
+          countLabel={t("search.resultsCount").replace("{count}", total.toLocaleString(lang === "en" ? "en-GB" : "es-ES"))}
+          emptyLabel={t("search.noResults")}
+          epsLabel={(n) => t("search.episodesShort").replace("{count}", String(n))}
+        />
+      )}
+      {hasNext && !loading && <button type="button" className="search-more" onClick={loadMore}>{t("search.more")}</button>}
+      {filtersOpen && (
+        <div className="sf-back" onMouseDown={(event) => { if (event.target === event.currentTarget) closePanel(); }}>
+          <div ref={dialogRef} className="sf-sheet" role="dialog" aria-modal="true" aria-labelledby="sf-title">
+            <div className="sf-grab" aria-hidden="true" />
+            <div className="sf-head"><h2 id="sf-title">{t("search.filters")}</h2><button type="button" className="sf-clear" onClick={clearFilters}>{t("search.clear")}</button></div>
+            <div className="sf-body">
+              <section className="sf-group"><p className="sf-lab">{t("search.genre")}</p><div className="sf-chips">
+                {genres.map((genre) => <button key={genre} type="button" className="sf-chip" aria-pressed={draft.genres.includes(genre)} onClick={() => updateGenre(genre)}>{genre}</button>)}
+              </div></section>
+              <section className="sf-group"><p className="sf-lab">{t("search.year")}</p><div className="sf-chips">
+                {years.map((year) => <button key={year} type="button" className="sf-chip" aria-pressed={draft.year === year} onClick={() => updateYear(year)}>{year === "before2020" ? t("search.before2020") : year}</button>)}
+              </div></section>
+              <section className="sf-group"><p className="sf-lab">{t("search.status")}</p><div className="sf-chips">
+                <button type="button" className="sf-chip" aria-pressed={draft.status === "FINISHED"} onClick={() => updateStatus("FINISHED")}>{t("search.finished")}</button>
+                <button type="button" className="sf-chip" aria-pressed={draft.status === "RELEASING"} onClick={() => updateStatus("RELEASING")}>{t("search.releasing")}</button>
+              </div></section>
+            </div>
+            {countError && <button type="button" className="sf-clear" onClick={() => setCountRetry((value) => value + 1)}>Reintentar recuento</button>}
+            <button type="button" className="sf-go" disabled={count === 0 || countLoading || count === null || countError} onClick={applyFilters}>
+              {countError ? t("search.error") : count === 0 ? t("search.noResults") : buttonLabel}
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

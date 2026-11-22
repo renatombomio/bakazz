@@ -1,0 +1,177 @@
+---
+interface Props {
+  video?: { mp4: string; webm?: string } | null;
+  rotate?: 0 | 90 | 180;
+  imagePosition?: string;
+  subtitle: string;
+  primary: { label: string; href: string };
+  secondary?: { label: string; href: string };
+}
+const { video = null, rotate = 270, subtitle, primary, secondary } = Astro.props;
+---
+<section class="hh">
+  {video
+    ? (
+      <video class="hh-img" autoplay muted loop playsinline preload="metadata" aria-hidden="true" controlslist="nodownload noplaybackrate" disablepictureinpicture style={`transform: rotate(${rotate}deg)`}>
+        {video.webm && <source src={video.webm} type="video/webm" />}
+        <source src={video.mp4} type="video/mp4" />
+      </video>
+    )
+    : null}
+  <div class="hh-veil" aria-hidden="true"></div>
+  <div class="hh-body">
+    <h1 class="hh-word" aria-label="BAKAZZ">
+      <span aria-hidden="true"><b>BAK</b>AZZ</span>
+    </h1>
+    <p class="hh-sub">{subtitle}</p>
+    <div class="hh-actions">
+      <a class="hh-btn" href={primary.href}>{primary.label}</a>
+      {secondary && <a class="hh-btn hh-ghost" href={secondary.href}>{secondary.label}</a>}
+    </div>
+  </div>
+</section>
+<script>
+  const silenceHero = () => {
+    document.querySelectorAll<HTMLVideoElement>(".hh video").forEach((video) => {
+      video.muted = true;
+      video.defaultMuted = true;
+      video.volume = 0;
+      video.removeAttribute("controls");
+      video.addEventListener("volumechange", () => {
+        if (!video.muted || video.volume !== 0) {
+          video.muted = true;
+          video.volume = 0;
+        }
+      });
+    });
+  };
+  document.addEventListener("astro:page-load", silenceHero);
+  silenceHero();
+</script>
+
+<style>
+  .hh {
+    --hh-bg: #09090b;
+    --hh-fg: #f2efe9;
+    --hh-sub: #e4e0e8;
+    --hh-line: rgba(255,255,255,.4);
+    --hh-bright: .55;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    min-height: min(80svh, 640px);
+    overflow: hidden;
+    background: var(--hh-bg);
+    color: var(--hh-fg);
+  }
+  .hh-img {
+    position: absolute;
+    inset: auto;
+    top: 50%;
+    left: 50%;
+    width: min(88svh, 760px);
+    height: 100vw;
+    translate: -50% -50%;
+    object-fit: cover;
+    filter: saturate(.9) brightness(var(--hh-bright));
+  }
+  .hh-veil {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      to top,
+      var(--hh-bg) 0,
+      color-mix(in srgb, var(--hh-bg) 88%, transparent) 32%,
+      color-mix(in srgb, var(--hh-bg) 0%, transparent) 72%
+    );
+  }
+  .hh-body {
+    position: relative;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 16px 40px;
+    box-sizing: border-box;
+    container-type: inline-size;
+  }
+  .hh-word {
+    position: relative;
+    margin: 0;
+    font-family: "Anton", "Impact", "Arial Narrow", sans-serif;
+    font-weight: 400;
+    font-size: calc(100cqw / 3.8);
+    line-height: .9;
+    letter-spacing: .005em;
+    text-transform: uppercase;
+    color: var(--hh-fg);
+    white-space: nowrap;
+  }
+  .hh-word b { font-weight: 400; color: var(--hh-fg); }
+  .hh-me { position: relative; display: inline-block; }
+  .hh-world {
+    position: absolute;
+    left: 0;
+    bottom: 100%;
+    margin: 0 0 .06em;
+    font-size: .37em;
+    line-height: 1;
+    letter-spacing: .08em;
+    margin-right: -.08em;
+    white-space: nowrap;
+    color: var(--hh-fg);
+  }
+  .hh-sub {
+    margin: 18px 0 0;
+    font-size: 18px;
+    line-height: 1.4;
+    color: var(--hh-sub);
+  }
+  .hh-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+  .hh-btn {
+    padding: 13px 24px;
+    border-radius: 999px;
+    background: #ec4899;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .hh-ghost {
+    background: transparent;
+    border: 1px solid var(--hh-line);
+    color: var(--hh-fg);
+    font-weight: 600;
+  }
+  .hh::after { content: none; }
+  .hh-btn:focus-visible { outline: 2px solid #f472b6; outline-offset: 4px; }
+
+
+  @media (prefers-reduced-motion: reduce) {
+    .hh-img { animation: none; }
+  }
+
+  @media (max-width: 767px) {
+    .hh { display: block; min-height: 0; }
+    .hh::before {
+      content: "";
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+    }
+    .hh-img {
+      top: 28.125vw;
+      left: 50%;
+      width: 56.25vw;
+      height: 100vw;
+    }
+    .hh-veil { inset: 0; }
+    .hh-body { margin-top: -22vw; padding-top: 0; }
+  }
+
+  @media (min-width: 768px) {
+    .hh { min-height: min(88svh, 760px); }
+    .hh-sub { font-size: 22px; }
+    .hh-body { padding-bottom: 64px; }
+  }
+</style>

@@ -1,5 +1,5 @@
 {
-  "name": "renanime",
+  "name": "bakazz",
   "type": "module",
   "version": "0.0.1",
   "engines": {
@@ -11,13 +11,19 @@
     "preview": "astro preview",
     "astro": "astro",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "covers:manifest": "node scripts/generate-ren-cover-manifest.mjs",
+    "covers:identify": "node scripts/audit-ren-anime-identities.mjs",
+    "duels:resolve": "node scripts/resolve-duels.mjs > /tmp/duel-candidates.json",
+    "duels:validate": "node scripts/validate-duels.mjs",
+    "duels:verify": "node scripts/verify-duels-anilist.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^6.0.6",
     "@astrojs/vercel": "^11.0.14",
     "@react-three/fiber": "^9.0.0",
     "@shadergradient/react": "^2.4.20",
+    "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.102.0",
     "@tailwindcss/vite": "^4.3.3",
     "@vercel/analytics": "^2.0.1",
@@ -29,7 +35,9 @@
     "react-dom": "^19.3.0",
     "tailwindcss": "^4.3.3",
     "three": "^0.174.0",
-    "three-stdlib": "^2.36.0"
+    "three-stdlib": "^2.36.0",
+    "sharp": "^0.35.4",
+    "@fontsource/anton": "^5.3.0"
   },
   "allowScripts": {
     "esbuild": true

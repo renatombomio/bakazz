@@ -1,33 +1,29 @@
 ---
 import MobileMenu from "../navigation/MobileMenu";
+import NotificationBell from "../notifications/NotificationBell";
 import { localizedPath, useT } from "../../i18n";
 
-interface Props { variant?: "default" | "ghibli"; }
-
-const { variant = "default" } = Astro.props;
 const { lang, basePath } = Astro.locals;
+const isAuthenticated = Boolean(Astro.locals.bakazzUser);
 const t = useT(lang);
 
 const links = [
   { key: "nav.home", href: "/" },
   { key: "nav.renCollection", href: "/ren-collection/" },
-  { key: "nav.renFavorites", href: "/favorites/" },
-  { key: "nav.renGenres", href: "/genres/" },
-  { key: "nav.search", href: "/search/" },
-  { key: "nav.myList", href: "/pending/" },
-  { key: "nav.myCollection", href: "/collection/" },
+
+  { key: "nav.search", href: "/buscar/" },
   { key: "nav.profile", href: "/profile/" },
-  { key: "nav.renSecret", href: "/ghibli/" }
+  { key: "nav.community", href: "/community/" }
 ] as const;
 
 const currentPath = basePath.replace(/\/$/, "") || "/";
 const otherLang = lang === "es" ? "en" : "es";
 ---
 
-<header class:list={["site-header", variant === "ghibli" && "site-header--ghibli"]}>
+<header class="site-header">
   <div class="header-inner">
     <a class="brand" href={localizedPath(lang, "/")} aria-label={t("nav.homeLabel")}>
-      <span class="brand-accent">Ren</span>anime
+      BAKAZZ
     </a>
 
     <nav class="desktop-nav" aria-label={t("nav.main")}>
@@ -40,8 +36,10 @@ const otherLang = lang === "es" ? "en" : "es";
 
     <a class="language-toggle" href={localizedPath(otherLang, basePath) + Astro.url.search} data-astro-reload hreflang={otherLang} aria-label={lang === "es" ? t("language.switchToEnglish") : t("language.switchToSpanish")} title={lang === "es" ? t("language.switchToEnglish") : t("language.switchToSpanish")}><span aria-current={lang === "en" ? "true" : undefined}>EN</span> · <span aria-current={lang === "es" ? "true" : undefined}>ES</span></a>
 
+    {isAuthenticated && <NotificationBell lang={lang} client:load />}
+
     <div class="mobile-menu">
-      <MobileMenu variant={variant} lang={lang} client:load />
+      <MobileMenu lang={lang} showLogout={isAuthenticated} client:load />
     </div>
   </div>
 </header>
@@ -54,8 +52,9 @@ const otherLang = lang === "es" ? "en" : "es";
     z-index: 50;
     width: 100%;
     height: 88px;
-    background: #050505;
-    border-bottom: 1px solid rgba(245, 242, 236, 0.1);
+    background: color-mix(in srgb, var(--color-background) 94%, transparent);
+    border-bottom: 1px solid var(--color-border);
+    backdrop-filter: blur(16px);
   }
 
   .header-inner {
@@ -68,29 +67,22 @@ const otherLang = lang === "es" ? "en" : "es";
 
   .brand {
     flex: 0 0 auto;
-    color: #f5f2ec;
+    color: var(--color-text-primary);
     font-family: var(--font-heading);
     font-size: 23px;
     font-weight: 600;
     letter-spacing: 0.045em;
     line-height: 1;
     white-space: nowrap;
-    transition: opacity 180ms ease, color 180ms ease;
+    transition: opacity var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
   }
 
-  .brand-accent {
-    color: #ec4899;
-  }
 
   .brand:hover,
   .brand:focus-visible {
-    color: #ffffff;
+    color: var(--color-paper-50);
   }
 
-  .brand:hover .brand-accent,
-  .brand:focus-visible .brand-accent {
-    color: #ec4899;
-  }
 
   .desktop-nav {
     margin-left: auto;
@@ -109,15 +101,14 @@ const otherLang = lang === "es" ? "en" : "es";
     position: relative;
     display: inline-block;
     padding: 10px 0;
-    color: #8f8a82;
-    font-family: var(--font-meta);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.075em;
+    color: var(--color-text-muted);
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
     line-height: 1;
-    text-transform: uppercase;
     white-space: nowrap;
-    transition: color 180ms ease, transform 180ms ease;
+    transition: color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
   }
 
   .desktop-nav a::after {
@@ -126,17 +117,17 @@ const otherLang = lang === "es" ? "en" : "es";
     bottom: 1px;
     left: 0;
     height: 1px;
-    background: #a48a68;
+    background: var(--color-accent);
     content: "";
     transform: scaleX(0);
     transform-origin: center;
-    transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform var(--duration-base) var(--ease-out);
   }
 
   .desktop-nav a:hover,
   .desktop-nav a:focus-visible,
   .desktop-nav a[aria-current="page"] {
-    color: #f5f2ec;
+    color: var(--color-paper-50);
     transform: translateY(-1px);
   }
 
@@ -146,33 +137,16 @@ const otherLang = lang === "es" ? "en" : "es";
     transform: scaleX(1);
   }
 
-  .site-header--ghibli {
-    background: rgba(255, 255, 255, 0.94);
-    border-bottom-color: rgba(25, 54, 47, 0.12);
-    backdrop-filter: blur(10px);
-  }
-
-  .site-header--ghibli .brand { color: var(--ghibli-ink, #19362f); }
-  .site-header--ghibli .brand-accent { color: var(--ghibli-blue, #18528a); }
-  .site-header--ghibli .brand:hover,
-  .site-header--ghibli .brand:focus-visible { color: var(--ghibli-blue, #18528a); }
-  .site-header--ghibli .brand:hover .brand-accent,
-  .site-header--ghibli .brand:focus-visible .brand-accent { color: var(--ghibli-coral, #f45164); }
-  .site-header--ghibli .desktop-nav a { color: #527066; }
-  .site-header--ghibli .desktop-nav a:hover,
-  .site-header--ghibli .desktop-nav a:focus-visible { color: var(--ghibli-blue, #18528a); }
-  .site-header--ghibli .desktop-nav a::after { background: var(--ghibli-coral, #f45164); }
-
   .language-toggle {
     flex: 0 0 auto;
     margin-left: clamp(1rem, 2vw, 1.75rem);
     padding: 0.55rem 0.65rem;
-    border: 1px solid rgba(245, 242, 236, 0.24);
+    border: 1px solid var(--color-border-strong);
     border-radius: 999px;
     background: transparent;
-    color: #f5f2ec;
-    font-family: var(--font-meta);
-    font-size: 0.62rem;
+    color: var(--color-text-secondary);
+    font-family: var(--font-body);
+    font-size: 0.68rem;
     font-weight: 600;
     letter-spacing: 0.08em;
     cursor: pointer;
@@ -180,25 +154,12 @@ const otherLang = lang === "es" ? "en" : "es";
     text-decoration: none;
   }
 
-  .language-toggle span[aria-current="true"] { font-weight: 800; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; color: #ec4899; }
-
-  .site-header--ghibli .language-toggle span[aria-current="true"] { color: var(--ghibli-coral, #f45164); }
+  .language-toggle span[aria-current="true"] { font-weight: 800; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; color: var(--color-accent); }
 
   .language-toggle:hover,
   .language-toggle:focus-visible {
-    border-color: #ec4899;
-    outline-color: #ec4899;
-  }
-
-  .site-header--ghibli .language-toggle {
-    color: var(--ghibli-ink, #19362f);
-    border-color: rgba(25, 54, 47, 0.25);
-  }
-
-  .site-header--ghibli .language-toggle:hover,
-  .site-header--ghibli .language-toggle:focus-visible {
-    border-color: var(--ghibli-coral, #f45164);
-    outline-color: var(--ghibli-coral, #f45164);
+    border-color: var(--color-accent);
+    outline-color: var(--color-accent);
   }
 
   .mobile-menu {

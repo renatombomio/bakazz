@@ -1,5 +1,4 @@
 import type { LibraryEntry } from "../types/personal";
-import { franchiseMovies } from "./franchise-movies";
 
 export const animeLibrary: LibraryEntry[] = [
   { animeId: "personal-001", title: "Boku no Hero Academia", state: { status: "WATCHED", favorite: false, recommended: true } },
@@ -117,8 +116,6 @@ export const animeLibrary: LibraryEntry[] = [
   { animeId: "personal-120", title: "Wind Breaker", state: { status: "WATCHED", favorite: false, recommended: true } },
   { animeId: "personal-121", title: "Bartender: Glass of God", state: { status: "WATCHED", favorite: false, recommended: false } },
   { animeId: "personal-122", title: "Kenka Dokugaku", state: { status: "WATCHED", favorite: false, recommended: false } },
-  { animeId: "personal-123", title: "Shinmai Ossan Boukensha", state: { status: "WATCHED", favorite: false, recommended: false } },
-  { animeId: "personal-124", title: "Sentai Daishikkai", state: { status: "WATCHED", favorite: false, recommended: false } },
   { animeId: "personal-125", title: "Nige Jouzu no Wakagimi", state: { status: "WATCHED", favorite: false, recommended: true } },
   { animeId: "personal-126", title: "Sousou no Frieren", state: { status: "WATCHED", favorite: false, recommended: true } },
   { animeId: "personal-127", title: "Sakamoto Days", state: { status: "WATCHED", favorite: false, recommended: true } },
@@ -134,27 +131,27 @@ export const animeLibrary: LibraryEntry[] = [
   { animeId: "personal-137", title: "Scissor Seven", state: { status: "WATCHED", favorite: false, recommended: true } },
   { animeId: "personal-138", title: "The Eminence in Shadow", state: { status: "PENDING", favorite: false, recommended: false } },
   { animeId: "personal-139", title: "Cowboy Bebop", state: { status: "WATCHED", favorite: false, recommended: false } },
-  { animeId: "personal-140", title: "Jujutsu Kaisen", state: { status: "WATCHED", favorite: false, recommended: false } },
+  { animeId: "personal-140", title: "Jujutsu Kaisen", state: { status: "WATCHED", favorite: false, recommended: true } },
   { animeId: "personal-141", title: "Hunter x Hunter", state: { status: "WATCHED", favorite: true, recommended: false } },
   { animeId: "personal-142", title: "Death Note", state: { status: "WATCHED", favorite: true, recommended: false } },
 ];
 
 export function getLibrary(): LibraryEntry[] {
-  return [...animeLibrary, ...franchiseMovies];
+  return [...animeLibrary];
 }
 
 export function getWatchedLibrary(): LibraryEntry[] {
-  return [...animeLibrary, ...franchiseMovies].filter((entry) => entry.state.status === "WATCHED");
+  return animeLibrary.filter((entry) => entry.state.status === "WATCHED");
 }
 
 export function getPendingLibrary(): LibraryEntry[] {
-  return [...animeLibrary, ...franchiseMovies].filter((entry) => entry.state.status === "PENDING");
+  return animeLibrary.filter((entry) => entry.state.status === "PENDING");
 }
 
 export function getRecommendedLibrary(): LibraryEntry[] {
-  return [...animeLibrary, ...franchiseMovies].filter((entry) => entry.state.recommended);
+  return animeLibrary.filter((entry) => entry.state.recommended);
 }
 
 export function getFavoritesLibrary(): LibraryEntry[] {
-  return [...animeLibrary, ...franchiseMovies].filter((entry) => entry.state.favorite);
+  return animeLibrary.filter((entry) => entry.state.favorite);
 }

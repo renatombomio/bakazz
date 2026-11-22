@@ -1,5 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-import { fetchFallbackPoster, selectBestAnimeCandidate } from "../../lib/api/poster-fallback";
+import AnimePosterDisplay from "../anime/AnimePosterDisplay";
+import { fetchRenMediaByIdentity, hasRenAnimeIdentity } from "../../lib/api/ren-anime-identities";
+import { getDisplayTitle } from "../../lib/anime/display-title";
+import { useEffect, useMemo, useRef, useState } from "react";
+
 import { useT, type Lang } from "../../i18n";
 
 interface FavoriteEntry {
@@ -10,7 +13,7 @@ interface FavoriteEntry {
 }
 
 interface Media {
-  title: { romaji?: string | null; english?: string | null };
+  title: { romaji?: string | null; english?: string | null; native?: string | null };
   startDate?: { year?: number | null; month?: number | null; day?: number | null } | null;
   coverImage?: { extraLarge?: string | null; large?: string | null };
   format?: string | null;
@@ -22,10 +25,11 @@ interface Props {
   lang?: Lang;
 }
 
-const ANILIST_BATCH_SIZE = 20;
 
 export default function FavoritesView({ entries, recommendations, lang = "es" }: Props) {
   const t = useT(lang);
+  const verifiedEntries = useMemo(() => entries.filter((entry) => hasRenAnimeIdentity(entry.animeId)), [entries]);
+  const verifiedRecommendations = useMemo(() => recommendations.filter((entry) => hasRenAnimeIdentity(entry.animeId)), [recommendations]);
   const [media, setMedia] = useState<Record<string, Media | null>>({});
   const [loading, setLoading] = useState(true);
   const [visibleFavorites, setVisibleFavorites] = useState(10);
@@ -36,98 +40,25 @@ export default function FavoritesView({ entries, recommendations, lang = "es" }:
   useEffect(() => {
     let cancelled = false;
 
-    async function loadBatch(batch: FavoriteEntry[], offset: number) {
-      const variables: Record<string, string> = {};
-      const fields = batch.map((entry, index) => {
-        const key = "a" + index;
-        const variable = "s" + index;
-        variables[variable] = entry.title;
-
-        return key + ": Page(page: 1, perPage: 10) { media(search: $" + variable + ", type: ANIME, sort: SEARCH_MATCH) { title { romaji english native } synonyms startDate { year month day } coverImage { extraLarge large } format } }";
-      }).join("\n");
-
-      const definitions = batch.map((_, index) => "$s" + index + ": String!").join(", ");
-      const query = "query Favorites(" + definitions + ") { " + fields + " }";
-
-      const response = await fetch("https://graphql.anilist.co", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({ query, variables }),
-      });
-
-      if (!response.ok) {
-        throw new Error("AniList request failed with " + response.status);
-      }
-
-      const payload = await response.json();
-      const result: Record<string, Media | null> = {};
-      const missingPosters: Array<{ entry: FavoriteEntry; selected: Media | null }> = [];
-
-      for (const [index, entry] of batch.entries()) {
-        const candidates = payload.data?.["a" + index]?.media ?? [];
-        const selected = selectBestAnimeCandidate(candidates, entry.title, entry.format);
-        result[entry.animeId] = selected ?? null;
-        if (!selected?.coverImage?.extraLarge && !selected?.coverImage?.large) {
-          missingPosters.push({ entry, selected: selected ?? null });
-        }
-      }
-
-      if (!cancelled) {
-        setMedia((current) => ({ ...current, ...result }));
-        setLoading(false);
-      }
-
-      // Resolve fallback posters in the background so the next AniList batch
-      // can render without waiting for the slow, rate-limited poster queue.
-      void Promise.all(missingPosters.map(async ({ entry, selected }) => {
-        const poster = await fetchFallbackPoster(entry.title, entry.format);
-        if (poster && !cancelled) {
-          setMedia((current) => ({
-            ...current,
-            [entry.animeId]: {
-              ...(current[entry.animeId] ?? selected ?? {}),
-              title: current[entry.animeId]?.title ?? selected?.title ?? { romaji: entry.title },
-              format: current[entry.animeId]?.format ?? selected?.format ?? entry.format,
-              coverImage: { extraLarge: poster, large: poster },
-            },
-          }));
-        }
-      }));
-
-      return offset + batch.length;
-    }
-
     async function load() {
-      const allEntries = [...entries, ...recommendations];
-
+      const allEntries = [...verifiedEntries, ...verifiedRecommendations];
       if (!allEntries.length) {
         setLoading(false);
         return;
       }
 
+      setLoading(true);
       try {
-        for (let offset = 0; offset < allEntries.length; offset += ANILIST_BATCH_SIZE) {
-          if (cancelled) break;
-
-          const batch = allEntries.slice(offset, offset + ANILIST_BATCH_SIZE);
-          await loadBatch(batch, offset);
-        }
-      } catch {
-        // Personal titles remain visible if metadata is unavailable.
+        const identityMedia = await fetchRenMediaByIdentity(allEntries);
+        if (!cancelled) setMedia(identityMedia);
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
 
     load();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [entries, recommendations]);
+    return () => { cancelled = true; };
+  }, [verifiedEntries, verifiedRecommendations]);
 
   const scroll = (ref: React.RefObject<HTMLDivElement | null>, direction: "prev" | "next") => {
     ref.current?.scrollBy({
@@ -138,25 +69,14 @@ export default function FavoritesView({ entries, recommendations, lang = "es" }:
 
   const renderCard = (entry: FavoriteEntry, index: number, compact = false) => {
     const item = media[entry.animeId];
-    const title = lang === "en" ? (item?.title.english || item?.title.romaji || entry.title) : (item?.title.romaji || item?.title.english || entry.title);
+    const title = getDisplayTitle(item?.title, entry.title);
     const year = item?.startDate?.year;
 
     return (
       <article className={"favorite-card" + (compact ? " favorite-card--recommendation" : "")} key={entry.animeId}>
         <a href={`${lang === "en" ? "/en" : ""}/anime/${entry.animeId}`} aria-label={t("favorites.view").replace("{title}", title)}>
           <div className="favorite-media">
-            {item?.coverImage?.extraLarge || item?.coverImage?.large ? (
-              <img
-                src={item.coverImage.extraLarge || item.coverImage.large || ""}
-                alt={title}
-                loading={index < 2 ? "eager" : "lazy"}
-              />
-            ) : (
-              <div className="favorite-placeholder">
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <strong>{entry.title}</strong>
-              </div>
-            )}
+            <AnimePosterDisplay src={item?.coverImage?.extraLarge || item?.coverImage?.large} title={entry.title} loading={index < 2 ? "eager" : "lazy"} />
           </div>
 
           <div className="favorite-caption">
@@ -182,21 +102,21 @@ export default function FavoritesView({ entries, recommendations, lang = "es" }:
           </div>
         </div>
 
-        {entries.length ? (
+        {verifiedEntries.length ? (
           <div className="favorites-track" ref={favoriteTrackRef}>
-            {entries.slice(0, visibleFavorites).map((entry, index) => renderCard(entry, index))}
+            {verifiedEntries.slice(0, visibleFavorites).map((entry, index) => renderCard(entry, index))}
           </div>
         ) : (
           <div className="favorites-empty" role="status">{t("favorites.empty")}</div>
         )}
 
-        {visibleFavorites < entries.length && (
+        {visibleFavorites < verifiedEntries.length && (
           <button
             type="button"
             className="favorites-load-more"
             onClick={() => setVisibleFavorites((count) => count + 10)}
           >
-            {t("favorites.loadMoreCount").replace("{shown}", String(Math.min(visibleFavorites + 10, entries.length))).replace("{total}", String(entries.length))}
+            {t("favorites.loadMoreCount").replace("{shown}", String(Math.min(visibleFavorites + 10, verifiedEntries.length))).replace("{total}", String(verifiedEntries.length))}
           </button>
         )}
       </section>
@@ -217,21 +137,21 @@ export default function FavoritesView({ entries, recommendations, lang = "es" }:
           {t("favorites.copy")}
         </p>
 
-        {recommendations.length ? (
+        {verifiedRecommendations.length ? (
           <div className="favorites-track favorites-track--recommendations" ref={recommendationTrackRef}>
-            {recommendations.slice(0, visibleRecommendations).map((entry, index) => renderCard(entry, index, true))}
+            {verifiedRecommendations.slice(0, visibleRecommendations).map((entry, index) => renderCard(entry, index, true))}
           </div>
         ) : (
           <div className="favorites-empty" role="status">{t("favorites.emptyRecommendations")}</div>
         )}
 
-        {visibleRecommendations < recommendations.length && (
+        {visibleRecommendations < verifiedRecommendations.length && (
           <button
             type="button"
             className="favorites-load-more"
             onClick={() => setVisibleRecommendations((count) => count + 10)}
           >
-            {t("favorites.loadMoreCount").replace("{shown}", String(Math.min(visibleRecommendations + 10, recommendations.length))).replace("{total}", String(recommendations.length))}
+            {t("favorites.loadMoreCount").replace("{shown}", String(Math.min(visibleRecommendations + 10, verifiedRecommendations.length))).replace("{total}", String(verifiedRecommendations.length))}
           </button>
         )}
       </section>

@@ -1,0 +1,93 @@
+---
+const { name, handle, avatar, banner, headline, bio, location, memberDate, interests = [], instagram, tiktok, stats = [], shared = [], isEnglish = false } = Astro.props;
+const instagramUrl = instagram ? `https://www.instagram.com/${instagram}/` : "";
+const tiktokUrl = tiktok ? `https://www.tiktok.com/@${tiktok}` : "";
+---
+<section class="profile-editor" aria-label={isEnglish ? "Profile header" : "Encabezado del perfil"}>
+  <div class="cover-preview" id="cover-preview" style={banner ? `background-image: url("${banner}")` : undefined}>
+    <slot name="cover-actions" />
+    <span class="presence-status cover-presence" id="profile-presence" aria-label={isEnglish ? "Online" : "En línea"} hidden><span class="presence-dot"></span><span>{isEnglish ? "Online" : "En línea"}</span></span>
+  </div>
+  <div class="identity-editor">
+    <div class="avatar-wrap">
+      <img id="avatar-preview" class="avatar-preview" src={avatar || "/images/profile-avatar-placeholder.svg"} alt={isEnglish ? "Profile picture" : "Foto de perfil"} />
+      <slot name="avatar-actions" />
+    </div>
+    <div class="identity-copy">
+      <h2 id="identity-name">{name}</h2>
+      <p class="handle" id="identity-aka">@{handle}</p>
+      <slot name="rank" />
+    </div>
+    <slot name="identity-actions" />
+  </div>
+  <slot name="editor-fields" />
+</section>
+<section class="profile-about" aria-label={isEnglish ? "About" : "Sobre mí"}>
+  {headline && <h1 id="profile-headline-view">{headline}</h1>}
+  {bio && <p id="profile-bio-view">{bio}</p>}
+  {(location || memberDate) && <p class="profile-member-line">{location ? location + " · " : ""}{isEnglish ? "Member since" : "Miembro desde"} {memberDate}</p>}
+  {(instagram || tiktok) && <div class="profile-social-links">
+    {instagram && <a class="profile-social-button" href={instagramUrl} target="_blank" rel="noopener noreferrer nofollow ugc" aria-label={`Instagram de ${name}`}><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.2" fill="currentColor" stroke="none"/></svg></a>}
+    {tiktok && <a class="profile-social-button" href={tiktokUrl} target="_blank" rel="noopener noreferrer nofollow ugc" aria-label={`TikTok de ${name}`}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 2v12.1a4 4 0 1 1-3.5-4"/></svg></a>}
+  </div>}
+  <div class="genre-tags" id="profile-genre-tags">{interests.map((genre) => <span>#{genre}</span>)}</div>
+</section>
+<section class="profile-stats" aria-label={isEnglish ? "Anime activity" : "Actividad anime"}>
+  {stats.map((stat) => stat.href
+    ? <a href={stat.href} class="profile-stat"><strong>{Number(stat.value).toLocaleString(isEnglish ? "en" : "es")}</strong><span>{stat.label}</span></a>
+    : <div class="profile-stat"><strong>{Number(stat.value).toLocaleString(isEnglish ? "en" : "es")}</strong><span>{stat.label}</span></div>)}
+</section>
+{shared.length > 0 && <section class="profile-shared" aria-label={isEnglish ? "Shared interests" : "Coincidencias"}>
+  {shared.slice(0,2).map((row) => <div class="profile-shared-row">
+    <div class="profile-shared-copy"><strong>{row.title}</strong>{row.subtitle && <p>{row.subtitle}</p>}</div>
+    <div class="profile-shared-images">{row.images.slice(0,3).map((src) => <img src={src} alt="" loading="lazy" />)}</div>
+  </div>)}
+</section>}
+<style is:global>
+.cover-preview{position:relative;width:100%;height:clamp(210px,34vw,340px);background:linear-gradient(135deg,#24202a,#111);background-size:cover;background-position:center;isolation:isolate}
+.cover-preview::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.02) 28%,rgba(0,0,0,.22) 58%,#050505 100%)}
+.cover-preview>*{position:relative;z-index:1}
+.cover-edit{position:absolute;right:1rem;bottom:1rem;z-index:5;display:none;cursor:pointer;pointer-events:auto}
+.cover-file-input,.file-input{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;opacity:0}
+.cover-upload-feedback{position:absolute;z-index:4;left:1rem;bottom:.75rem;max-width:55%;color:#fff;font-size:.72rem;text-shadow:0 1px 5px #000;pointer-events:none}
+.cover-edit[hidden]{display:none!important}
+.profile-editor.is-editing .avatar-edit{display:grid}
+.identity-editor{display:flex;align-items:end;gap:1rem;padding:0 1.5rem;margin-top:-3.4rem;position:relative;pointer-events:none}
+.identity-editor .avatar-wrap,.identity-editor .avatar-edit,.identity-editor .profile-edit-toggle,.identity-editor a,.identity-editor button,.identity-editor label{pointer-events:auto}
+.avatar-wrap{position:relative;flex:0 0 auto}
+.avatar-preview{display:block;width:112px;height:112px;border-radius:50%;object-fit:cover;border:4px solid #090909;background:#242424}
+.avatar-edit{display:none;place-items:center;position:absolute;right:-2px;bottom:5px;width:36px;height:36px;border:2px solid #090909;border-radius:50%;background:#ec4899;color:white;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.4)}
+.avatar-edit svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.identity-copy{padding-bottom:.45rem;min-width:0;flex:1}
+.identity-copy h2{margin:.2rem 0;font-size:clamp(1.9rem,5vw,2.65rem);line-height:1.02;letter-spacing:-.045em;font-weight:750;overflow-wrap:anywhere}
+.handle{margin:0;color:#aaa;font-size:.85rem}
+.profile-edit-toggle{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;margin:0 0 .55rem auto;border:1px solid rgba(255,255,255,.2);border-radius:50%;background:rgba(255,255,255,.06);color:#fff;cursor:pointer}
+.profile-edit-toggle svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.cover-presence{position:absolute;top:1.1rem;right:1.25rem;z-index:2;padding:.5rem .7rem;border:1px solid rgba(255,255,255,.2);border-radius:999px;background:rgba(0,0,0,.48);backdrop-filter:blur(10px)}
+.presence-status{display:inline-flex;align-items:center;gap:.35rem;color:#9bd7a9;font-size:.68rem;font-weight:550;white-space:nowrap}
+.presence-status[hidden]{display:none}
+.presence-dot{width:8px;height:8px;border-radius:50%;background:#35d06f;box-shadow:0 0 9px rgba(53,208,111,.65)}
+.profile-about{padding:1.25rem 1.5rem .5rem}
+.profile-about h1{margin:0 0 .55rem;font-size:clamp(1.35rem,4vw,2rem);line-height:1.15;letter-spacing:-.025em}
+.profile-about p{margin:.4rem 0;color:#c5c5c5;font-size:.92rem;line-height:1.55}
+.profile-member-line{color:#888!important;font-size:.78rem!important}
+.genre-tags{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.9rem}
+.genre-tags span{padding:.42rem .65rem;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(255,255,255,.045);color:#ddd;font-size:.68rem}
+.profile-social-links{display:flex;gap:10px;padding-top:14px}
+.profile-social-button{width:40px;height:40px;border-radius:50%;background:#1c1c22;color:#f2efe9;display:grid;place-items:center}
+.profile-social-button svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8}
+.profile-social-button:focus-visible{outline:2px solid #f472b6;outline-offset:3px}
+.profile-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));justify-content:space-between;gap:.5rem;padding:22px 1.25rem 12px}
+.profile-stat{display:grid;gap:.25rem;min-width:0;color:inherit;text-decoration:none}
+.profile-stat strong{font-family:Anton,Impact,sans-serif;font-size:clamp(2rem,5vw,2.5rem);font-weight:400;line-height:1;color:#f2efe9}
+.profile-stat span{font-size:.66rem;line-height:1.25;color:#888}
+.profile-shared{padding:0 1.5rem}
+.profile-shared-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid #ffffff18;min-width:0}
+.profile-shared-copy{min-width:0}
+.profile-shared-copy strong{font-size:13px}
+.profile-shared-copy p{margin:4px 0 0;color:#999;font-size:12px;line-height:1.35}
+.profile-shared-images{display:flex;flex:none}
+.profile-shared-images img{width:32px;height:44px;object-fit:cover;border-radius:4px;margin-left:-7px;border:2px solid #09090b}
+.profile-shared-images img:first-child{margin-left:0}
+@media(max-width:520px){.cover-preview{height:220px}.identity-editor{padding:0 1.25rem;margin-top:-2.8rem;gap:.75rem}.avatar-preview{width:88px;height:88px}.profile-about{padding:1rem 1.25rem 0}.profile-stats{padding:22px 1.25rem 12px;gap:.5rem}.profile-shared{padding:0 1.25rem}}
+</style>

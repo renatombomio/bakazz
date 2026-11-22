@@ -1,0 +1,28 @@
+---
+import CommunityPeople from "../community/CommunityPeople.astro";
+interface CommunityMember { id: string; aka: string; avatar_url: string | null; last_seen_at?: string | null; href: string; }
+interface Props { members: CommunityMember[]; labels: { title: string; members: string; emptyMembers: string; }; }
+const { members, labels } = Astro.props;
+---
+<section class="home-community" aria-label={labels.title}>
+  <div class="community-heading"><h2>{labels.title}</h2></div>
+  <div class="community-members-block">
+    {members.length > 0
+      ? <CommunityPeople title={labels.members} members={members.map((member) => ({
+          id: member.id,
+          username: member.aka,
+          avatar: member.avatar_url,
+          isOnline: Boolean(member.last_seen_at && Date.now() - new Date(member.last_seen_at).getTime() <= 120_000),
+          href: member.href,
+        }))} />
+      : <p class="community-empty">{labels.emptyMembers}</p>}
+  </div>
+</section>
+<style>
+  .home-community{width:min(calc(100% - (var(--gutter)*2)),var(--container-max));margin:0 auto;padding:3rem 0 3.5rem;color:#f5f2ec}
+  .community-heading{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.1rem}
+  .community-heading h2{margin:0;font-size:clamp(2rem,4vw,2.8rem);font-weight:750;letter-spacing:-.035em}
+  .community-members-block{min-width:0;overflow:hidden}
+  .community-empty{margin:0;color:#85858b;font-size:.78rem}
+  @media(max-width:640px){.home-community{width:calc(100% - 2rem);padding:2.6rem 0 3rem}.community-heading h2{font-size:2.15rem}}
+</style>

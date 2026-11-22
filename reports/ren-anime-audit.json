@@ -1,0 +1,19 @@
+{
+  "generatedAt": "2026-11-04T13:46:42.198Z",
+  "historicalExpectedCount": 135,
+  "currentSourceCount": 135,
+  "differenceFromHistoricalCount": 0,
+  "sourceBreakdown": {
+    "src/data/library.ts": 135
+  },
+  "uniqueAnimeIds": 135,
+  "duplicateIds": [],
+  "duplicateTitles": [],
+  "formats": {
+    "series": 132,
+    "movies": 3
+  },
+  "acceptedExactMatches": 113,
+  "requiringReview": 22,
+  "note": "221 is a historical reference. Inspect source history to explain the difference; do not assume the extra entries are new titles."
+}

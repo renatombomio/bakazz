@@ -1,0 +1,62 @@
+.ad-top{background:#09090b;color:#f2efe9}.ad-visual{position:relative;overflow:hidden;background:#1c1c22}.ad-banner{display:block;width:100%;height:auto}
+.ad-top[data-mode="poster"] .ad-visual{aspect-ratio:16/9}.ad-bg{position:absolute;inset:-30px;width:calc(100% + 60px);height:calc(100% + 60px);object-fit:cover;filter:blur(28px) brightness(.55) saturate(1.2)}
+.ad-pos{position:absolute;left:50%;top:10px;transform:translateX(-50%);height:calc(100% - 20px);aspect-ratio:2/3;object-fit:cover;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.6)}.ad-top[data-mode="empty"] .ad-visual{height:64px}
+.ad-actions{position:absolute;top:10px;right:16px;z-index:2;display:flex;align-items:center;gap:10px}.ad-ic{height:40px;min-width:40px;padding:0 12px;border:0;border-radius:999px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(9,9,11,.75);color:#f2efe9;backdrop-filter:blur(8px);font:600 14px Inter,system-ui,sans-serif}
+.ad-ic[aria-pressed="true"]{color:#ec4899}.ad-ic:focus-visible{outline:2px solid #f472b6;outline-offset:3px}.ad-ic svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ad-top[data-mode="poster"] .anime-detail-share-button span{display:none}.ad-body{position:relative;z-index:3;padding:20px 16px 8px}.ad-body h1{margin:0;font-size:32px;line-height:1.05;font-weight:800;letter-spacing:-.02em;overflow-wrap:anywhere}
+.ad-meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px;font-size:14px;color:#c9c5cf}.ad-score{color:#ec4899;font-weight:700}.ad-chip{padding:3px 9px;border-radius:6px;background:#1c1c22;font-size:12.5px;color:#d8d4de;text-transform:none}
+.ad-cta{display:flex;gap:10px;margin-top:20px}.ad-cta .personal-actions{display:flex;flex:1;gap:10px;margin:0;min-width:0}.ad-cta .personal-actions button,.ad-cta .personal-status{flex:1;display:flex;align-items:center;justify-content:center;min-width:0;min-height:52px;padding:12px 8px;border:0;border-radius:999px;background:#1c1c22;color:#f2efe9;font:700 14.5px Inter,system-ui,sans-serif;letter-spacing:0;text-transform:none;text-align:center}.ad-cta .personal-actions button:first-child,.ad-cta .personal-actions button.is-active{background:#ec4899;color:#fff}.ad-cta .personal-actions button:focus-visible{outline:2px solid #f472b6;outline-offset:3px}
+.ad-avail{display:flex;align-items:center;gap:14px;margin-top:20px;font-size:14px;color:#a6a2ad}.ad-avail .anime-detail-streaming-providers{display:flex;align-items:center;gap:14px}.ad-genres{margin:18px 0 0;font-size:14px;color:#c9c5cf}.ad-genres b{color:#f2efe9}.ad-body h2{margin:22px 0 8px;font-size:20px;font-weight:700}.ad-synopsis{max-width:42rem;color:#d8d4de;font-size:15.5px;line-height:1.55}.ad-synopsis .anime-detail-synopsis{margin:0}.ad-synopsis .anime-detail-translate{margin-top:12px}
+.anime-detail-share-wrap{position:relative;display:inline-flex;flex-direction:column;align-items:flex-start;margin:0}.anime-detail-share-menu{left:auto;right:0}
+@media(min-width:768px){.ad-top[data-mode="banner"] .ad-visual{height:min(56svh,520px)}.ad-top[data-mode="banner"] .ad-banner{width:100%;height:100%;object-fit:cover;object-position:50% 25%}.ad-top[data-mode="banner"] .ad-visual::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(to bottom,rgba(9,9,11,.25) 0,rgba(9,9,11,0) 30%,rgba(9,9,11,.55) 75%,#09090b 100%)}.ad-top[data-mode="banner"] .ad-body{margin-top:-72px}.ad-top[data-mode="poster"] .ad-visual{aspect-ratio:auto;height:min(56svh,520px)}.ad-body{max-width:1100px;margin-inline:auto;padding-inline:24px}.ad-actions{right:max(24px,calc((100% - 1100px)/2 + 24px))}}
+@media(prefers-reduced-motion:reduce){.ad-ic,.anime-detail-share-button{backdrop-filter:none}}
+
+@media (max-width: 767px) {
+  .ad-top[data-mode="banner"] .ad-visual {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 16 / 9 !important;
+    overflow: hidden;
+    padding: 0;
+  }
+  .ad-top[data-mode="banner"] .ad-visual::before {
+    content: "";
+    position: absolute;
+    inset: -20px;
+    z-index: 0;
+    background: var(--ad-banner) center / cover;
+    filter: blur(22px) brightness(.5) saturate(1.2);
+  }
+  .ad-top[data-mode="banner"] .ad-visual::after { content: none; }
+  .ad-top[data-mode="banner"] .ad-banner {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    object-fit: cover;
+    object-position: center;
+    transform: none;
+    z-index: 1;
+  }
+  .ad-top[data-mode="banner"] .ad-actions {
+    top: 6px;
+    right: 16px;
+    z-index: 2;
+  }
+  .ad-top[data-mode="banner"] .ad-body {
+    margin-top: 0;
+    padding-top: 20px;
+  }
+}
+
+/* Keep the anime title independent from the legacy detail-page h1 rules. */
+.ad-top .ad-body h1 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+}
