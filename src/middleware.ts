@@ -3,13 +3,12 @@ import type { User } from "@supabase/supabase-js";
 import { createSupabaseSsrClient } from "./lib/supabase-ssr";
 import { localizedPath } from "./i18n";
 
-// Production remains in maintenance until the BAKAZZ auth cutover is tested
-// and explicitly approved. Preview is the active testing environment.
+// Keep production and Preview in maintenance until the Supabase Auth cutover
+// has been fully tested and explicitly approved.
 const MAINTENANCE_MODE = true;
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname, search } = context.url;
-  const isPreview = import.meta.env.VERCEL_ENV === "preview";
   const isEnglish = /^\/en(?:\/|$)/.test(pathname);
   const basePath = isEnglish ? pathname.replace(/^\/en(?=\/|$)/, "") || "/" : pathname;
   const routePath = basePath.length > 1 ? basePath.replace(/\/$/, "") : basePath;
@@ -17,7 +16,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   context.locals.lang = isEnglish ? "en" : "es";
   context.locals.basePath = basePath;
 
-  if (MAINTENANCE_MODE && !isPreview) {
+  if (MAINTENANCE_MODE && import.meta.env.VERCEL_ENV !== "preview") {
     if (routePath === "/maintenance") return next();
 
     const isStaticAsset =
@@ -30,6 +29,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
       routePath === "/favicon.ico";
 
     if (isStaticAsset) return next();
+
+    // Preview permits only auth endpoints for controlled migration testing.
+    if (import.meta.env.VERCEL_ENV === "preview" && routePath.startsWith("/api/auth/")) {
+      return next();
+    }
 
     if (routePath.startsWith("/api/")) {
       return new Response(
@@ -47,6 +51,10 @@ export const onRequest = defineMiddleware(async (context, next) => {
           },
         },
       );
+    }
+
+    if (import.meta.env.VERCEL_ENV === "preview") {
+      return isEnglish ? next(basePath + search) : next();
     }
 
     return context.redirect("/maintenance/", 307);
@@ -72,16 +80,21 @@ export const onRequest = defineMiddleware(async (context, next) => {
   ].includes(routePath);
 
   if (isPublicAssetOrApi) {
+    // Login and OAuth callback pages must render even when Supabase is
+    // misconfigured or temporarily unavailable, so the user can see the UI
+    // and auth endpoints can report their own actionable errors.
     return isEnglish ? next(basePath + search) : next();
   }
 
-  // In Preview, the application starts at login. The homepage and all
-  // product/profile routes require an authenticated Development user.
-  // Outside Preview, preserve the public homepage behavior.
-  if (routePath === "/" && !isPreview) {
+  // Keep the BAKAZZ homepage publicly viewable on Preview so the rebrand,
+  // editorial landing page and community sections can be reviewed without
+  // requiring a Supabase account. Production remains behind maintenance mode.
+  if (routePath === "/") {
     return isEnglish ? next(basePath + search) : next();
   }
 
+  // Public API responses must not emit a language Set-Cookie header:
+  // it prevents shared CDN caching for otherwise public, cacheable responses.
   context.cookies.set("lang", context.locals.lang, {
     path: "/",
     maxAge: 60 * 60 * 24 * 365,
@@ -98,7 +111,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
     if (!error) user = data.user;
   } catch (error) {
     console.error("Supabase middleware authentication failed:", error);
-    if (isPreview) {
+    if (import.meta.env.VERCEL_ENV === "preview") {
+      // Public auth pages must remain reachable when Supabase is unavailable.
+      // Redirecting /login back to itself creates ERR_TOO_MANY_REDIRECTS.
       if (isPublicAuthPage) return isEnglish ? next(basePath + search) : next();
       return context.redirect(localizedPath(context.locals.lang, "/login/"), 303);
     }
@@ -152,6 +167,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
       const isCompletingProfile =
         routePath === "/login" && context.url.searchParams.get("complete-profile") === "1";
 
+      // An authenticated user without a nickname must be allowed to render
+      // the profile-completion form instead of being redirected to itself.
       if (!context.url.searchParams.has("recovery") && !isCompletingProfile) {
         return hasNickname
           ? context.redirect(isEnglish ? "/en/" : "/", 303)
