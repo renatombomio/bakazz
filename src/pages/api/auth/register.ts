@@ -20,7 +20,7 @@ function json(body: unknown, status = 200) {
 }
 
 export const POST: APIRoute = async ({ request, cookies }) => {
-  let body: { email?: unknown; password?: unknown; aka?: unknown };
+  let body: { email?: unknown; password?: unknown; aka?: unknown; next?: unknown };
   try {
     body = await request.json();
   } catch {
@@ -43,7 +43,20 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   try {
     const supabase = createSupabaseSsrClient(request, cookies);
-    const emailRedirectTo = new URL("/auth/callback?next=%2Flogin%2F%3Fconfirmed%3D1", request.url).toString();
+    const requestedNext = typeof body.next === "string" ? body.next : "/";
+    const safeNext =
+      requestedNext.startsWith("/") &&
+      !requestedNext.startsWith("//") &&
+      !requestedNext.includes("\\") &&
+      !requestedNext.includes("://")
+        ? requestedNext
+        : "/";
+    const confirmationPath = new URL("/login/", request.url);
+    confirmationPath.searchParams.set("confirmed", "1");
+    confirmationPath.searchParams.set("next", safeNext);
+    const callbackUrl = new URL("/auth/callback", request.url);
+    callbackUrl.searchParams.set("next", confirmationPath.pathname + confirmationPath.search);
+    const emailRedirectTo = callbackUrl.toString();
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
