@@ -11,7 +11,7 @@ function json(body: unknown, status = 200) {
 }
 
 export const POST: APIRoute = async ({ request, cookies }) => {
-  let body: { provider?: unknown };
+  let body: { provider?: unknown; next?: unknown };
   try {
     body = await request.json();
   } catch {
@@ -34,10 +34,17 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     );
   }
 
-  const redirectTo = new URL(
-    "/auth/callback?next=%2F",
-    request.url,
-  ).toString();
+  const requestedNext = typeof body.next === "string" ? body.next : "/";
+  const safeNext =
+    requestedNext.startsWith("/") &&
+    !requestedNext.startsWith("//") &&
+    !requestedNext.includes("\\") &&
+    !requestedNext.includes("://")
+      ? requestedNext
+      : "/";
+  const callbackUrl = new URL("/auth/callback", request.url);
+  callbackUrl.searchParams.set("next", safeNext);
+  const redirectTo = callbackUrl.toString();
 
   try {
     const { data, error } = await supabase.auth.signInWithOAuth({
