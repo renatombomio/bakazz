@@ -1,135 +1,86 @@
 # BAKAZZ — Anime Community
 
-BAKAZZ es una comunidad de anime para descubrir series y películas, compartir gustos, participar en debates y conectar con otros fans. Sitio oficial: https://www.bakazz.com.
+BAKAZZ es una comunidad de anime para descubrir series y películas, compartir gustos, participar en debates y conectar con otros fans.
 
-> **Estado del proyecto:** BAKAZZ está temporalmente en mantenimiento mientras se prepara la migración de autenticación de la versión 2.0. La migración aún no está activa en producción. No despliegues ni desactives el modo mantenimiento hasta completar las pruebas indicadas en la documentación de seguridad.
+- Sitio oficial: https://www.bakazz.com
+- Repositorio: https://github.com/renatombomio/bakazz
+- Rama de trabajo autorizada: `feature/renanime-2.0-workspace`
 
-## Funcionalidades
+> **Estado operativo (24-11-2026):** Preview está disponible para desarrollo y pruebas. Producción permanece intencionadamente en mantenimiento mientras se completa la validación y se obtiene aprobación explícita para el cambio. No desactives el mantenimiento ni despliegues a producción sin autorización.
 
-- **Descubrir anime:** explorar recomendaciones, joyas escondidas, tendencias, temporada, próximos estrenos y títulos mejor valorados.
-- **Colección personal:** organizar anime visto y mantener el estado de cada entrada.
-- **Mi lista:** guardar anime pendiente de ver.
-- **Favoritos y géneros:** explorar y organizar títulos con vistas adaptadas a móvil.
-- **Fichas y franquicias:** consultar información de anime y títulos relacionados.
-- **Interfaz bilingüe:** español e inglés.
-- **Diseño mobile-first:** navegación y carruseles adaptados a pantallas pequeñas.
+## Antes de trabajar en el proyecto
 
-Las fuentes de datos de anime incluyen AniList y Jikan. Las cuotas y límites de las API externas deben respetarse; las consultas deben agruparse y evitar solicitudes innecesarias.
+Lee primero [AGENTS.md](./AGENTS.md) y, obligatoriamente, [AI_HANDOFF_AND_WORKFLOW.md](./docs/development/AI_HANDOFF_AND_WORKFLOW.md). Ese documento contiene las reglas de trabajo, arquitectura de rutas/autenticación, entornos, historial de incidencias, commits relevantes, pruebas y procedimiento para investigar errores. Las nuevas conversaciones deben consultar el repositorio antes de pedir al propietario que repita contexto.
+
+## Funcionalidades del producto
+
+- Descubrimiento de anime: recomendaciones, tendencias, temporada, próximos estrenos y títulos mejor valorados.
+- Colección personal y lista de anime pendiente.
+- Favoritos, géneros, fichas de anime y franquicias.
+- Comunidad, perfiles públicos y debates.
+- Interfaz en español e inglés.
+- Diseño mobile-first.
+
+Consulta `docs/product/` y `docs/MASTER_ROADMAP_RENANIME_WORLD_2.md` para las decisiones de producto existentes. El roadmap conserva contexto histórico de la etapa Renanime; la marca actual es BAKAZZ.
 
 ## Stack tecnológico
 
-- [Astro](https://astro.build/) con renderizado SSR y adaptador de Vercel.
-- React y TypeScript.
-- Tailwind CSS 4.
-- GSAP para animaciones.
-- Supabase/PostgreSQL para datos y servicios backend.
-- AniList API y Jikan API para datos de anime.
-- pnpm como gestor de paquetes.
-- Vitest para pruebas.
+- Astro 7 con SSR y adaptador de Vercel.
+- React 19, TypeScript y Tailwind CSS v4.
+- Supabase Auth, PostgreSQL y `@supabase/ssr`.
+- AniList y Jikan como fuentes de datos de anime.
+- pnpm y Vitest.
 
-La migración a Supabase Auth está en curso. Ya existe un cliente SSR por petición y endpoints iniciales para login, consulta de sesión y callback PKCE, pero todavía no están integrados con la pantalla de acceso, el middleware, el registro ni la biblioteca. No se debe asumir que la autenticación de Supabase está operativa.
-
-## Requisitos
-
-- Node.js \`>=22.12.0\`.
-- pnpm compatible con el lockfile del repositorio.
+Requisito de Node.js: `>=22.12.0`. Consulta `package.json` para los scripts disponibles.
 
 ## Desarrollo local
 
-1. Clona el repositorio:
+```bash
+pnpm install --frozen-lockfile
+pnpm dev
+```
 
-   \`\`\`bash
-   git clone https://github.com/renatombomio/renanime.git
-   cd renanime
-   \`\`\`
+Astro suele servir el proyecto en `http://localhost:4321`.
 
-2. Instala las dependencias:
+Variables de entorno:
+- Usa únicamente el entorno autorizado para la tarea.
+- Preview debe apuntar a Supabase Development.
+- No compartas, imprimas ni subas secretos.
+- No leas ni modifiques `.env.local` salvo autorización explícita.
+- Consulta [supabase-environments.md](./docs/development/supabase-environments.md).
 
-   \`\`\`bash
-   pnpm install --frozen-lockfile
-   \`\`\`
-
-3. Configura las variables de entorno locales en \`.env.local\`. Usa únicamente las credenciales del entorno al que vayas a conectarte y no subas secretos a Git.
-
-   Las variables usadas por la configuración actual incluyen:
-
-   - \`PUBLIC_SUPABASE_URL\`: URL del proyecto Supabase.
-   - \`SUPABASE_SECRET_KEY\`: clave secreta solo de servidor. Nunca debe exponerse al navegador ni publicarse en el repositorio.
-
-   Consulta la configuración del entorno de desarrollo antes de añadir otras variables. El cliente SSR usa `PUBLIC_SUPABASE_PUBLISHABLE_KEY` o, como alternativa compatible, `PUBLIC_SUPABASE_ANON_KEY`, junto con `PUBLIC_SUPABASE_URL`. Configura la clave pública en el entorno local y en Vercel antes de probar las nuevas rutas. La clave secreta seguirá reservada para tareas confiables de servidor y nunca para una sesión de usuario.
-
-4. Inicia el servidor de desarrollo:
-
-   \`\`\`bash
-   pnpm dev
-   \`\`\`
-
-   Astro suele servir el proyecto en \`http://localhost:4321\`.
-
-## Comandos disponibles
+## Comandos
 
 | Comando | Descripción |
 | --- | --- |
-| \`pnpm dev\` | Inicia el servidor de desarrollo. |
-| \`pnpm build\` | Construye el proyecto para producción. |
-| \`pnpm preview\` | Previsualiza localmente la compilación. |
-| \`pnpm test\` | Ejecuta las pruebas con Vitest. |
-| \`pnpm test:watch\` | Ejecuta Vitest en modo interactivo. |
-| \`pnpm astro -- --help\` | Muestra la ayuda de Astro. |
+| `pnpm dev` | Servidor local |
+| `pnpm build` | Compilación SSR |
+| `pnpm preview` | Previsualización de build |
+| `pnpm test` | Pruebas Vitest |
 
-Antes de abrir o fusionar cambios, ejecuta al menos:
+Antes de cerrar una tarea que cambie código, ejecuta cuando sea posible:
 
-\`\`\`bash
-pnpm install --frozen-lockfile
+```bash
 pnpm test
 pnpm build
-\`\`\`
+```
 
-Si cambias dependencias, actualiza \`pnpm-lock.yaml\` usando pnpm y confirma ambos archivos. No edites el lockfile manualmente.
+Indica siempre qué comandos se ejecutaron realmente. No declares una compilación o prueba como correcta sin evidencia.
 
-## Estructura del proyecto
+## Seguridad y entornos
 
-La estructura exacta evoluciona con el desarrollo. Las principales áreas son:
+- Supabase Development: proyecto `pakkdnfifrshqyqedpni`.
+- Supabase Production: entorno exclusivamente productivo; prohibido usarlo para pruebas.
+- No ejecutar operaciones destructivas ni alterar datos existentes sin autorización.
+- La colección personal del propietario es intocable.
+- No modificar claves, OAuth, variables de Vercel, DNS ni configuración de producción sin autorización.
+- Producción permanece en mantenimiento mediante `MAINTENANCE_MODE = true` en `src/middleware.ts`.
 
-- \`src/pages/\`: páginas y endpoints API de Astro.
-- \`src/components/\`: componentes reutilizables de interfaz.
-- \`src/lib/\`: clientes y lógica compartida del backend.
-- \`public/\`: imágenes, vídeos, audio y otros recursos estáticos.
-- \`docs/security/\`: planificación de seguridad y migración de autenticación.
+Detalles y reglas completas: [AI_HANDOFF_AND_WORKFLOW.md](./docs/development/AI_HANDOFF_AND_WORKFLOW.md) y documentación de `docs/security/`.
 
-## Seguridad y autenticación
+## Enlaces técnicos
 
-La migración completa a Supabase Auth se está preparando en la rama \`feature/supabase-auth-migration\` y la PR [#13](https://github.com/renatombomio/renanime/pull/13).
-
-Documentos de referencia:
-
-- [Plan de migración](docs/security/supabase-auth-migration-plan.md)
-- [Propuesta de mapeo de identidades — solo revisión](docs/security/001_identity_mapping_review_only.sql)
-- [Contrato de implementación y criterios de corte](docs/security/002-auth-implementation-contract.md)
-
-Principios obligatorios:
-
-- No vincular cuentas antiguas basándose únicamente en el nombre visible o en un email no verificado.
-- Preservar los UUID antiguos y las entradas existentes de biblioteca.
-- No aplicar la propuesta SQL de revisión sin una revisión explícita y un plan de respaldo.
-- Mantener el modo mantenimiento hasta que autenticación, biblioteca, callbacks y recuperación pasen las pruebas.
-- No exponer claves secretas ni credenciales en código cliente, logs o commits.
-- No retirar las funciones de autenticación heredadas hasta verificar la migración y el procedimiento de rollback.
-
-## Flujo de trabajo
-
-- Trabaja en ramas de funcionalidad y abre una Pull Request hacia \`main\`.
-- Mantén los cambios acotados y documenta los cambios de esquema o autenticación.
-- No hagas cambios destructivos en producción como parte de una tarea de documentación.
-- Comprueba los resultados de build y tests; no declares una validación si no se ha ejecutado.
-
-## Estado de la migración
-
-La migración a Supabase Auth todavía no está completada. La PR #13 contiene la documentación de migración, el cliente SSR y endpoints iniciales aún no integrados; no activa el nuevo sistema ni cambia datos de producción. El sitio debe permanecer en mantenimiento hasta que la implementación y las pruebas estén listas.
-
-## Enlaces
-
-- Repositorio: https://github.com/renatombomio/renanime
-- Astro: https://docs.astro.build/
-- Supabase Auth: https://supabase.com/docs/guides/auth
-- Supabase SSR: https://supabase.com/docs/guides/auth/server-side
+- [Astro](https://docs.astro.build/)
+- [Supabase Auth](https://supabase.com/docs/guides/auth)
+- [Supabase SSR](https://supabase.com/docs/guides/auth/server-side)
+- [Vercel](https://vercel.com/docs)
