@@ -1,303 +1,247 @@
-# BAKAZZ Anime Data Platform — architecture proposal
+# BAKAZZ Anime Data Access — revised architecture proposal
 
-> Status: architecture proposal; not yet implemented  
+> Status: proposal only — no code, migration, database, environment or deployment changes have been made  
 > Date: 2026-11-24  
 > Target branch: `feature/renanime-2.0-workspace`  
-> Supabase target for all implementation/testing: Development only (`pakkdnfifrshqyqedpni`)
+> Database for any future approved implementation: Supabase Development only (`pakkdnfifrshqyqedpni`)
 
-## 1. Objective
+## 1. Why the previous proposal is withdrawn
 
-Make BAKAZZ independent of live AniList/Jikan calls for normal page rendering. BAKAZZ should own a curated, persistent anime catalogue and internal read APIs. External providers become ingestion/enrichment sources, not runtime dependencies for every visitor.
+The previous proposal for a persistent master catalogue, scheduled bulk imports and broad character ingestion is withdrawn. It risks conflicting with AniList's published API terms.
 
-Target user experience:
-- Anime detail pages render from BAKAZZ's database.
-- Search reads the local catalogue first.
-- Library, likes, comments, debates, duels, profiles and character relations keep using stable anime identifiers.
-- Missing provider data never blocks a page from rendering or prevents a known catalogue item from being saved.
-- External calls are bounded, controlled, observable and made only for explicit ingestion/enrichment or a controlled search miss.
+AniList's current Terms of Use state that:
+- API use is free for non-commercial use; commercial services with less than $150 monthly revenue may use it free without express permission.
+- Using the API as a backup or data-storage service is prohibited.
+- Hoarding or mass collection of API data is prohibited.
+- Use in competing, non-complementary services of the same nature, including anime/manga list or tracker services, is prohibited. The terms say competing services may be authorized on request if they provide significant sustained integration/syncing with AniList and AniList user accounts.
+- Commercial services above the stated revenue threshold need a commercial licence, discussed via contact@anilist.co.
 
-This is a staged plan, not a claim that these capabilities already exist.
+The current rate-limit guide says the normal limit is 90 requests/minute, but the API is presently in a degraded state and limited to 30 requests/minute. It also documents a burst limiter, rate-limit headers and Retry-After behavior. The guide says requests for increased limits are not currently being accepted.
 
-## 2. Current audit findings
+**Important interpretation:** the published terms do not clearly grant a general right to retain AniList responses for seven days, even when the data was fetched because a user requested a page. A short-lived cache, stale fallback copy, CDN cache or database cache may still be considered data storage depending on AniList's interpretation. Therefore, the design below treats persistent caching of AniList-sourced fields as conditional on written confirmation from AniList. Do not treat the proposed TTL as legal permission.
 
-### Direct provider calls in runtime paths
-- `src/pages/anime/[slug].astro` calls AniList during SSR to check a numeric anime ID not found in the static local library.
-- `src/components/anime/AnimeDetail.tsx` resolves the detail from the browser. It calls AniList directly, retries provider failures, searches by title for non-canonical IDs and uses browser localStorage as its detail cache.
-- `src/pages/api/anime/[id]/characters.ts` reads the local `anime_characters` / `characters` tables first, but when no rows are found it calls AniList and writes the result back using `sync_anime_character_catalog`. A user opening a page can therefore trigger catalogue ingestion.
-- `src/data/personal-library.ts` resolves MAL IDs by making a direct AniList call before saving.
-- `src/pages/u/[aka].astro` contains direct AniList lookups for profile library titles and shared anime.
-- `src/pages/api/profile/character-favorites.ts` also fetches anime titles from AniList.
-- Search and discovery have shared persistent cache support, but it does not provide a complete normalized catalogue for all detail and social features.
-- `src/lib/server/anilist-gateway.ts` has a shared-slot limiter, while several browser and server paths call providers without using that gateway. The result is inconsistent timeout, retry, rate-limit and caching behavior.
+## 2. Product objective
 
-### Existing database facts
-Development contains:
-- `public.user_anime`: user library rows with integer `anime_id` values.
-- `public.anime_likes`, `public.anime_comments`, `public.anime_of_the_week`, `public.duel_votes`, debates with optional anime IDs and the anime-character relation tables: they also use integer anime identifiers.
-- `public.characters`: 1,507 rows.
-- `public.anime_characters`: 1,549 rows.
-- `private.anime_search_cache` and lock/config tables for persistent cache.
-- No dedicated master anime metadata catalogue table was present in the inspected Development table inventory.
+Improve BAKAZZ performance and reliability without mirroring AniList or collecting data in bulk.
 
-The current identifier convention is AniList numeric ID. Preserve it during the first implementation to avoid breaking existing data and relationships. Do not migrate IDs to a new internal sequence as part of this project.
+- Keep BAKAZZ-owned APIs as the interface used by the frontend.
+- Resolve and fetch only the anime a user explicitly requests or selects.
+- Deduplicate concurrent requests for the same anime.
+- Enforce one distributed, conservative rate limiter for all server-side AniList requests.
+- Do not perform AniList calls during unrelated page rendering, profile rendering or character browsing.
+- Do not import whole seasons, rankings, search pages or the full character graph into a local catalogue.
+- Preserve current numeric AniList IDs wherever they are already used by libraries, likes, comments, debates and duels.
+- Keep BAKAZZ-owned user-generated data (reviews, likes, comments, personal status and community content) separate from provider-sourced metadata.
 
-## 3. Target architecture
+## 3. Current code audit — call sites to migrate
+
+The following current code paths were inspected on `feature/renanime-2.0-workspace`:
+
+- `src/components/anime/AnimeDetail.tsx`: browser-side AniList detail resolution, retry logic, title search and browser localStorage detail cache.
+- `src/pages/anime/[slug].astro`: SSR AniList lookup to validate/resolve some numeric anime IDs.
+- `src/pages/api/anime/[id]/characters.ts`: reads local character tables first, but fetches AniList and persists characters/relations when local rows are missing.
+- `src/data/personal-library.ts`: resolves MAL IDs through a direct AniList request before saving.
+- `src/pages/u/[aka].astro`: direct AniList lookups for profile library titles/shared anime.
+- `src/pages/api/profile/character-favorites.ts`: fetches anime titles from AniList.
+- `src/pages/api/anime-search.ts`: already has a persistent shared search cache and provider fallback logic; its cache semantics and stored fields must be reviewed against AniList's written guidance before being retained.
+- `src/lib/server/anilist-gateway.ts`: existing distributed shared-slot limiter, but other call sites bypass it.
+
+The existing database includes:
+- `public.user_anime` and social tables using numeric AniList IDs.
+- `public.characters` and `public.anime_characters` with existing rows.
+- Persistent search-cache tables and lock/config tables.
+
+These existing rows are not authorization to expand AniList data retention. Do not bulk-copy or expand these datasets. Existing character rows and their provenance/retention should be reviewed separately before further syncing.
+
+## 4. Proposed runtime architecture
 
 ```text
 Browser / Astro pages
         |
         v
-BAKAZZ internal read APIs
-  /api/anime/:id
-  /api/anime/search
-  /api/anime/:id/characters
+BAKAZZ internal API
+  GET /api/anime/:id
+  GET /api/anime/search
+  GET /api/anime/:id/characters
         |
         v
-Supabase Development / Production (separate environments)
-  anime_catalog
-  anime_catalog_aliases / external IDs
-  characters + anime_characters
-  existing user/social tables
-        ^
+Request coordinator
+  - per-ID in-flight deduplication
+  - distributed rate limiter
+  - bounded queue
+  - timeouts / circuit breaker
         |
-Controlled ingestion and enrichment jobs
+        +---- approved short-lived cache (only if AniList confirms)
         |
         v
-AniList / Jikan / other approved providers
+AniList API
 ```
 
-The browser and normal SSR page render must not call AniList or Jikan directly.
+The frontend calls BAKAZZ endpoints, not AniList directly. This centralizes timeout handling, request deduplication, observability and rate limiting. It does **not** increase AniList's quota: all server-side calls must be budgeted against the current shared limit and burst limiter.
 
-## 4. Catalogue data model proposal
+## 5. Request-driven cache policy — approval required
 
-Design the schema before writing a migration. Proposed entities:
+### Proposed behavior
 
-### `public.anime_catalog`
-One canonical row per anime. For compatibility, `id` should initially be the AniList numeric ID already used throughout BAKAZZ.
+When a user opens a detail page:
+1. BAKAZZ checks whether an approved, unexpired response for that exact AniList ID is available.
+2. If present, serve it.
+3. If absent, enqueue one AniList request for that ID.
+4. Concurrent requests for the same ID join the same in-flight promise; they must not issue duplicate provider calls.
+5. If AniList responds successfully, return the result and cache only the fields and duration explicitly approved by AniList.
+6. If AniList fails, serve an unexpired approved cached response if available. Otherwise show a controlled unavailable state; do not launch retries from every component.
 
-Proposed fields (final types/constraints require migration review):
-- `id` — canonical AniList numeric ID, primary key.
-- `mal_id` — nullable MAL ID, unique when present.
-- `title_romaji`, `title_english`, `title_native`.
-- `synonyms` — alternate titles for local search.
-- `description`, `genres`, `format`, `status`.
-- `start_year`, `start_month`, `start_day`, `season`, `season_year`.
-- `episodes`, `duration_minutes`, `average_score`.
-- `cover_image_url`, `banner_image_url`, `trailer`.
-- `studios`, `relations`, `recommendations` (structured JSON only where useful; avoid duplicating large provider payloads).
-- `source`, `source_updated_at`, `synced_at`, `created_at`, `updated_at`.
-- `catalog_status` or `is_published` to distinguish imported/reviewed items from unreviewed candidates.
+### TTL
 
-Use a deliberately selected field set, not a raw copy of every provider response. Add database indexes for title lookup, MAL ID, format, year, status and any real filter/sort query.
+A seven-day TTL was suggested as an initial product target, not as an established permission. It must not be implemented for AniList-sourced data until AniList confirms in writing that request-driven caching for that duration and purpose is allowed.
 
-### External identity mapping
-Prefer a separate `anime_external_ids` table if BAKAZZ expects more than AniList and MAL:
-- provider key (e.g. `anilist`, `mal`, `kitsu`)
-- external ID
-- canonical BAKAZZ anime ID
-- unique(provider, external_id)
+Ask AniList to specify:
+- whether request-driven caching is allowed at all;
+- whether metadata, images, descriptions, scores, relations and character data have different rules;
+- permitted storage location and retention/TTL;
+- whether stale fallback copies are allowed during outages;
+- whether CDN/browser caching is allowed;
+- whether cached data may be shown to users who did not trigger the original request.
 
-This avoids binding the whole product permanently to one upstream ID provider. For the first release, however, keep AniList ID as the canonical integer to preserve compatibility with current tables.
+If permission is denied or unclear, disable persistent storage of AniList response bodies. Keep only ephemeral in-flight deduplication and minimal operational metrics that do not reproduce provider content. Use another source only after its own licence/terms explicitly allow the intended retention and use.
 
-### Alternate title lookup
-Use either a normalized alias table or a generated normalized search column, with a unique/indexed normalized representation where practical. Avoid fuzzy full-table scans for every keystroke. Exact normalized title and prefix/trigram search can be considered after inspecting Postgres extensions and query plans.
+## 6. Global AniList queue and rate limiting
 
-### Existing character catalogue
-Keep `characters` and `anime_characters`; they are already populated. Character metadata and relations should be refreshed by controlled ingestion, not by page-view-triggered writes. Keep character likes and aggregate counters independent of provider sync.
+The current documented degraded limit is 30 requests per minute. Design below it with a conservative target of **20 requests per minute globally** for BAKAZZ, subject to any lower limit or instructions AniList communicates.
 
-## 5. Internal BAKAZZ API contract
+Requirements:
+- One distributed limiter shared across all Vercel instances and all AniList call sites.
+- Do not rely on an in-memory counter or per-instance queue as the only limiter.
+- Pace requests evenly (approximately one request every three seconds at 20/minute); avoid bursts.
+- Respect response headers such as `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `Retry-After` and `X-RateLimit-Reset`.
+- On HTTP/GraphQL 429, stop sending requests for the instructed period. Do not continue retries during AniList's timeout window.
+- Use bounded exponential backoff with jitter for retryable 5xx/network failures; do not retry non-retryable GraphQL errors.
+- Add a circuit breaker for sustained provider failure and a maximum queue wait. If the queue is full, return a controlled 503/retry response rather than spawning more work.
+- Prioritize an interactive detail request over optional enrichment. Do not enqueue characters, relations or recommendations automatically when the user only needs the core detail.
+- Coalesce identical requests and query only the fields needed for the requested screen.
+- Log provider status, latency, remaining quota, queue depth and retry counts, not full payloads or secrets.
 
-All client requests should target BAKAZZ-owned endpoints. Proposed contract:
+The 20/minute budget is an engineering safety target, not a quota granted by AniList. Revisit it only if the provider's published limit changes or AniList gives written instructions.
+
+## 7. API contracts
 
 ### `GET /api/anime/:id`
-- Read one row from `anime_catalog`.
-- Return a stable, provider-neutral response shape.
-- Return 404 when the ID is not in the published catalogue.
-- Never call AniList/Jikan synchronously on a normal detail-page request.
-- Public cache headers may be used for published catalogue data; user-specific state must be fetched separately and never included in a shared CDN response.
+- Accept only a valid positive numeric AniList ID for the existing compatibility model.
+- Read an approved unexpired cache if caching has been authorized.
+- Otherwise request the minimum required fields through the shared queue.
+- Return a normalized BAKAZZ response shape.
+- Do not perform title search as a hidden fallback for an invalid numeric ID.
+- Return controlled 404/503 responses; never turn provider errors into a false "anime does not exist" result.
 
-### `GET /api/anime/search?q=&page=&genre=&year=&format=`
-- Search the local catalogue first.
-- Cap page size and query length.
-- Normalize search terms and filters for deterministic cache keys.
-- Use indexed queries and stable pagination.
-- Return metadata indicating local result source and whether a controlled fallback was used, without exposing provider errors or internal credentials.
+### `GET /api/anime/search?q=&page=`
+- Search AniList only when a user explicitly submits a search that is not served by an approved cache.
+- Enforce query length, page-size and rate limits.
+- Deduplicate identical searches.
+- Do not crawl subsequent pages automatically.
+- Do not persist search result collections or import every result into a local catalogue unless AniList explicitly authorizes that use.
+- If search caching is not authorized, retain no provider result set after the response.
 
 ### `GET /api/anime/:id/characters?page=`
-- Read the existing local character relations and character rows.
-- Return local results immediately.
-- Do not make an upstream request because a user opened the page.
-- If no local character data exists, return an empty/not-yet-catalogued state; enrichment is performed separately.
+- Fetch character data only when the user explicitly opens/requests the characters section, and only if the relevant caching/storage is authorized.
+- Do not make background character requests merely because the detail page loads.
+- Do not mass-import character lists or relations.
+- If local existing character rows are displayed, review their provenance and retention rules; do not silently extend or refresh them from AniList.
 
-### Private ingestion API / job
-- A server-only job imports/upserts catalogue records and character relations.
-- It must require a dedicated secret/cron authorization and must never be callable by anonymous browser requests.
-- It must not use a Supabase secret key in client code.
-- Prefer scheduled batch jobs and controlled scripts over a public “sync on page view” endpoint.
-- If a manual curation interface is later needed, authorize it with a verified server-side role/allowlist; do not assume a profile nickname is an admin role.
+### Library writes
+- Keep the existing AniList numeric ID contract for known items.
+- Do not make a library save depend on a fresh provider request if the selected item already has a valid numeric AniList ID.
+- For MAL IDs or other provider IDs, resolve mappings only through a source and mapping process permitted by that source's terms. Never guess an AniList ID from a title.
+- Keep personal library state as BAKAZZ user-generated data, distinct from copying AniList's catalogue.
 
-## 6. When external API calls are allowed
+## 8. What BAKAZZ may store independently
 
-| Situation | Provider call? | Behavior |
-|---|---|---|
-| Open a known anime detail page | No | Read local catalogue |
-| Refresh a known detail page | No | Serve local data; refresh only via scheduled job |
-| Search a title already in catalogue | No | Local indexed search |
-| Search returns no local result | Conditional | One controlled provider search may run after rate-limit/circuit-breaker checks; cache result and do not repeat identical misses |
-| User selects an external search candidate | Conditional | Validate identity and import/upsert before allowing persistent library save |
-| Anime has no local characters | No on page request | Mark enrichment pending; scheduled/manual ingestion handles it |
-| Scheduled catalogue refresh | Yes | Batch, bounded concurrency, incremental updates |
-| Editorial curation/import | Yes | Controlled batch import with review and audit record |
-| Provider unavailable | No retry storm | Serve local/stale data; otherwise return a controlled empty/unavailable state |
+The design should clearly separate BAKAZZ-owned data from provider metadata.
 
-A provider search miss must not automatically insert an ambiguous title as a published catalogue record. Store candidate results separately or require a high-confidence identity match/review before publication.
+BAKAZZ-owned data includes:
+- user watch status and personal library records;
+- personal ratings, reviews and notes written by users;
+- likes, comments, debate content and duel votes;
+- moderation and community activity;
+- BAKAZZ-authored editorial text and curated selections, provided the underlying metadata/image use is separately compliant.
 
-## 7. Ingestion and refresh strategy
+Do not assume that an AniList ID alone, a title, an image URL, a synopsis, a score, character information or a relation graph is automatically free of provider restrictions. Confirm the allowed fields and retention with AniList and check image/content rights independently.
 
-### Curated catalogue, not the entire upstream universe
-Start with anime BAKAZZ actually needs:
-1. Existing fixed/owner collection and titles referenced by current user/social rows.
-2. Home page, monthly selection, weekly episodes and upcoming releases.
-3. Titles in current search/discovery result sets that users select or save.
-4. Titles required by existing character catalogue relations.
-5. Additional editorial picks approved for BAKAZZ.
+## 9. Alternative data source
 
-Do not attempt to import the entire AniList database at once. The catalogue should grow based on actual product use and curation.
+Evaluate Jikan and other providers only after reviewing their current terms, rate limits, attribution rules, caching/retention permissions and commercial-use rules. An alternative API is not automatically a licence to mirror MyAnimeList or another catalogue.
 
-### Batch import
-- Batch AniList IDs where GraphQL supports `id_in`.
-- Use bounded concurrency and a single provider gateway for every request.
-- Respect Retry-After; exponential backoff with jitter; no aggressive retry loops.
-- Use timeouts, maximum batch size, request budgets and a circuit breaker.
-- Upsert idempotently by canonical ID.
-- Persist job progress/checkpoints so interrupted imports resume safely.
-- Track source timestamp and local sync timestamp.
-- Do not overwrite curated fields with lower-quality provider data without a defined precedence rule.
-- Log counts, durations, provider status, retries, failures and imported IDs; never log secrets.
-- Character relations should be fetched in batches per selected anime and stored through a controlled sync path.
+For any provider, record:
+- source and field provenance;
+- allowed use and redistribution;
+- permitted caching/storage and TTL;
+- attribution requirements;
+- commercial thresholds/licensing;
+- rate limits and outage behavior.
 
-### Refresh cadence
-Different data changes at different rates:
-- Core metadata, synopsis, genres, format, episode count: refresh infrequently (e.g. weekly or monthly) unless a new release is active.
-- Ongoing series status/episodes: refresh daily or via editorial schedule.
-- Seasonal/upcoming data: refresh daily during active season windows.
-- Characters/relations: import once for selected titles; refresh only when explicitly requested or periodically if needed.
-- Images: store stable provider URLs first; evaluate image proxy/storage only after licensing/terms, caching and bandwidth implications are understood.
+Do not combine sources into a persistent catalogue until the terms for each source permit it.
 
-Cadences are starting proposals and should be tuned using actual update requirements and provider terms.
+## 10. AniList clarification email — send before implementing persistent cache
 
-## 8. Caching and response-time policy
+Send a concise description of BAKAZZ to `contact@anilist.co`. Explain:
+- BAKAZZ is an anime-focused community with personal watch lists/collections, likes, comments, debates and character interactions.
+- It may eventually have merchandising or other revenue.
+- We currently use the public AniList GraphQL API for anime metadata and search.
+- We want to centralize requests through our server, deduplicate concurrent requests and apply a global 20 requests/minute limiter.
+- We propose caching only records requested by users, with a seven-day expiry and stale fallback during outages; no bulk imports, no full-catalogue mirror and no background mass character collection.
+- We need explicit clarification whether this request-driven cache, seven-day retention, stale fallback, and use in a community with watch-list features are allowed.
+- Ask whether BAKAZZ needs a competing-service authorization and what integration/syncing requirements would apply.
+- Ask how the $150/month revenue threshold applies to mixed revenue such as merchandise, affiliate income, sponsorships and subscriptions, and whether gross revenue or API-attributable revenue is considered.
+- Ask whether there are attribution, display or deletion requirements.
 
-Use layered caching:
-1. **Postgres catalogue** — durable source of truth.
-2. **Vercel/CDN cache** — public, deterministic catalogue/detail/search responses with explicit cache keys and safe public headers.
-3. **Optional application cache** — only for hot public payloads where measurements justify it.
-4. **Browser cache** — a convenience, never the only cache and never the source of truth.
+Do not treat silence as approval. Keep persistent AniList caching disabled until written clarification is received and reviewed.
 
-Suggested initial policy (validate with traffic and data freshness):
-- Published detail: CDN `s-maxage=3600`, `stale-while-revalidate=86400`.
-- Catalogue search: short CDN cache (e.g. 60–300 seconds) plus indexed DB query.
-- Editorial feeds: 5–15 minutes, with scheduled refresh for source data.
-- User library, likes, comments, profile privacy and personalized status: private/no-store or user-scoped cache; never shared public CDN cache.
-- Negative lookup: short TTL to avoid repeated provider misses, with invalidation on import.
+## 11. Implementation phases — no changes until approval
 
-Serve stale public catalogue data during provider outages. Provider availability must not be in the critical path for detail rendering.
+### Phase A — compliance clarification
+- Send the email and retain the written response in project documentation.
+- Review all current AniList-derived persisted data and existing cache tables against the response.
+- Review BAKAZZ's list/tracker functionality with AniList's competing-service clause.
+- Review commercial model and expected revenue sources.
 
-Do not add Redis or another paid service before measuring whether Postgres + CDN + existing persistent cache is insufficient.
+### Phase B — request coordinator (only after policy decision)
+- Design one shared queue and distributed rate limiter.
+- Centralize every AniList request through the gateway.
+- Add request deduplication, backoff, circuit breaker, queue limits and metrics.
+- Do not change provider data retention in this phase unless expressly approved.
 
-## 9. Search and identity correctness
+### Phase C — BAKAZZ internal read API
+- Add the internal detail/search/character API contracts.
+- Migrate browser and SSR consumers to those endpoints.
+- Avoid persistent provider-response caching until the allowed policy is documented.
+- Preserve existing user/social identifiers and data.
 
-The screenshot failure (“could not identify this anime in AniList; cannot save”) indicates a provider identity-resolution dependency. Fix the identity layer, not the button:
-- Search and display the BAKAZZ catalogue ID.
-- Map MAL/AniList/other provider IDs through an explicit identity table.
-- Never assume MAL ID equals AniList ID.
-- Never use a fuzzy title match as an unverified canonical ID.
-- For known catalogue anime, saving must use the stable canonical ID already used by `user_anime`.
-- For an external search result, confirm the selected candidate and persist its ID mapping before library writes.
-- Keep the current `user_anime.anime_id` values and all existing likes/comments/debates/duel references intact.
+### Phase D — approved cache or alternative source
+- If AniList approves request-driven caching, implement only the exact fields, audience and TTL they approve.
+- If not, use ephemeral response handling and/or a separately licensed data source whose terms permit persistent storage.
+- Keep provider provenance and retention rules explicit.
 
-## 10. Performance and reliability requirements
+### Phase E — verification
+- Test AniList unavailable, 429, 5xx, queue saturation and cold-cache behavior.
+- Test simultaneous requests for one anime result in one provider request.
+- Test global rate stays within the configured budget across multiple server instances.
+- Test core page does not automatically fetch characters, recommendations or unrelated relations.
+- Test saving an item with a known numeric AniList ID does not require a provider round trip.
+- Verify no mass import or background crawl can run.
 
-Before calling the data platform scalable, measure it:
-- p50/p95/p99 latency for detail, search, characters and profile.
-- Provider request count per page view (target: zero for normal known detail).
-- Catalogue cache hit ratio and stale response ratio.
-- Database query latency, rows scanned, index usage, connection pressure.
-- Provider 429/5xx rate, retry count and circuit-breaker events.
-- API error rate and response payload size.
-- Ingestion throughput, backlog, failure and retry counts.
+## 12. Security and database constraints
 
-Required tests:
-- Detail page renders when AniList/Jikan are unavailable.
-- Known anime detail makes zero upstream calls.
-- Search hit makes zero upstream calls.
-- Repeated identical provider misses are cached and bounded.
-- Concurrent cache misses do not trigger a provider stampede.
-- Provider 429 respects Retry-After and does not retry aggressively.
-- MAL and AniList IDs map correctly; mismatches cannot save the wrong anime.
-- Catalogue import is idempotent and cannot erase curated data.
-- Character page reads local rows and never performs user-triggered ingestion.
-- RLS tests prove anonymous users cannot mutate catalogue data and users cannot access other users' private library data.
-
-## 11. Security blocker found during the Development audit
-
-Supabase Development's advisor currently reports RLS disabled on `private.anime_search_cache_config` (critical). It also reports a public-executable SECURITY DEFINER function for character catalogue synchronization. Do not auto-apply the advisor's one-line RLS remediation: inspect schema exposure, grants and the function's access path first, then define the correct server-only access model. This is a separate security task that should be resolved before expanding catalogue write capabilities.
-
-## 12. Implementation phases
-
-### Phase A — Baseline and contract
-- Add this architecture document and record the current provider call sites.
-- Confirm all consumers of anime IDs and current schema/migrations.
-- Define the catalogue response type and API contracts.
-- Decide curation/publishing rules and external ID mapping.
-
-### Phase B — Catalogue schema (Development only)
-- Create reviewed migrations for `anime_catalog` and external ID/alias mapping.
-- Add indexes based on expected lookup/filter paths.
-- Define RLS/grants so public users can read only published catalogue rows and cannot write.
-- Restrict ingestion writes to a server-only path.
-- Validate on a clean Development baseline; preserve all current data.
-
-### Phase C — Controlled import
-- Build an idempotent batch import script/job for curated IDs.
-- Import current owner collection, existing references and editorial anime first.
-- Import/attach existing character data without duplicating IDs.
-- Add progress logs, checkpoints and retry/backoff.
-
-### Phase D — Internal read APIs
-- Implement `GET /api/anime/:id`, local search and local characters reads.
-- Add response validation, cache headers, query limits and tests.
-- Keep old endpoints available until all callers are migrated and parity is proven.
-
-### Phase E — Remove direct runtime provider dependencies
-- Migrate AnimeDetail to BAKAZZ detail API.
-- Migrate SSR route existence/title check to local catalogue.
-- Migrate profile library/shared anime titles and character-favourite titles to local catalogue batch queries.
-- Remove direct MAL-to-AniList calls from the library save path; resolve through local external-ID mapping.
-- Change character endpoint so page views never trigger provider sync.
-- Ensure search uses local results first and only uses controlled fallback on genuine catalogue miss.
-
-### Phase F — Resilience, tests and load
-- Add provider circuit breaker, request budgets and metrics.
-- Add integration/RLS tests and regression tests for the screenshot failure.
-- Load test browse, search, detail, characters, profiles and mixed traffic.
-- Tune cache TTL/indexes from measured data.
-- Verify Preview routes and provider outage behavior.
-
-### Phase G — Production readiness (approval required)
-- Rehearse migrations and import on Development.
-- Review backups, rollback and data reconciliation.
-- Do not touch Production until the owner explicitly authorizes a release plan and migration.
+- No Supabase migration, table creation, policy change, data import, cache purge or schema change is authorized by this document.
+- Do not change Production, `.env.local`, Vercel environment variables or deployment settings.
+- Any later implementation must use Supabase Development only and preserve all existing user data and the personal collection.
+- Existing security-advisor findings remain a separate review; do not apply automatic RLS changes as part of this proposal.
 
 ## 13. Definition of done
 
-- Known anime pages render from BAKAZZ data with no upstream API call.
-- Catalogue search and identity mapping are deterministic and indexed.
-- Library save never depends on a live AniList request for a known item.
-- Character data is served from local storage and page views do not cause imports.
-- External provider requests are limited to controlled jobs or bounded search fallback.
-- All existing user/social anime IDs remain compatible.
-- Provider outage does not break core browsing, detail, library or community features.
-- Security/RLS and load tests pass in Development.
-- Preview deployment is READY and all relevant routes are verified.
-- Production remains unchanged until explicit owner approval.
+- AniList usage complies with written guidance applicable to BAKAZZ.
+- No mass collection, catalogue mirroring or unapproved persistent cache exists.
+- All AniList calls pass through one global queue/rate limiter.
+- Normal detail page rendering uses one deduplicated, minimum-field request at most when no approved cached response exists.
+- Characters and optional enrichment are fetched only on explicit demand.
+- AniList 429/outage does not create a retry storm.
+- Existing numeric IDs and user-generated BAKAZZ data remain intact.
+- No production or Supabase change occurs without explicit approval.
