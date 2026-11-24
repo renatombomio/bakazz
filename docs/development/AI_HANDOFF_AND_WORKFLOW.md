@@ -190,3 +190,8 @@ Whenever a session changes behavior, update the appropriate document in the same
 - Repository-wide rules: `AGENTS.md`.
 
 Keep dates, branch names, deployment references and status labels accurate. Remove obsolete statements rather than appending contradictory instructions.
+
+
+## Anime data platform work
+
+Before changing anime data fetching, detail pages, search, characters, profiles, provider integrations or caching, read [ANIME_DATA_PLATFORM_PLAN.md](./ANIME_DATA_PLATFORM_PLAN.md). It records the audited provider call sites, current Development schema facts, target BAKAZZ-owned catalogue/API design, controlled ingestion policy, cache rules, security blocker and implementation phases. The proposal is not implemented yet; do not assume the catalogue table or internal detail API already exists.
