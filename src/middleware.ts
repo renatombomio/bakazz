@@ -55,12 +55,25 @@ export const onRequest = defineMiddleware(async (context, next) => {
     "/auth/callback", "/auth/callback/",
   ].includes(routePath);
 
-  if (isPublicAssetOrApi) return isEnglish ? next(basePath + search) : next();
+  // Public-facing BAKAZZ routes: visitors can discover the product before
+  // creating an account. Personal areas remain protected below.
+  const isPublicPage =
+    routePath === "/" ||
+    [
+      "/buscar", "/search", "/genres", "/ren-collection",
+      "/community", "/community/debates",
+    ].includes(routePath) ||
+    /^\/anime\/[^/]+$/.test(routePath) ||
+    /^\/community\/debates\/[^/]+$/.test(routePath) ||
+    /^\/u\/[^/]+$/.test(routePath);
 
-  // Preview is a private testing environment: unauthenticated visitors land
-  // on login first, and protected application routes require a Development
-  // account. Production keeps its maintenance gate.
-  if (routePath === "/" && !isPreview) return isEnglish ? next(basePath + search) : next();
+  // Reading debates is public; opening the composer is an authenticated action.
+  const isProtectedAction =
+    routePath === "/community/debates" &&
+    context.url.searchParams.get("compose") === "1";
+  const requiresAuthentication = !isPublicPage || isProtectedAction;
+
+  if (isPublicAssetOrApi) return isEnglish ? next(basePath + search) : next();
 
   context.cookies.set("lang", context.locals.lang, {
     path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax",
@@ -74,9 +87,13 @@ export const onRequest = defineMiddleware(async (context, next) => {
     if (!error) user = data.user;
   } catch (error) {
     console.error("Supabase middleware authentication failed:", error);
+    if (isPublicAuthPage || (isPublicPage && !isProtectedAction)) {
+      return isEnglish ? next(basePath + search) : next();
+    }
     if (isPreview) {
-      if (isPublicAuthPage) return isEnglish ? next(basePath + search) : next();
-      return context.redirect(localizedPath(context.locals.lang, "/login/"), 303);
+      const loginUrl = new URL(localizedPath(context.locals.lang, "/login/"), context.url);
+      loginUrl.searchParams.set("next", pathname + search);
+      return context.redirect(loginUrl.pathname + loginUrl.search, 303);
     }
     return new Response("Authentication service unavailable.", {
       status: 503, headers: { "Cache-Control": "no-store" },
@@ -84,8 +101,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   if (!user) {
-    if (isPublicAuthPage) return isEnglish ? next(basePath + search) : next();
-    return context.redirect(localizedPath(context.locals.lang, "/login/"));
+    if (isPublicAuthPage || (isPublicPage && !isProtectedAction)) {
+      return isEnglish ? next(basePath + search) : next();
+    }
+    const loginUrl = new URL(localizedPath(context.locals.lang, "/login/"), context.url);
+    loginUrl.searchParams.set("next", pathname + search);
+    return context.redirect(loginUrl.pathname + loginUrl.search, 303);
   }
 
   try {
@@ -121,13 +142,28 @@ export const onRequest = defineMiddleware(async (context, next) => {
       const isCompletingProfile =
         routePath === "/login" && context.url.searchParams.get("complete-profile") === "1";
       if (!context.url.searchParams.has("recovery") && !isCompletingProfile) {
+        const requestedNext = context.url.searchParams.get("next") ?? "";
+        const safeNext =
+          requestedNext.startsWith("/") &&
+          !requestedNext.startsWith("//") &&
+          !requestedNext.includes("\\") &&
+          !requestedNext.includes("://")
+            ? requestedNext
+            : (isEnglish ? "/en/" : "/");
         return hasNickname
-          ? context.redirect(isEnglish ? "/en/" : "/", 303)
-          : context.redirect(localizedPath(context.locals.lang, "/login/") + "?complete-profile=1", 303);
+          ? context.redirect(safeNext, 303)
+          : context.redirect(
+              localizedPath(context.locals.lang, "/login/") +
+                "?complete-profile=1&next=" + encodeURIComponent(safeNext),
+              303,
+            );
       }
     }
-  } else if (!hasNickname) {
-    return context.redirect(localizedPath(context.locals.lang, "/login/") + "?complete-profile=1", 303);
+  } else if (!hasNickname && requiresAuthentication) {
+    const loginUrl = new URL(localizedPath(context.locals.lang, "/login/"), context.url);
+    loginUrl.searchParams.set("complete-profile", "1");
+    loginUrl.searchParams.set("next", pathname + search);
+    return context.redirect(loginUrl.pathname + loginUrl.search, 303);
   }
 
   return isEnglish ? next(basePath + search) : next();
