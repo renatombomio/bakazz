@@ -291,3 +291,199 @@ BAKAZZ team
 - AniList 429/outage does not create a retry storm.
 - Existing numeric IDs and user-generated BAKAZZ data remain intact.
 - No production or Supabase change occurs without explicit approval.
+
+## 14. Scale and capacity plan — thousands of users
+
+This section is a capacity design proposal only. It does not authorize implementation, migrations, configuration changes or plan upgrades.
+
+### 14.1 Priority zero: establish a stable Preview baseline
+
+Before starting the data-platform implementation:
+- Verify the current branch Preview deployment is READY.
+- Re-test the home page, anime detail, login, registration and protected-route redirect.
+- Complete a real Google OAuth browser flow, including callback, cookie/session establishment and return to the requested destination.
+- If any of these fail, investigate and resolve that first. Do not build new infrastructure on an unstable baseline.
+- Keep Production in maintenance and do not deploy/promote.
+
+A previous middleware source defect caused Preview HTTP 500 and was fixed in commit `2866b4c91e99a374c0ff7e1393ab895efbb98dd8`. The owner later confirmed the site was working, but the full Google OAuth end-to-end flow was not proven by that confirmation. Re-run the checks rather than assuming either failure or success.
+
+### 14.2 Anime cache and internal API design
+
+Proposed table shape for review only:
+- `anilist_id` — existing numeric AniList ID, unique key.
+- `payload` — only fields and data that AniList has expressly permitted BAKAZZ to retain.
+- `fetched_at`
+- `expires_at`
+- `last_accessed_at` (optional; assess write amplification before adding)
+- `source` / schema version / status metadata as needed.
+
+Do not create this table until the owner approves a migration and AniList has clarified whether this request-driven cache, its fields, TTL and stale fallback are allowed in writing. A seven-day TTL is a product proposal, not permission under AniList's terms.
+
+Proposed request flow:
+1. Read the cache by ID.
+2. If fresh, return it immediately.
+3. If stale and retention/stale serving is approved, return stale data immediately and enqueue one background refresh.
+4. If absent, join or create one in-flight request for that ID. The caller receives the provider result if the bounded request completes; if the queue is full or provider is unavailable, return the localized unavailable state and allow retry.
+5. Never wait for AniList when a stale response is available.
+6. Never launch repeated provider calls from each component.
+
+If a user opens a known anime and the cached payload is stale, the stale payload should render without blocking on a refresh. If no cache exists and no approved provider response is available, show a localized placeholder; do not fabricate metadata.
+
+Suggested internal routes:
+- `GET /api/anime/:id`
+- `GET /api/anime/:id/characters`
+
+All provider calls must pass through one server-only provider gateway. Browser components and SSR pages must not call AniList directly. Keep user-specific state (likes, collection status, comments, privacy) out of public shared cache responses.
+
+### 14.3 CDN caching
+
+For public, non-personalized responses only:
+- Evaluate Vercel CDN response caching with explicit `s-maxage` and `stale-while-revalidate`.
+- Set `Cache-Control: public` only when the response contains no user-specific or private fields.
+- Use deterministic cache keys and canonical URLs.
+- Separate public anime metadata from per-user library/like state.
+- Invalidate or version cache keys when a record is updated.
+- Confirm that CDN/browser retention of provider-derived fields is allowed by AniList before enabling it. CDN caching is still data retention and must not be assumed exempt from the provider terms.
+
+### 14.4 Single provider gateway and global limiter
+
+- One distributed limiter across all Vercel instances and all AniList call sites; an in-memory counter alone is insufficient.
+- Conservative target: at most 20 requests/minute globally, paced evenly, unless AniList gives stricter instructions.
+- Coalesce duplicate concurrent requests by provider + ID + requested field set.
+- Respect HTTP 429, `Retry-After`, and rate-limit headers. Stop requests for the specified cooldown.
+- Bounded retries with exponential backoff and jitter for retryable network/5xx failures only.
+- Circuit breaker on sustained failures; cap queue depth and maximum wait.
+- Prioritize interactive detail requests; do not automatically fetch characters, relations or recommendations.
+- Record queue depth, wait time, latency, response status, remaining quota and cache hit/miss counts.
+- Never log API secrets or full provider payloads unnecessarily.
+
+### 14.5 Remove direct browser/provider dependencies
+
+Migrate, in controlled stages:
+- `AnimeDetail.tsx` to BAKAZZ's internal detail endpoint.
+- `src/pages/anime/[slug].astro` to local approved cache/internal API rather than direct AniList validation.
+- Character API to return locally retained, authorized data and never trigger ingestion on page view.
+- Profile/library title and cover lookups to BAKAZZ's internal data layer.
+- MAL-to-AniList mapping to an explicit verified mapping flow; never infer IDs from fuzzy title matches.
+
+When saving a library entry, retain BAKAZZ-owned user state and the selected numeric AniList ID. Persisting provider-sourced title/cover snapshots is subject to the same source rights and retention review; do not assume those snapshots are automatically allowed.
+
+### 14.6 Localized failure states
+
+The visitor-facing interface must not expose provider names or upstream technical details.
+
+Suggested Spanish message when no approved cached data exists:
+“Estamos preparando esta ficha. Vuelve a intentarlo en un momento.”
+
+Provide a retry action with client-side cooldown. If a known title/cover can lawfully be displayed from an approved source, show it; otherwise do not invent or reproduce unapproved data. All strings must use the existing i18n system and have equivalent English copy.
+
+### 14.7 Search and prewarming
+
+- Search the local approved cache first.
+- Only call the provider on an explicit user search miss, subject to queue/rate-limit and terms.
+- Do not crawl result pages automatically or import every result.
+- Do not run a nightly mass prewarm of trending, seasonal, duel or library titles until AniList expressly approves that background access and retention. A job that fetches hundreds of IDs is still bulk collection even if the IDs were selected by product usage.
+- If a provider permits it, schedule only a bounded, documented refresh of records already requested by users; respect the exact allowed scope and retention.
+- If permission is not granted, use the provider response only as permitted and evaluate alternative licensed sources for persistent fields.
+
+### 14.8 Supabase/Postgres capacity
+
+Before scaling traffic, review actual query patterns and metrics rather than adding infrastructure speculatively:
+- Use Supabase's supported connection pooler for serverless workloads where appropriate; verify the exact connection string mode and prepared-statement compatibility for the deployed driver.
+- Check Postgres connection counts, pool saturation, query duration, CPU, memory, disk and egress.
+- Add indexes only for measured filters, joins, foreign keys and sort paths. Review the Supabase advisor's foreign-key index and RLS performance findings.
+- Review RLS policies for correctness and query efficiency; never disable RLS as a performance shortcut.
+- Paginate all potentially unbounded lists: search, comments, debates, notifications, collections, profiles and character lists.
+- Remove N+1 patterns and queries inside loops; batch related reads.
+- Avoid counting large collections on every request. Maintain counters only where justified, with atomic update logic, reconciliation and tests to prevent drift.
+- Keep transactions short and avoid unnecessary writes to cache/access timestamps on every hit.
+- Use read-only public data paths separately from user-specific private state.
+- Do not add Redis or microservices until measurements show Postgres/CDN/managed queues are insufficient.
+
+### 14.9 Abuse prevention and uploads
+
+- Apply server-side rate limits to registration, login attempts, search, comments, likes, votes, debate creation and other mutation endpoints.
+- Use per-IP and per-account limits with sensible exceptions for shared networks; avoid relying only on client-side throttling.
+- Evaluate Cloudflare Turnstile or an equivalent challenge for high-risk anonymous forms and suspicious traffic. Add privacy/consent review before enabling.
+- Validate MIME type and actual file content, impose maximum dimensions and file sizes, strip unnecessary metadata and generate responsive compressed variants for uploaded avatars/banners.
+- Use private storage and signed URLs for private assets; moderate/report user-submitted images and provide abuse handling.
+- Do not proxy or rehost third-party anime artwork unless the relevant licence permits it.
+
+### 14.10 Observability and load testing
+
+Instrument:
+- p50/p95/p99 response latency by route.
+- HTTP 4xx/5xx and client-side error rate.
+- CDN hit/miss and stale response rate.
+- Database query latency, connection usage and pool wait.
+- AniList request count/minute, 429s, queue depth/wait, circuit-breaker state.
+- Cache hit/miss/stale counts.
+- Upload/storage/egress volume.
+- Auth success/failure and OAuth callback outcomes.
+
+Evaluate Sentry or an equivalent error tracker and alerting service. Before adoption, check data residency, personal-data collection, retention and budget. Do not log tokens, passwords, email confirmation links or private profile data.
+
+Use k6 or equivalent against the Preview deployment only:
+- Start with smoke tests, then staged concurrency (e.g. 25, 50, 100, 250 and 500 virtual users) and realistic ramp-up.
+- Include anonymous browse, anime detail, search, profiles, paginated debates/comments and authenticated reads/writes.
+- Run both cold-cache and warm-cache scenarios.
+- Test AniList timeout/429 simulations without flooding the real provider.
+- Monitor Vercel function duration/concurrency, Supabase connections/CPU, CDN cache ratio and p95/p99.
+- Define pass/fail thresholds from a measured baseline; do not claim “thousands supported” merely because a small test passed.
+- Never run load tests against Production or against AniList itself.
+
+### 14.11 Queues and background work
+
+Use background jobs only for work that genuinely needs asynchronous processing: cache refreshes (if permitted), notifications, moderation workflows, aggregation and scheduled editorial updates. Jobs must be idempotent, bounded, observable and retry-safe. Avoid creating a separate queue service until volume and platform limits justify it.
+
+### 14.12 Hosting plans and production operating cost
+
+Current official plan information reviewed on 2026-11-24:
+
+| Provider | Plan | Published price / relevant terms | BAKAZZ recommendation |
+|---|---|---|---|
+| Vercel | Hobby | $0; strictly personal/non-commercial use | Suitable for private development/Preview only while usage is genuinely non-commercial. Not suitable for a site used to generate financial gain or host paid brand promotion. |
+| Vercel | Pro | $20/month base; usage-based charges may apply; includes $20 usage credit according to current pricing | Expected minimum production plan if BAKAZZ is used for brand promotion or other commercial activity. Monitor usage and configure spend controls. |
+| Supabase | Free | $0; 500 MB DB, shared CPU, 5 GB egress; projects pause after one week of inactivity | Development/testing only; not a dependable production tier. |
+| Supabase | Pro | From $25/month; 8 GB DB disk, 250 GB egress, daily backups retained 7 days, 7-day logs; additional compute/usage can cost more | Recommended baseline for production database once launching publicly. Choose compute size based on load testing; Pro is not a guarantee of capacity for any traffic level. |
+| Supabase | Team | From $599/month | Not justified at current stage unless SSO, compliance, longer backup retention, priority support or organization controls are required. |
+
+Vercel's official Terms state that Hobby is limited to personal or non-commercial use. Its Fair Use guidance defines commercial usage broadly as a deployment used for financial gain by anyone involved in producing the project. Therefore even if users access BAKAZZ for free, paid brand visibility on the site is likely to require Vercel Pro. Confirm the account's exact billing/team setup before launch.
+
+Supabase Free projects pause after inactivity and lack the production backup retention of Pro. Pro includes daily backups for seven days and avoids inactivity pausing. Pro starts at $25/month, but compute, egress, storage and add-ons can increase the bill. Use Pro as a baseline recommendation for production, not as a substitute for capacity testing.
+
+Initial baseline estimate: approximately $45/month for Vercel Pro ($20) plus one Supabase Pro organization/project ($25), before VAT, usage overages, larger compute, storage, monitoring, email, domains and other services. Supabase compute credits and billing organization details can affect the exact invoice; verify in the billing dashboards before committing.
+
+Official references:
+- Vercel pricing: https://vercel.com/pricing
+- Vercel Terms, Hobby restrictions: https://vercel.com/legal/terms
+- Vercel commercial-use guidance: https://vercel.com/docs/limits/fair-use-guidelines
+- Supabase pricing: https://supabase.com/pricing
+- Supabase plan billing: https://supabase.com/docs/guides/platform/billing-on-supabase
+- Supabase backups: https://supabase.com/docs/guides/platform/backups
+
+### 14.13 Phased implementation order
+
+1. Reconfirm Preview stability and full Google OAuth/login behavior.
+2. Obtain AniList's written answer on competing-service status, request-driven caching, stale serving, CDN retention and commercial thresholds.
+3. Approve the cache schema and API contract in writing; only then prepare a Development migration for review.
+4. Implement BAKAZZ internal detail/character APIs and migrate browser/SSR calls.
+5. Add CDN caching for public responses only where source terms allow.
+6. Implement distributed rate limiting, request coalescing, 429 handling and circuit breaker.
+7. Add localized unavailable states and retry controls.
+8. Add metrics, alerts, abuse protection, upload validation and database query optimization.
+9. Add only permitted, bounded background refresh; no mass prewarming.
+10. Load-test Preview in stages and record measured capacity.
+11. Choose/upgrade production plans and prepare a production migration/release plan only after owner approval.
+
+### 14.14 Approval boundaries
+
+This section is a proposal only. It does not authorize:
+- any Supabase migration, table creation, RLS/index change or data update;
+- any Vercel/Supabase plan upgrade, billing change or environment-variable change;
+- any change to `.env.local`;
+- any production deployment, DNS change or removal of maintenance mode;
+- any AniList cache retention before written clarification;
+- any load test against Production or AniList.
+
+The owner must explicitly approve each implementation stage. Development-only work must preserve the personal collection and all existing data.
