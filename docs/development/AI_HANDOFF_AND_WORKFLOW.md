@@ -195,3 +195,8 @@ Keep dates, branch names, deployment references and status labels accurate. Remo
 ## Anime data platform work
 
 Before changing anime data fetching, detail pages, search, characters, profiles, provider integrations or caching, read [ANIME_DATA_PLATFORM_PLAN.md](./ANIME_DATA_PLATFORM_PLAN.md). It records the audited provider call sites, current Development schema facts, target BAKAZZ-owned catalogue/API design, controlled ingestion policy, cache rules, security blocker and implementation phases. The proposal is not implemented yet; do not assume the catalogue table or internal detail API already exists.
+
+
+## Scale and capacity planning
+
+The current proposal for the anime request cache, internal APIs, AniList gateway, CDN, rate limiting, localized errors, abuse prevention, Postgres/serverless capacity, observability, load testing and hosting-plan selection is documented in [ANIME_DATA_PLATFORM_PLAN.md](./ANIME_DATA_PLATFORM_PLAN.md), sections 14 onward. This remains proposal-only: no migrations, Supabase changes, plan upgrades, environment changes or Production actions are authorized. Before implementation, reverify Preview routes and complete the Google OAuth end-to-end flow, and obtain AniList's written clarification on caching and competing-service restrictions.
