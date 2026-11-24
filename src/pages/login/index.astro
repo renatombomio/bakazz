@@ -255,7 +255,7 @@ const nextPath =
       } else {
         response = await fetch(mode === "register" ? "/api/auth/register" : "/api/auth/login", {
           method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin",
-          body: JSON.stringify(mode === "register" ? { email, password, aka } : { email, password }),
+          body: JSON.stringify(mode === "register" ? { email, password, aka, next: nextPath } : { email, password }),
         });
       }
       data = await response.json();
