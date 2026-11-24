@@ -9,7 +9,10 @@ const MAINTENANCE_MODE = true;
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname, search } = context.url;
-  // Maintenance is intentionally restricted to the two production hostnames.\n  // Every Preview, deployment URL, localhost, and other host stays accessible.\n  const hostname = context.url.hostname.toLowerCase();\n  const isProductionHost = hostname === "bakazz.com" || hostname === "www.bakazz.com";
+  // Maintenance is intentionally restricted to the two production hostnames.
+  // Every Preview, deployment URL, localhost, and other host stays accessible.
+  const hostname = context.url.hostname.toLowerCase();
+  const isProductionHost = hostname === "bakazz.com" || hostname === "www.bakazz.com";
   const isEnglish = /^\/en(?:\/|$)/.test(pathname);
   const basePath = isEnglish ? pathname.replace(/^\/en(?=\/|$)/, "") || "/" : pathname;
   const routePath = basePath.length > 1 ? basePath.replace(/\/$/, "") : basePath;
