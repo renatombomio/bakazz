@@ -9,7 +9,7 @@ const MAINTENANCE_MODE = true;
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname, search } = context.url;
-  // VERCEL_ENV can be unavailable in some SSR runtime builds. Identify the\n  // isolated Vercel deployment host as a second, explicit Preview signal.\n  // The production domains (bakazz.com / www.bakazz.com) never match this.\n  const hostname = context.url.hostname.toLowerCase();\n  const isPreview =\n    import.meta.env.VERCEL_ENV === "preview" ||\n    hostname.endsWith("-rene-webs1.vercel.app");
+  // Maintenance is intentionally restricted to the two production hostnames.\n  // Every Preview, deployment URL, localhost, and other host stays accessible.\n  const hostname = context.url.hostname.toLowerCase();\n  const isProductionHost = hostname === "bakazz.com" || hostname === "www.bakazz.com";
   const isEnglish = /^\/en(?:\/|$)/.test(pathname);
   const basePath = isEnglish ? pathname.replace(/^\/en(?=\/|$)/, "") || "/" : pathname;
   const routePath = basePath.length > 1 ? basePath.replace(/\/$/, "") : basePath;
@@ -17,7 +17,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   context.locals.lang = isEnglish ? "en" : "es";
   context.locals.basePath = basePath;
 
-  if (MAINTENANCE_MODE && !isPreview) {
+  if (MAINTENANCE_MODE && isProductionHost) {
     if (routePath === "/maintenance") return next();
     const isStaticAsset =
       routePath.startsWith("/_astro/") ||
