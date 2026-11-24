@@ -1,35 +1,50 @@
 # Supabase environments
 
-Renanime uses two independent Supabase projects.
+BAKAZZ mantiene proyectos Supabase independientes. Preview/Development se usa para desarrollo y pruebas; Production se reserva para el servicio real.
 
 | Environment | Project ref | Purpose |
 |---|---|---|
-| Production | `zgjetpoamiewygqlhheo` | Real users and production data |
-| Development / Preview | `pakkdnfifrshqyqedpni` | Test registrations, profiles, libraries and community |
+| Production | `zgjetpoamiewygqlhheo` | Entorno productivo. Nunca usar para pruebas ni tareas de desarrollo. |
+| Development / Preview | `pakkdnfifrshqyqedpni` | Desarrollo, registros de prueba, perfiles, colecciones y comunidad. |
 
-## Astro/Vercel variables
+## Reglas obligatorias
 
-The SSR client reads:
+- Las pruebas y el trabajo de desarrollo deben usar exclusivamente el proyecto Development.
+- Vercel Preview debe apuntar al proyecto Development.
+- Vercel Production debe conservar su configuración productiva; no modificarla durante tareas de desarrollo.
+- No usar variables compartidas entre Preview y Production si eso puede mezclar proyectos.
+- No ejecutar SQL destructivo, resetear proyectos ni borrar usuarios/datos.
+- La colección personal del propietario (“Colección de Ren”) no se modifica.
+- No leer, mostrar ni editar `.env.local` salvo autorización explícita.
+- Nunca guardar valores secretos reales en el repositorio.
+
+## Variables utilizadas por la aplicación
+
+El cliente SSR utiliza:
 - `PUBLIC_SUPABASE_URL`
-- `PUBLIC_SUPABASE_PUBLISHABLE_KEY` (or the legacy `PUBLIC_SUPABASE_ANON_KEY` fallback)
-- `SUPABASE_SECRET_KEY` only for trusted server-side catalog synchronization; never expose it through a `PUBLIC_` variable or browser code.
-- `ANIME_SEARCH_CACHE_TOKEN` for the private server-side anime search cache. This token is isolated to the Preview branch and is never sent to the browser.
+- `PUBLIC_SUPABASE_PUBLISHABLE_KEY` (o fallback compatible `PUBLIC_SUPABASE_ANON_KEY`)
 
-Configure the **Preview** environment in Vercel with the Development project's URL and publishable key. The character catalog synchronization endpoint also requires the Development project's `SUPABASE_SECRET_KEY` in Preview only. Keep the **Production** environment pointed at the Production project. Do not use a shared variable scope for both environments.
+Funciones confiables de servidor pueden requerir:
+- `SUPABASE_SECRET_KEY` — solo servidor; nunca exponer en navegador ni en variables `PUBLIC_`.
 
-Development values:
-- `PUBLIC_SUPABASE_URL=https://pakkdnfifrshqyqedpni.supabase.co`
-- `PUBLIC_SUPABASE_PUBLISHABLE_KEY`: retrieve from the Development project's API Keys page and store in Vercel Preview only.
+El caché privado de búsqueda de anime puede utilizar:
+- `ANIME_SEARCH_CACHE_TOKEN` — solo servidor; no enviar al navegador.
 
-The anime search cache uses private tables and token-validated database functions. Only the server route receives the cache token. Cache entries are shared across Preview instances, keyed by normalized query/filter state and page. Search entries expire after 12 hours; filter combinations expire after 6 hours; Jikan fallback entries expire after 30 minutes. Expired entries are opportunistically cleaned during writes.
+Configura las variables únicamente en el scope de entorno autorizado. Para Preview, la URL debe ser `https://pakkdnfifrshqyqedpni.supabase.co` y la publishable key debe obtenerse desde el panel del proyecto Development. No documentes aquí el valor de ninguna clave.
 
-Do not commit real keys. Keep local development values in an ignored `.env.local`. Never configure the Development secret as a Production variable.
+## Base de datos
 
-## Database baseline
+Antes de cambiar el esquema:
+1. Inspecciona el esquema real del proyecto Development.
+2. Lee las migraciones existentes en `supabase/migrations`.
+3. Revisa el SQL y el impacto de cada migración.
+4. Confirma que no elimina ni altera datos existentes protegidos.
+5. No apliques cambios a Production.
 
-The clean Development project starts with only:
-- `public.profiles`, linked to `auth.users`
-- `public.user_anime`, linked to `auth.users`
-- per-user RLS policies and timestamp/auth triggers
+No asumas que una migración está aplicada por el mero hecho de existir en el repositorio.
 
-No production user records or legacy custom-auth tables are copied. Apply subsequent migrations from `supabase/migrations` only after reviewing them against this baseline.
+## Caché de búsqueda de anime
+
+La implementación documentada utiliza funciones/tablas privadas y validación del token en servidor. Los tiempos de expiración definidos en código/documentación deben comprobarse antes de modificarse; no se deben recrear tablas ni borrar caché manualmente como primera medida.
+
+Para las reglas completas de trabajo, consulta [AI_HANDOFF_AND_WORKFLOW.md](./AI_HANDOFF_AND_WORKFLOW.md).
