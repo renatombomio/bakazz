@@ -9,7 +9,7 @@ const MAINTENANCE_MODE = true;
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname, search } = context.url;
-  const isPreview = import.meta.env.VERCEL_ENV === "preview";
+  // VERCEL_ENV can be unavailable in some SSR runtime builds. Identify the\n  // isolated Vercel deployment host as a second, explicit Preview signal.\n  // The production domains (bakazz.com / www.bakazz.com) never match this.\n  const hostname = context.url.hostname.toLowerCase();\n  const isPreview =\n    import.meta.env.VERCEL_ENV === "preview" ||\n    hostname.endsWith("-rene-webs1.vercel.app");
   const isEnglish = /^\/en(?:\/|$)/.test(pathname);
   const basePath = isEnglish ? pathname.replace(/^\/en(?=\/|$)/, "") || "/" : pathname;
   const routePath = basePath.length > 1 ? basePath.replace(/\/$/, "") : basePath;
